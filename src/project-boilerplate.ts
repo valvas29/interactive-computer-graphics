@@ -53,7 +53,7 @@ window.addEventListener('load', () => {
 	sg.add(gn2);
 	const gn3 = new GroupNode(new Translation(new Vector(0, 0, 0, 0)));
 	gn2.add(gn3);
-	const cube = new TextureBoxNode('hci-logo.png');
+	const cube = new TextureBoxNode('swag.png');
 	gn3.add(cube);
 
 	// setup for rendering
@@ -92,7 +92,7 @@ window.addEventListener('load', () => {
 	//Euler-Rotations
 	let animationNodes = [
 		new RotationNode(sg, new Vector(0, 0, 1, 0)),
-		new RotationNode(gn3, new Vector(0, 1, 0, 0))
+		new RotationNode(gn3, new Vector(0, 1, 0, 0)),
 	];
 
 	function simulate(deltaT: number) {
