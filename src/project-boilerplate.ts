@@ -8,6 +8,7 @@ import Ray from './ray';
 import Intersection from "./intersection";
 
 import {
+	AABoxNode,
 	GroupNode,
 	SphereNode,
 	TextureBoxNode
@@ -25,7 +26,7 @@ import phongVertexShader from './phong-vertex-perspective-shader.glsl';
 import phongFragmentShader from './phong-fragment-shader.glsl';
 import textureVertexShader from './texture-vertex-perspective-shader.glsl';
 import textureFragmentShader from './texture-fragment-shader.glsl';
-import {Rotation, SQT, Translation} from './transformation';
+import {Rotation, Scaling, SQT, Translation} from './transformation';
 import Quaternion from './quaternion';
 
 window.addEventListener('load', () => {
@@ -37,12 +38,12 @@ window.addEventListener('load', () => {
 
 	//        SG
 	//         |
-	//    +----+-----+
-	//  T(gn1)     T(gn2)
-	//    |          |
-	//  Sphere     R(gn3)
-	//               |
-	//              Box
+	//    +----+-----+-----------+
+	//  T(gn1)     T(gn2)      T(gn4)
+	//    |          |           |
+	//  Sphere     R(gn3)      S(gn5)
+	//               |           |
+	//             TexBox      AABox
 
 	const sg = new GroupNode(new Rotation(new Vector(0, 0, 1, 0), 0));
 	const gn1 = new GroupNode(new Translation(new Vector(-0.75, -0.75, -3, 0)));
@@ -51,10 +52,16 @@ window.addEventListener('load', () => {
 	gn1.add(sphere);
 	const gn2 = new GroupNode(new Translation(new Vector(.2, .2, -1, 0)));
 	sg.add(gn2);
-	const gn3 = new GroupNode(new Translation(new Vector(0, 0, 0, 0)));
+	const gn3 = new GroupNode(new Rotation(new Vector(0, 1, 0, 0), 0));
 	gn2.add(gn3);
-	const cube = new TextureBoxNode('swag.png');
-	gn3.add(cube);
+	const textureCube = new TextureBoxNode('swag.png');
+	gn3.add(textureCube);
+	const gn4 = new GroupNode(new Translation(new Vector(0.8, -1.2, -0.5, 0)));
+	sg.add(gn4);
+	const gn5 = new GroupNode(new Scaling(new Vector(0.1, 0.2, 1, 1)));
+	gn4.add(gn5);
+	const cube = new AABoxNode(new Vector(0, 0, 0, 1));
+	gn5.add(cube);
 
 	// setup for rendering
 	const setupVisitor = new RasterSetupVisitor(gl);
@@ -93,6 +100,9 @@ window.addEventListener('load', () => {
 	let animationNodes = [
 		new RotationNode(sg, new Vector(0, 0, 1, 0)),
 		new RotationNode(gn3, new Vector(0, 1, 0, 0)),
+		new RotationNode(gn3, new Vector(1, 0, 0, 0)),
+		new RotationNode(gn3, new Vector(1, 0, 0, 0)),
+		new RotationNode(gn4, new Vector(0, 1, 0, 0))
 	];
 
 	function simulate(deltaT: number) {
