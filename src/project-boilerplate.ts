@@ -20,7 +20,7 @@ import {
 import Shader from './shader';
 import {
 	SlerpNode,
-	RotationNode
+	RotationNode, TranslationNode
 } from './animation-nodes';
 import phongVertexShader from './phong-vertex-perspective-shader.glsl';
 import phongFragmentShader from './phong-fragment-shader.glsl';
@@ -98,12 +98,22 @@ window.addEventListener('load', () => {
 	 */
 	//Euler-Rotations
 	let animationNodes = [
-		new RotationNode(sg, new Vector(0, 0, 1, 0)),
-		new RotationNode(gn3, new Vector(0, 1, 0, 0)),
-		new RotationNode(gn3, new Vector(1, 0, 0, 0)),
-		new RotationNode(gn3, new Vector(1, 0, 0, 0)),
-		new RotationNode(gn4, new Vector(0, 1, 0, 0))
+		//FahrAnimationNodes
+		new TranslationNode(gn4, new Vector(-10, 0, 0, 0)),
+		new TranslationNode(gn4, new Vector(10, 0, 0, 0)),
+		new TranslationNode(gn4, new Vector(0, 0, -10, 0)),
+		new TranslationNode(gn4, new Vector(0, 0, 10, 0)),
+		new RotationNode(gn4, new Vector(0, 1, 0, 0), 10),
+		new RotationNode(gn4, new Vector(0, 1, 0, 0), -10),
 	];
+
+	//Fahranimationen defaultmäßig aus, nur bei keydown-events
+	animationNodes[0].turnOffActive();
+	animationNodes[1].turnOffActive();
+	animationNodes[2].turnOffActive();
+	animationNodes[3].turnOffActive();
+	animationNodes[4].turnOffActive();
+	animationNodes[5].turnOffActive();
 
 	function simulate(deltaT: number) {
 		for (let animationNode of animationNodes) {
@@ -119,6 +129,7 @@ window.addEventListener('load', () => {
 		lastTimestamp = timestamp;
 		window.requestAnimationFrame(animate);
 	}
+
 	Promise.all(
 		[phongShader.load(), textureShader.load()]
 	).then(x =>
@@ -127,8 +138,58 @@ window.addEventListener('load', () => {
 
 	window.addEventListener('keydown', function (event) {
 		switch (event.key) {
-			case "ArrowUp":
-				animationNodes[0].toggleActive();
+			//nach links fahren
+			case "a":
+				animationNodes[0].turnOnActive();
+				break;
+			//nach rechts fahren
+			case "d":
+				animationNodes[1].turnOnActive();
+				break;
+			//nach vorne fahren
+			case "w":
+				animationNodes[2].turnOnActive();
+				break;
+			//nach hinten fahren
+			case "s":
+				animationNodes[3].turnOnActive();
+				break;
+			//nach links drehen
+			case "q":
+				animationNodes[4].turnOnActive();
+				break;
+			//nach rechts drehen
+			case "e":
+				animationNodes[5].turnOnActive();
+				break;
+		}
+	});
+
+	window.addEventListener('keyup', function (event) {
+		switch (event.key) {
+			//nach links fahren
+			case "a":
+				animationNodes[0].turnOffActive();
+				break;
+			//nach rechts fahren
+			case "d":
+				animationNodes[1].turnOffActive();
+				break;
+			//nach vorne fahren
+			case "w":
+				animationNodes[2].turnOffActive();
+				break;
+			//nach hinten fahren
+			case "s":
+				animationNodes[3].turnOffActive();
+				break;
+			//nach links drehen
+			case "q":
+				animationNodes[4].turnOffActive();
+				break;
+			//nach rechts drehen
+			case "e":
+				animationNodes[5].turnOffActive();
 				break;
 		}
 	});
