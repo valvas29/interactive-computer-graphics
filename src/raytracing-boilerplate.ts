@@ -19,7 +19,7 @@ window.addEventListener('load', evt => {
     const camera = {
         width: canvas.width,
         height: canvas.height,
-        alpha: Math.PI * 2 / 3
+        alpha: Math.PI * 2 / 3 //evtl. Radian-Einheit
     }
     for (let x = 0; x < canvas.width; x++) {
         for (let y = 0; y < canvas.height; y++) {
