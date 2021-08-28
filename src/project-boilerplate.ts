@@ -142,9 +142,9 @@ window.addEventListener('load', () => {
 	//            S8
 	//          TexBox	   Sphere	 Pyramid
 
-	const sg = new GroupNode(new Translation(new Vector(0, 0, -1.5, 0)));
+	scenegraph = new GroupNode(new Translation(new Vector(0, 0, -1.5, 0)));
 	const gn1 = new GroupNode(new Rotation(new Vector(0, 1, 0, 0), 100));
-	sg.add(gn1);
+	scenegraph.add(gn1);
 	const gn2 = new GroupNode(new Scaling(new Vector(2, 2, 2, 0)));
 	gn1.add(gn2);
 	const desktop = new AABoxNode(new Vector(0, 0, 0, 1));
