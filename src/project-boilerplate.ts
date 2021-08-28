@@ -67,7 +67,7 @@ window.addEventListener('load', () => {
 		far: 100
 	};
 	cameraRaytracer = {
-		origin: new Vector(0, 0, 2, 1),
+		origin: new Vector(0, 0, 5, 1),
 		width: canvasRaytracer.width,
 		height: canvasRaytracer.height,
 		alpha: Math.PI / 3
@@ -126,8 +126,8 @@ window.addEventListener('load', () => {
 		new TranslationNode(gn2, new Vector(0, 0, -10, 0)),
 		new TranslationNode(gn2, new Vector(0, 0, 10, 0)),
 		new RotationNode(gn2, new Vector(0, 1, 0, 0), -10),
-		new RotationNode(gn2, new Vector(0, 1, 0, 0), 10));
-		//new RotationNode(scenegraph, new Vector(0, 1, 0, 0), 10));
+		new RotationNode(gn2, new Vector(0, 1, 0, 0), 10),
+		new TranslationNode(scenegraph, new Vector(0, 0, -40, 0)));
 
 	//Fahranimationen defaultmäßig aus, nur bei keydown-events
 	animationNodes[0].turnOffActive();
@@ -154,7 +154,7 @@ window.addEventListener('load', () => {
 	function animate(timestamp: number) {
 		simulate(timestamp - lastTimestamp);
 		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, cameraRasteriser, lightPositions);
-		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, cameraRaytracer, lightPositions)
+		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, cameraRaytracer, lightPositions);
 		lastTimestamp = timestamp;
 		window.requestAnimationFrame(animate);
 	}
