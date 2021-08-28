@@ -7,7 +7,7 @@ import Matrix from "./matrix";
 /**
  * Class representing an Animation
  */
-class AnimationNode {
+export class AnimationNode {
   /**
    * Describes if the animation is running
    */
