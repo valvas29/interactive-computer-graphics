@@ -52,7 +52,7 @@ window.addEventListener('load', () => {
         gnRotation.angle = animationTime / 2000;
 
         visitor.render(sg, camera, lightPositions);
-        // animationHandle = window.requestAnimationFrame(animate);
+        animationHandle = window.requestAnimationFrame(animate);
     }
 
     function startAnimation() {
