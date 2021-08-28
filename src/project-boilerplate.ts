@@ -36,32 +36,42 @@ window.addEventListener('load', () => {
 	// construct scene graph
 	// für Quaterions const sg = new GroupNode(new SQT(new Vector(1, 1, 1, 0), { angle: 0.6, axis: new Vector(0, 1, 0, 0) }, new Vector(0, 0, 0, 0)));
 
-	//        SG
+	//       T(SG)
 	//         |
-	//    +----+-----+-----------+
-	//  T(gn1)     T(gn2)      T(gn4)
-	//    |          |           |
-	//  Sphere     R(gn3)      S(gn5)
-	//               |           |
-	//             TexBox      AABox
+	//		 R(gn1)
+	//		   |
+	//    +----+-----+
+	//  S(gn2)     T(gn3)
+	//    |          |
+	//	 Box	  +--+--------+---------+
+	//          T(gn4)     T(gn5)	  T(gn6)
+	//            |
+	//            S8
+	//          TexBox	   Sphere	 Pyramid
 
-	const sg = new GroupNode(new Rotation(new Vector(0, 0, 1, 0), 0));
-	const gn1 = new GroupNode(new Translation(new Vector(-0.75, -0.75, -3, 0)));
+	const sg = new GroupNode(new Translation(new Vector(0, 0, -1.5, 0)));
+	const gn1 = new GroupNode(new Rotation(new Vector(0, 1, 0, 0), 100));
 	sg.add(gn1);
-	const sphere = new SphereNode(new Vector(.8, .4, .1, 1))
-	gn1.add(sphere);
-	const gn2 = new GroupNode(new Translation(new Vector(.2, .2, -1, 0)));
-	sg.add(gn2);
-	const gn3 = new GroupNode(new Rotation(new Vector(0, 1, 0, 0), 0));
-	gn2.add(gn3);
-	const textureCube = new TextureBoxNode('swag.png');
-	gn3.add(textureCube);
-	const gn4 = new GroupNode(new Translation(new Vector(0.8, -1.2, -0.5, 0)));
-	sg.add(gn4);
-	const gn5 = new GroupNode(new Scaling(new Vector(0.1, 0.2, 1, 1)));
-	gn4.add(gn5);
-	const cube = new AABoxNode(new Vector(0, 0, 0, 1));
-	gn5.add(cube);
+	const gn2 = new GroupNode(new Scaling(new Vector(2, 2, 2, 0)));
+	gn1.add(gn2);
+	const desktop = new AABoxNode(new Vector(0, 0, 0, 1));
+	gn2.add(desktop);
+	const gn3 = new GroupNode(new Translation(new Vector(-1, 0, 1, 0)));
+	gn1.add(gn3);
+	const gn4 = new GroupNode(new Translation(new Vector(0.3, 0.8, 0.1, 0)));
+	const gn8 = new GroupNode(new Scaling(new Vector(0.2, 0.2, 0.2, 0)));
+	const textureCube = new TextureBoxNode('hci-logo.png');
+	gn3.add(gn4);
+	gn4.add(gn8);
+	gn8.add(textureCube);
+	const gn5 = new GroupNode(new Translation(new Vector(0.8, -1.2, -0.5, 0)));
+	const sphere = new SphereNode(new Vector(.1, .4, .1, 1));
+	gn3.add(gn5);
+	gn5.add(sphere);
+	const gn6 = new GroupNode(new Translation(new Vector(0.1, 0.2, 1, 1)));
+	const sphere2 = new SphereNode(new Vector(.1, .4, .1, 1));
+	gn3.add(gn5);
+	gn6.add(sphere2);
 
 	// setup for rendering
 	const setupVisitor = new RasterSetupVisitor(gl);
@@ -98,11 +108,8 @@ window.addEventListener('load', () => {
 	 */
 	//Euler-Rotations
 	let animationNodes = [
-		new RotationNode(sg, new Vector(0, 0, 1, 0)),
-		new RotationNode(gn3, new Vector(0, 1, 0, 0)),
-		new RotationNode(gn3, new Vector(1, 0, 0, 0)),
-		new RotationNode(gn3, new Vector(1, 0, 0, 0)),
-		new RotationNode(gn4, new Vector(0, 1, 0, 0))
+		new RotationNode(gn4, new Vector(1, 0.3, 0.5, 0)),
+
 	];
 
 	function simulate(deltaT: number) {

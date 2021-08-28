@@ -141,40 +141,6 @@ export class RasterVisitor implements Visitor {
       P.set(this.perspective);
     }
 
-    // TODO set the normal matrix
-/*
-    //https://www.mathsisfun.com/algebra/matrix-inverse-minors-cofactors-adjugate.html
-    let normal = Matrix.identity();
-
-    //für jeden Wert der 3x3 Matrix (Letzte Zeile und Spalte wird nicht benötigt)
-    let coFactorMinus = false; //Step 2 aus Link, Minusse für jeden zweiten Wert hinzufügen
-    for (let col = 0; col < 3; col++) {
-      for (let row = 0; row < 3; row++) {
-        if (!coFactorMinus) normal.setVal(row, col, this.matrixOfMinors(toWorld, row, col));
-        else normal.setVal(row, col, - this.matrixOfMinors(toWorld, row, col));
-        coFactorMinus = !coFactorMinus;
-      }
-    }
-
-    normal.setVal(0, 3, 0);
-    normal.setVal(1, 3, 0);
-    normal.setVal(2, 3, 0);
-    normal.setVal(3, 0, 0);
-    normal.setVal(3, 1, 0);
-    normal.setVal(3, 2, 0);
-    normal.setVal(3, 3, 1);
-
-    //Step 3 des Links: Erst hier transponieren, damit ich beim determinanten noch auf die Werte von normal zugreifen kann
-    normal = normal.transpose();
-
-    //Step 4 des Links: In normal stehen die Werte des MatrixOfMinor, die hier auch benötigt werden, deswegen greife ich darauf direkt zu
-    let determinant = toWorld.getVal(0, 0) * this.matrixOfMinors(toWorld, 0, 0) - toWorld.getVal(0, 1) * this.matrixOfMinors(toWorld, 0, 1) + toWorld.getVal(0, 2) * this.matrixOfMinors(toWorld, 0, 2);
-
-    //Step 4 Fortsetzung: multiply with 1/Determinant
-    for (let i = 0; i < normal.data.length; i++) {
-      normal.data[i] = normal.data[i] * (1 / determinant);
-    }
- */
     let normal = fromWorld.transpose();
 
     normal.setVal(0, 3, 0);
@@ -192,26 +158,6 @@ export class RasterVisitor implements Visitor {
 
     this.renderables.get(node).render(shader);
   }
-
-/*
-  //https://www.mathsisfun.com/algebra/matrix-inverse-minors-cofactors-adjugate.html
-  private matrixOfMinors(matrix: Matrix, ignoredRow: number, ignoredCol: number) {
-    //Kopie der matrix.data Werte
-    let mat2 = []; //2x2 Matrix für Calculation
-
-    //Werte entfernen, die in übergebener row oder col stehen
-    for (let col = 0; col < 4; col++) {
-      for (let row = 0; row < 4; row++) {
-        if (row !== ignoredRow && col !== ignoredCol && row !== 3 && col !== 3) { // Werte aus letzter Zeile und Spalte nicht gebraucht, da nur 3x3 Matrix gebraucht wird
-          mat2.push(matrix.getVal(row, col));
-        }
-      }
-    }
-
-    //Calculation
-    return mat2[0] * mat2[3] - mat2[1] * mat2[2];
-  }
- */
 
   /**
    * Visits an axis aligned box node
