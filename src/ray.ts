@@ -18,9 +18,8 @@ export default class Ray {
    * @param camera The Camera
    * @return The resulting Ray
    */
-  static makeRay(x: number, y: number, camera: { width: number, height: number, alpha: number }): Ray {
-    let origin = new Vector(0, 0, 0, 1);
+  static makeRay(x: number, y: number, camera: {origin: Vector, width: number, height: number, alpha: number }): Ray {
     let direction = new Vector(x - (camera.width - 1) / 2, (camera.height - 1) / 2 - y, -((camera.width / 2) / Math.tan(camera.alpha / 2)), 0).normalize();
-    return new Ray(origin, direction);
+    return new Ray(camera.origin, direction);
   }
 }
