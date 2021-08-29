@@ -1,5 +1,6 @@
 import Vector from './vector';
 import Intersection from './intersection';
+import {PhongValues} from "./project-boilerplate";
 
 /**
  * Calculate the colour of an object at the intersection point according to the Phong Lighting model.
@@ -8,16 +9,17 @@ import Intersection from './intersection';
  * @param lightPositions The light positions
  * @param shininess The shininess parameter of the Phong model
  * @param cameraPosition The position of the camera
+ * @param phongValues
  * @return The resulting colour
  */
-export default function phong(color: Vector, intersection: Intersection, lightPositions: Array<Vector>, shininess: number, cameraPosition: Vector): Vector {
+export default function phong(color: Vector, intersection: Intersection, lightPositions: Array<Vector>, cameraPosition: Vector, phongValues: PhongValues): Vector {
   //https://codepen.io/shubniggurath/pen/jRwPKm?editors=1000
   //http://jsfiddle.net/soulwire/vBuTR/
   //reflect function: https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/reflect.xhtml
   const lightColor = new Vector(0.8, 0.8, 0.8, 0);
-  const kA = 0.8;
-  const kD = 0.5;
-  const kS = 0.5;
+  const kA = phongValues.kA;
+  const kD = phongValues.kD;
+  const kS = phongValues.kS;
 
 
   let viewDirection = cameraPosition.sub(intersection.point);
@@ -32,7 +34,7 @@ export default function phong(color: Vector, intersection: Intersection, lightPo
 
     diff += Math.max(intersection.normal.dot(lightDirection.normalize()), 0.0);
 
-    spec += Math.pow(Math.max(viewDirection.normalize().dot(reflectDirection.normalize()), 0.0), shininess);
+    spec += Math.pow(Math.max(viewDirection.normalize().dot(reflectDirection.normalize()), 0.0), phongValues.shininess);
   }
 
   let diffuse = lightColor.mul(diff).mul(kD);

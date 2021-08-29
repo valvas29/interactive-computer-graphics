@@ -24,6 +24,8 @@ import Quaternion from './quaternion';
 import RayVisitor from "./rayvisitor";
 import Matrix from "./matrix";
 import phong from "./phong";
+import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
+import {FirstTraversalVisitorRay} from "./firstTraversalVisitorRay";
 
 export interface CameraRasteriser {
 	eye: Vector,
@@ -61,6 +63,8 @@ let cameraRaytracer: CameraRaytracer;
 let setupVisitor: RasterSetupVisitor;
 let visitorRasteriser: RasterVisitor;
 let visitorRaytracer: RayVisitor;
+let firstTraversalVisitorRaster: FirstTraversalVisitorRaster;
+let firstTraversalVisitorRay: FirstTraversalVisitorRay;
 
 let scenegraph: GroupNode;
 let animationNodes: Array<any>; //wenn Array vom Typ AnimationNode, kann die simulate-Methode nicht gefunden werden
@@ -191,6 +195,8 @@ window.addEventListener('load', () => {
 	// setup for rendering
 	setupVisitor = new RasterSetupVisitor(gl);
 	setupVisitor.setup(scenegraph);
+	firstTraversalVisitorRaster = new FirstTraversalVisitorRaster();
+	firstTraversalVisitorRay = new FirstTraversalVisitorRay();
 	visitorRasteriser = new RasterVisitor(gl, phongShader, textureShader, setupVisitor.objects);
 	visitorRaytracer = new RayVisitor(ctx2d, canvasRaytracer.width, canvasRaytracer.height);
 
@@ -204,8 +210,8 @@ window.addEventListener('load', () => {
 
 	function animate(timestamp: number) {
 		simulate(timestamp - lastTimestamp);
-		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, cameraRasteriser, lightPositions, phongValues);
-		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, cameraRaytracer, lightPositions);
+		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, cameraRasteriser, lightPositions, phongValues, firstTraversalVisitorRaster);
+		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, cameraRaytracer, lightPositions, phongValues, firstTraversalVisitorRay);
 		lastTimestamp = timestamp;
 		window.requestAnimationFrame(animate);
 	}

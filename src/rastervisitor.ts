@@ -8,7 +8,7 @@ import Visitor from './visitor';
 import {AABoxNode, GroupNode, Node, SphereNode, TextureBoxNode, PyramidNode, CameraNode} from './nodes';
 import Shader from './shader';
 import {CameraRasteriser, PhongValues} from "./project-boilerplate";
-import {FirstTraversalVisitor} from "./firstTraversalVisitor";
+import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
 
 interface Renderable {
   render(shader: Shader): void;
@@ -37,19 +37,17 @@ export class RasterVisitor implements Visitor {
    * @param camera The camera used
    * @param lightPositions The light positions
    * @param phongValues phong-coefficients
+   * @param firstTraversalVisitor
    */
   render(
     rootNode: Node,
     camera: CameraRasteriser | null,
     lightPositions: Array<Vector>,
-    phongValues: PhongValues
+    phongValues: PhongValues,
+    firstTraversalVisitor: FirstTraversalVisitorRaster
   ) {
     // clear
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-
-    if (camera) {
-      this.setupCamera(camera);
-    }
 
     if (phongValues) {
       this.passPhongValues(phongValues);
@@ -63,7 +61,6 @@ export class RasterVisitor implements Visitor {
     this.inverseStack.push(Matrix.identity());
 
     //first traversal
-    let firstTraversalVisitor = new FirstTraversalVisitor();
     firstTraversalVisitor.setup(rootNode);
     this.lookat = firstTraversalVisitor.lookat;
     this.perspective = firstTraversalVisitor.perspective;
@@ -232,7 +229,6 @@ export class RasterVisitor implements Visitor {
     this.shader.use();
     let shader = this.shader;
 
-    // TODO Calculate the model matrix for the box
     let toWorld = this.matrixStack[this.matrixStack.length - 1];
 
     shader.getUniformMatrix("M").set(toWorld);
