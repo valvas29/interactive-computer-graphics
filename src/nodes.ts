@@ -1,6 +1,7 @@
 import Visitor from './visitor';
 import Vector from './vector';
 import { Transformation } from './transformation';
+import Matrix from "./matrix";
 
 /**
  * Class representing a Node in a Scenegraph
@@ -45,6 +46,28 @@ export class GroupNode extends Node {
    */
   add(childNode: Node) {
     this.childNodes.push(childNode);
+  }
+}
+
+/**
+ * Class representing a Camera in the Scenegraph
+ * @extends Node
+ */
+export class CameraNode extends Node {
+
+  /**
+   * Camera
+   */
+  constructor(public matrix: Matrix) {
+    super();
+  }
+
+  /**
+   * Accepts a visitor according to the visitor pattern
+   * @param visitor The visitor
+   */
+  accept(visitor: Visitor) {
+    visitor.visitCameraNode(this);
   }
 }
 

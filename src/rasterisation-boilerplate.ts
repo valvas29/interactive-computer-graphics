@@ -42,8 +42,16 @@ window.addEventListener('load', () => {
         vertexShader,
         fragmentShader
     );
+
+    const phongValues = {
+        shininess: 16.0,
+        kA: 0.3,
+        kD: 0.6,
+        kS: 0.7
+    }
+
     // render
     const visitor = new RasterVisitor(gl, shader, null, setupVisitor.objects);
     shader.load();
-    visitor.render(sg, null, []);
+    visitor.render(sg, null, [], phongValues);
 });

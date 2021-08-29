@@ -64,7 +64,6 @@ export class TranslationNode extends AnimationNode {
   simulate(deltaT: number) {
     // change the matrix of the attached
     // group node to reflect a translation
-    // TODO
     if (this.active) {
       let matrix = this.groupNode.transform.getMatrix();
       let deltaVector = this.vector.mul(0.0001 * deltaT);
@@ -108,7 +107,6 @@ export class RotationNode extends AnimationNode {
   simulate(deltaT: number) {
     // change the matrix of the attached
     // group node to reflect a rotation
-    // TODO
     if (this.active) {
       let matrix = this.groupNode.transform.getMatrix();
       let rotation = new Rotation(this.axis, 0.0001 * this.angle * deltaT);

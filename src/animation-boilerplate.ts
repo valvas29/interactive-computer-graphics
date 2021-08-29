@@ -67,6 +67,14 @@ window.addEventListener('load', () => {
         textureVertexShader,
         textureFragmentShader
     );
+
+    const phongValues = {
+        shininess: 16.0,
+        kA: 0.3,
+        kD: 0.6,
+        kS: 0.7
+    }
+
     const visitor = new RasterVisitor(gl, phongShader, textureShader, setupVisitor.objects);
 
     let animationNodes = [
@@ -84,7 +92,7 @@ window.addEventListener('load', () => {
 
     function animate(timestamp: number) {
         simulate(timestamp - lastTimestamp);
-        visitor.render(sg, camera, []);
+        visitor.render(sg, camera, [], phongValues);
         lastTimestamp = timestamp;
         window.requestAnimationFrame(animate);
     }

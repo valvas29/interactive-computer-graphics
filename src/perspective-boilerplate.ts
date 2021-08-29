@@ -47,6 +47,14 @@ window.addEventListener('load', () => {
         perspectiveVertexShader,
         fragmentShader
     );
+
+    const phongValues = {
+        shininess: 16.0,
+        kA: 0.3,
+        kD: 0.6,
+        kS: 0.7
+    }
+
     const visitor = new RasterVisitor(gl, shader, null, setupVisitor.objects);
 
     function animate(timestamp: number) {
@@ -56,7 +64,7 @@ window.addEventListener('load', () => {
             Math.sin(timestamp / 1000),
             1
         );
-        visitor.render(sg, camera, []);
+        visitor.render(sg, camera, [], phongValues);
         window.requestAnimationFrame(animate);
     }
 

@@ -3,8 +3,7 @@ import 'bootstrap/scss/bootstrap.scss';
 import Vector from './vector';
 import {
 	AABoxNode,
-	GroupNode, PyramidNode,
-	SphereNode,
+	GroupNode, PyramidNode, CameraNode, SphereNode,
 	TextureBoxNode
 } from './nodes';
 import {
@@ -23,6 +22,32 @@ import textureFragmentShader from './texture-fragment-shader.glsl';
 import {Rotation, Scaling, SQT, Translation} from './transformation';
 import Quaternion from './quaternion';
 import RayVisitor from "./rayvisitor";
+import Matrix from "./matrix";
+import phong from "./phong";
+
+export interface CameraRasteriser {
+	eye: Vector,
+	center: Vector,
+	up: Vector,
+	fovy: number,
+	aspect: number,
+	near: number,
+	far: number
+}
+
+export interface CameraRaytracer {
+	origin: Vector,
+	width: number,
+	height: number,
+	alpha: number
+}
+
+export interface PhongValues {
+	shininess: number,
+	kA: number,
+	kD: number,
+	kS: number
+}
 
 //Eigener Canvas für Rendertypen, da ein Canvas nur einen Context unterstützt
 let canvasRasteriser: HTMLCanvasElement;
@@ -31,8 +56,8 @@ let gl: WebGL2RenderingContext;
 let ctx2d: CanvasRenderingContext2D;
 let phongShader: Shader;
 let textureShader: Shader;
-let cameraRasteriser: any;
-let cameraRaytracer: any;
+let cameraRasteriser: CameraRasteriser;
+let cameraRaytracer: CameraRaytracer;
 let setupVisitor: RasterSetupVisitor;
 let visitorRasteriser: RasterVisitor;
 let visitorRaytracer: RayVisitor;
@@ -40,6 +65,7 @@ let visitorRaytracer: RayVisitor;
 let scenegraph: GroupNode;
 let animationNodes: Array<any>; //wenn Array vom Typ AnimationNode, kann die simulate-Methode nicht gefunden werden
 let lightPositions: Array<Vector>;
+let phongValues: PhongValues;
 let rendertype = "rasteriser";
 
 window.addEventListener('load', () => {
@@ -58,7 +84,7 @@ window.addEventListener('load', () => {
 	);
 
 	cameraRasteriser = {
-		eye: new Vector(0, 0, 2, 1),
+		eye: new Vector(0, 0, -30, 1),
 		center: new Vector(0, 0, 0, 1),
 		up: new Vector(0, 1, 0, 0),
 		fovy: 60,
@@ -75,6 +101,12 @@ window.addEventListener('load', () => {
 	lightPositions = [
 		new Vector(1, 1, 1, 1)
 	];
+	phongValues = {
+		shininess: 32.0,
+		kA: 0.5,
+		kD: 0.9,
+		kS: 1.0
+	}
 
 	// construct scene graph
 	// für Quaterions const sg = new GroupNode(new SQT(new Vector(1, 1, 1, 0), { angle: 0.6, axis: new Vector(0, 1, 0, 0) }, new Vector(0, 0, 0, 0)));
@@ -93,8 +125,10 @@ window.addEventListener('load', () => {
 	//          TexBox	   Sphere	 Pyramid
 
 	scenegraph = new GroupNode(new Translation(new Vector(0, 0, -3.5, 0)));
+
 	const gn1 = new GroupNode(new Rotation(new Vector(0, 1, 0, 0), 100));
 	scenegraph.add(gn1);
+
 	const gn2 = new GroupNode(new Scaling(new Vector(2, 2, 2, 0)));
 	gn1.add(gn2);
 	const desktop = new AABoxNode(new Vector(0, 0, 0, 1));
@@ -108,27 +142,39 @@ window.addEventListener('load', () => {
 	gn3.add(gn4);
 	gn4.add(gn8);
 	gn8.add(textureCube);
+
+	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 5, 0)));
+	const camera = new CameraNode(Matrix.identity());
+	cameraNode.add(camera);
+	gn8.add(cameraNode);
+
 	const gn5 = new GroupNode(new Translation(new Vector(0.8, -1.2, -2.5, 0)));
 	const sphere = new SphereNode(new Vector(.4, .1, .1, 1));
 	gn3.add(gn5);
 	gn5.add(sphere);
 	const gn6 = new GroupNode(new Translation(new Vector(1, 3, -2, 0)));
 	gn5.add(gn6);
+
 	const sphere2 = new SphereNode(new Vector(.1, .1, .4, 1));
-	gn3.add(gn5);
 	gn6.add(sphere2);
+
 
 	//Euler-Rotations
 	animationNodes = [];
 	animationNodes.push(
 		//FahrAnimationNodes
-		new TranslationNode(gn2, new Vector(-10, 0, 0, 0)),
-		new TranslationNode(gn2, new Vector(10, 0, 0, 0)),
-		new TranslationNode(gn2, new Vector(0, 0, -10, 0)),
-		new TranslationNode(gn2, new Vector(0, 0, 10, 0)),
-		new RotationNode(gn2, new Vector(0, 1, 0, 0), -10),
-		new RotationNode(gn2, new Vector(0, 1, 0, 0), 10),
-		new TranslationNode(scenegraph, new Vector(0, 0, -40, 0)));
+		new TranslationNode(cameraNode, new Vector(-20, 0, 0, 0)),
+		new TranslationNode(cameraNode, new Vector(20, 0, 0, 0)),
+		new TranslationNode(cameraNode, new Vector(0, 0, -20, 0)),
+		new TranslationNode(cameraNode, new Vector(0, 0, 20, 0)),
+		new TranslationNode(cameraNode, new Vector(0, 20, 0, 0)),
+		new TranslationNode(cameraNode, new Vector(0, -20, 0, 0)),
+		new RotationNode(cameraNode, new Vector(0, 1, 0, 0), 15),
+		new RotationNode(cameraNode, new Vector(0, 1, 0, 0), -15),
+		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), 15),
+		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), -15),
+
+		new RotationNode(gn1, new Vector(0, 1, 0, 0),1));
 
 	//Fahranimationen defaultmäßig aus, nur bei keydown-events
 	animationNodes[0].turnOffActive();
@@ -137,6 +183,10 @@ window.addEventListener('load', () => {
 	animationNodes[3].turnOffActive();
 	animationNodes[4].turnOffActive();
 	animationNodes[5].turnOffActive();
+	animationNodes[6].turnOffActive();
+	animationNodes[7].turnOffActive();
+	animationNodes[8].turnOffActive();
+	animationNodes[9].turnOffActive();
 
 	// setup for rendering
 	setupVisitor = new RasterSetupVisitor(gl);
@@ -154,7 +204,7 @@ window.addEventListener('load', () => {
 
 	function animate(timestamp: number) {
 		simulate(timestamp - lastTimestamp);
-		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, cameraRasteriser, lightPositions);
+		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, cameraRasteriser, lightPositions, phongValues);
 		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, cameraRaytracer, lightPositions);
 		lastTimestamp = timestamp;
 		window.requestAnimationFrame(animate);
@@ -188,6 +238,13 @@ window.addEventListener('load', () => {
 					canvasRaytracer.style.visibility = "hidden";
 				}
 				break;
+			//phongValues random ändern
+			case "p":
+				phongValues.shininess = Math.random() * 32;
+				phongValues.kA = Math.random() * 2;
+				phongValues.kD = Math.random() * 2;
+				phongValues.kS = Math.random() * 2;
+				break;
 			//nach links fahren
 			case "a":
 				animationNodes[0].turnOnActive();
@@ -204,13 +261,29 @@ window.addEventListener('load', () => {
 			case "s":
 				animationNodes[3].turnOnActive();
 				break;
-			//nach links drehen
+			//nach oben fahren
 			case "q":
 				animationNodes[4].turnOnActive();
 				break;
-			//nach rechts drehen
+			//nach unten fahren
 			case "e":
 				animationNodes[5].turnOnActive();
+				break;
+			//nach links drehen
+			case "ArrowLeft":
+				animationNodes[6].turnOnActive();
+				break;
+			//nach rechts drehen
+			case "ArrowRight":
+				animationNodes[7].turnOnActive();
+				break;
+			//nach oben drehen
+			case "ArrowUp":
+				animationNodes[8].turnOnActive();
+				break;
+			//nach unten drehen
+			case "ArrowDown":
+				animationNodes[9].turnOnActive();
 				break;
 		}
 	});
@@ -233,13 +306,29 @@ window.addEventListener('load', () => {
 			case "s":
 				animationNodes[3].turnOffActive();
 				break;
-			//nach links drehen
+			//nach oben fahren
 			case "q":
 				animationNodes[4].turnOffActive();
 				break;
-			//nach rechts drehen
+			//nach unten fahren
 			case "e":
 				animationNodes[5].turnOffActive();
+				break;
+			//nach links drehen
+			case "ArrowLeft":
+				animationNodes[6].turnOffActive();
+				break;
+			//nach rechts drehen
+			case "ArrowRight":
+				animationNodes[7].turnOffActive();
+				break;
+			//nach oben drehen
+			case "ArrowUp":
+				animationNodes[8].turnOffActive();
+				break;
+			//nach unten drehen
+			case "ArrowDown":
+				animationNodes[9].turnOffActive();
 				break;
 		}
 	});
