@@ -1,4 +1,4 @@
-import {AABoxNode, CameraNode, GroupNode, Node, SphereNode, TextureBoxNode} from "./nodes";
+import {AABoxNode, CameraNode, GroupNode, Node, SphereNode, TextureBoxNode, PyramidNode} from "./nodes";
 import RasterSphere from "./raster-sphere";
 import Vector from "./vector";
 import RasterBox from "./raster-box";
@@ -11,7 +11,7 @@ import {CameraRasteriser, CameraRaytracer} from "./project-boilerplate";
  * Class traversing the Scene Graph before the actual traversal
  * to extract camera- and light-information
  * */
-export class FirstTraversalVisitor implements Visitor{
+export class FirstTraversalVisitor implements Visitor {
 	matrixStack: Matrix[];
 	inverseStack: Matrix[];
 
@@ -35,6 +35,10 @@ export class FirstTraversalVisitor implements Visitor{
 	constructor() {
 
 	}
+
+	visitPyramidNode(node: PyramidNode): void {
+
+    }
 
 	/**
 	 * Sets up all needed buffers

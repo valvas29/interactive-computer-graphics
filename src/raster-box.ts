@@ -98,7 +98,7 @@ export default class RasterBox {
             // top
             9, 6, 21, 9, 18, 21,
             // left
-            2, 17, 20, 11, 20, 2
+            2, 20, 17, 11, 20, 2
         ];
         let colors = [
             1.0, 0.0, 0.0, 1.0, // red
@@ -230,5 +230,7 @@ export default class RasterBox {
 
         // TODO disable color vertex attrib array
         this.gl.disableVertexAttribArray(colorLocation);
+
+        this.gl.disableVertexAttribArray(normalLocation);
     }
 }

@@ -7,7 +7,7 @@ import Visitor from './visitor';
 import phong from './phong';
 import {
     Node, GroupNode, SphereNode,
-    AABoxNode, TextureBoxNode, CameraNode
+    AABoxNode, TextureBoxNode, CameraNode, PyramidNode
 } from './nodes';
 import AABox from './aabox';
 
@@ -166,4 +166,7 @@ export default class RayVisitor implements Visitor {
     }
 
     visitCameraNode(node: CameraNode): void {}
+
+    visitPyramidNode(node: PyramidNode): void {
+    }
 }
