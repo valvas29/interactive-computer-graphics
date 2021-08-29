@@ -4,7 +4,7 @@ import RasterTextureBox from './raster-texture-box';
 import Vector from './vector';
 import Matrix from './matrix';
 import Visitor from './visitor';
-import {AABoxNode, GroupNode, Node, SphereNode, TextureBoxNode} from './nodes';
+import {AABoxNode, CameraNode, GroupNode, Node, SphereNode, TextureBoxNode} from './nodes';
 import Shader from './shader';
 
 interface Camera {
@@ -203,6 +203,21 @@ export class RasterVisitor implements Visitor {
 
     this.renderables.get(node).render(shader);
   }
+
+  visitCameraNode(node: CameraNode): void {
+    let matrix = this.matrixStack[this.matrixStack.length - 1].mul(node.matrix);
+
+    let cameraRasteriser = {
+      eye: matrix.mulVec(new Vector(0, 0, 0, 1)),
+      center: matrix.mulVec(new Vector(0, 0, -1, 1)),
+      up: matrix.mulVec(new Vector(0, 1, 0, 0)),
+      fovy: 60,
+      aspect: 1000 / 600,
+      near: 0.1,
+      far: 100
+    };
+    this.setupCamera(cameraRasteriser);
+  }
 }
 
 /** 
@@ -293,5 +308,8 @@ export class RasterSetupVisitor {
         node.texture
       )
     );
+  }
+  visitCameraNode(node: CameraNode) {
+
   }
 }

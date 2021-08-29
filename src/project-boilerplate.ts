@@ -2,7 +2,7 @@ import 'bootstrap';
 import 'bootstrap/scss/bootstrap.scss';
 import Vector from './vector';
 import {
-	AABoxNode,
+	AABoxNode, CameraNode,
 	GroupNode,
 	SphereNode,
 	TextureBoxNode
@@ -23,6 +23,7 @@ import textureFragmentShader from './texture-fragment-shader.glsl';
 import {Rotation, Scaling, SQT, Translation} from './transformation';
 import Quaternion from './quaternion';
 import RayVisitor from "./rayvisitor";
+import Matrix from "./matrix";
 
 //Eigener Canvas für Rendertypen, da ein Canvas nur einen Context unterstützt
 let canvasRasteriser: HTMLCanvasElement;
@@ -58,7 +59,7 @@ window.addEventListener('load', () => {
 	);
 
 	cameraRasteriser = {
-		eye: new Vector(0, 0, 2, 1),
+		eye: new Vector(0, 2, -0.1, 1),
 		center: new Vector(0, 0, 0, 1),
 		up: new Vector(0, 1, 0, 0),
 		fovy: 60,
@@ -93,6 +94,12 @@ window.addEventListener('load', () => {
 	//          TexBox	   Sphere	 Pyramid
 
 	scenegraph = new GroupNode(new Translation(new Vector(0, 0, -3.5, 0)));
+
+	const cameraNode = new GroupNode(new Translation(new Vector(0, 0, 5, 0)));
+	const camera = new CameraNode(Matrix.identity());
+	cameraNode.add(camera);
+	scenegraph.add(cameraNode);
+
 	const gn1 = new GroupNode(new Rotation(new Vector(0, 1, 0, 0), 100));
 	scenegraph.add(gn1);
 	const gn2 = new GroupNode(new Scaling(new Vector(2, 2, 2, 0)));
@@ -121,13 +128,18 @@ window.addEventListener('load', () => {
 	animationNodes = [];
 	animationNodes.push(
 		//FahrAnimationNodes
-		new TranslationNode(gn2, new Vector(-10, 0, 0, 0)),
-		new TranslationNode(gn2, new Vector(10, 0, 0, 0)),
-		new TranslationNode(gn2, new Vector(0, 0, -10, 0)),
-		new TranslationNode(gn2, new Vector(0, 0, 10, 0)),
-		new RotationNode(gn2, new Vector(0, 1, 0, 0), -10),
-		new RotationNode(gn2, new Vector(0, 1, 0, 0), 10),
-		new TranslationNode(scenegraph, new Vector(0, 0, -40, 0)));
+		new TranslationNode(cameraNode, new Vector(-20, 0, 0, 0)),
+		new TranslationNode(cameraNode, new Vector(20, 0, 0, 0)),
+		new TranslationNode(cameraNode, new Vector(0, 0, -20, 0)),
+		new TranslationNode(cameraNode, new Vector(0, 0, 20, 0)),
+		new TranslationNode(cameraNode, new Vector(0, 20, 0, 0)),
+		new TranslationNode(cameraNode, new Vector(0, -20, 0, 0)),
+		new RotationNode(cameraNode, new Vector(0, 1, 0, 0), 15),
+		new RotationNode(cameraNode, new Vector(0, 1, 0, 0), -15),
+		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), 15),
+		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), -15),
+
+		new RotationNode(gn1, new Vector(0, 1, 0, 0),1));
 
 	//Fahranimationen defaultmäßig aus, nur bei keydown-events
 	animationNodes[0].turnOffActive();
@@ -136,6 +148,10 @@ window.addEventListener('load', () => {
 	animationNodes[3].turnOffActive();
 	animationNodes[4].turnOffActive();
 	animationNodes[5].turnOffActive();
+	animationNodes[6].turnOffActive();
+	animationNodes[7].turnOffActive();
+	animationNodes[8].turnOffActive();
+	animationNodes[9].turnOffActive();
 
 	// setup for rendering
 	setupVisitor = new RasterSetupVisitor(gl);
@@ -203,13 +219,29 @@ window.addEventListener('load', () => {
 			case "s":
 				animationNodes[3].turnOnActive();
 				break;
-			//nach links drehen
+			//nach oben fahren
 			case "q":
 				animationNodes[4].turnOnActive();
 				break;
-			//nach rechts drehen
+			//nach unten fahren
 			case "e":
 				animationNodes[5].turnOnActive();
+				break;
+			//nach links drehen
+			case "ArrowLeft":
+				animationNodes[6].turnOnActive();
+				break;
+			//nach rechts drehen
+			case "ArrowRight":
+				animationNodes[7].turnOnActive();
+				break;
+			//nach oben drehen
+			case "ArrowUp":
+				animationNodes[8].turnOnActive();
+				break;
+			//nach unten drehen
+			case "ArrowDown":
+				animationNodes[9].turnOnActive();
 				break;
 		}
 	});
@@ -232,13 +264,29 @@ window.addEventListener('load', () => {
 			case "s":
 				animationNodes[3].turnOffActive();
 				break;
-			//nach links drehen
+			//nach oben fahren
 			case "q":
 				animationNodes[4].turnOffActive();
 				break;
-			//nach rechts drehen
+			//nach unten fahren
 			case "e":
 				animationNodes[5].turnOffActive();
+				break;
+			//nach links drehen
+			case "ArrowLeft":
+				animationNodes[6].turnOffActive();
+				break;
+			//nach rechts drehen
+			case "ArrowRight":
+				animationNodes[7].turnOffActive();
+				break;
+			//nach oben drehen
+			case "ArrowUp":
+				animationNodes[8].turnOffActive();
+				break;
+			//nach unten drehen
+			case "ArrowDown":
+				animationNodes[9].turnOffActive();
 				break;
 		}
 	});

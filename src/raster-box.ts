@@ -88,9 +88,11 @@ export default class RasterBox {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([ r1, b1, g1, 1,
                                                                   r1, b1, g1, 1,
                                                                   r1, b1, g1, 1,
+                                                                  r1, b1, g1, 1,
                                                                   r2, b2, g2, 1,
                                                                   r2, b2, g2, 1,
-                                                                  r2, b2, g2, 1]), gl.STATIC_DRAW);
+                                                                  r2, b2, g2, 1,
+                                                                  r2, b2, g2, 1,]), gl.STATIC_DRAW);
         this.colorBuffer = colorBuffer;
     }
 
@@ -109,7 +111,7 @@ export default class RasterBox {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
         const colorLocation = shader.getAttributeLocation("a_color");
         this.gl.enableVertexAttribArray(colorLocation);
-        this.gl.vertexAttribPointer(colorLocation, 3, this.gl.FLOAT, false, 0, 0);
+        this.gl.vertexAttribPointer(colorLocation, 4, this.gl.FLOAT, false, 0, 0);
 
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
         this.gl.drawElements(this.gl.TRIANGLES, this.elements, this.gl.UNSIGNED_SHORT, 0);
