@@ -245,18 +245,7 @@ export class RasterVisitor implements Visitor {
   }
 
   visitCameraNode(node: CameraNode): void {
-    let matrix = this.matrixStack[this.matrixStack.length - 1].mul(node.matrix);
 
-    let cameraRasteriser = {
-      eye: matrix.mulVec(new Vector(0, 0, 0, 1)),
-      center: matrix.mulVec(new Vector(0, 0, -1, 1)),
-      up: matrix.mulVec(new Vector(0, 1, 0, 0)),
-      fovy: 60,
-      aspect: 1000 / 600,
-      near: 0.1,
-      far: 100
-    };
-    this.setupCamera(cameraRasteriser);
   }
 }
 

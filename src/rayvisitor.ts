@@ -62,15 +62,16 @@ export default class RayVisitor implements Visitor {
         let data = this.imageData.data;
         data.fill(0);
 
-        //first traversal
-        firstTraversalVisitorRay.setup(rootNode);
-        this.camera = firstTraversalVisitorRay.camera;
-
         // raytrace
         const width = this.imageData.width;
         const height = this.imageData.height;
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
+
+                //first traversal
+                firstTraversalVisitorRay.setup(rootNode);
+                this.camera = firstTraversalVisitorRay.camera;
+
                 this.ray = Ray.makeRay(x, y, this.camera);
 
                 //MatrixStacks hier immer neu leeren, damit firefox nicht crasht
@@ -149,6 +150,7 @@ export default class RayVisitor implements Visitor {
      * @param node The node to visit
      */
     visitAABoxNode(node: AABoxNode) {
+        /*
         let toWorld = this.matrixStack[this.matrixStack.length - 1];
         let fromWorld = this.inverseStack[this.inverseStack.length - 1];
 
@@ -168,6 +170,7 @@ export default class RayVisitor implements Visitor {
                 this.intersectionColor = node.color;
             }
         }
+         */
     }
 
     /**
@@ -181,17 +184,7 @@ export default class RayVisitor implements Visitor {
      * Visits a camera node
      * @param node The node to visit
      */
-    visitCameraNode(node: CameraNode) {
-        let matrix = this.matrixStack[this.matrixStack.length - 1].mul(node.matrix);
-
-        let cameraRaytracer = {
-            origin: matrix.mulVec(new Vector(0, 0, 0, 1)),
-            width: 200,
-            height: 200,
-            alpha: Math.PI / 3
-        }
-        this.camera = cameraRaytracer;
-    }
+    visitCameraNode(node: CameraNode) {}
 
     visitPyramidNode(node: PyramidNode): void {}
 }

@@ -87,6 +87,8 @@ window.addEventListener('load', () => {
 		textureFragmentShader
 	);
 
+	//Kameras werden nicht benötigt, sind im Szenengraphen
+	/*
 	cameraRasteriser = {
 		eye: new Vector(0, 0, -30, 1),
 		center: new Vector(0, 0, 0, 1),
@@ -102,6 +104,8 @@ window.addEventListener('load', () => {
 		height: canvasRaytracer.height,
 		alpha: Math.PI / 3
 	}
+	 */
+
 	lightPositions = [
 		new Vector(1, 1, 1, 1)
 	];
@@ -147,11 +151,6 @@ window.addEventListener('load', () => {
 	gn4.add(gn8);
 	gn8.add(textureCube);
 
-	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 5, 0)));
-	const camera = new CameraNode(Matrix.identity());
-	cameraNode.add(camera);
-	scenegraph.add(cameraNode);
-
 	const gn5 = new GroupNode(new Translation(new Vector(0.8, -1.2, -2.5, 0)));
 	const sphere = new SphereNode(new Vector(.4, .1, .1, 1));
 	gn3.add(gn5);
@@ -161,6 +160,11 @@ window.addEventListener('load', () => {
 
 	const sphere2 = new SphereNode(new Vector(.1, .1, .4, 1));
 	gn6.add(sphere2);
+
+	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 10, 0)));
+	const camera = new CameraNode(Matrix.identity());
+	cameraNode.add(camera);
+	scenegraph.add(cameraNode);
 
 
 	//Euler-Rotations
@@ -176,9 +180,9 @@ window.addEventListener('load', () => {
 		new RotationNode(cameraNode, new Vector(0, 1, 0, 0), 15),
 		new RotationNode(cameraNode, new Vector(0, 1, 0, 0), -15),
 		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), 15),
-		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), -15),
+		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), -15));
 
-		new RotationNode(gn1, new Vector(0, 1, 0, 0),1));
+		//new RotationNode(gn1, new Vector(0, 1, 0, 0),1));
 
 	//Fahranimationen defaultmäßig aus, nur bei keydown-events
 	animationNodes[0].turnOffActive();
@@ -210,8 +214,8 @@ window.addEventListener('load', () => {
 
 	function animate(timestamp: number) {
 		simulate(timestamp - lastTimestamp);
-		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, cameraRasteriser, lightPositions, phongValues, firstTraversalVisitorRaster);
-		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, cameraRaytracer, lightPositions, phongValues, firstTraversalVisitorRay);
+		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, null, lightPositions, phongValues, firstTraversalVisitorRaster);
+		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, null, lightPositions, phongValues, firstTraversalVisitorRay);
 		lastTimestamp = timestamp;
 		window.requestAnimationFrame(animate);
 	}
@@ -234,7 +238,7 @@ window.addEventListener('load', () => {
 					canvasRaytracer.style.zIndex = "1";
 					canvasRaytracer.style.visibility = "visible";
 				}
-				else  {
+				else {
 					rendertype = "rasteriser";
 
 					canvasRasteriser.style.zIndex = "1";
