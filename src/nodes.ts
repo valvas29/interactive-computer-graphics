@@ -148,7 +148,7 @@ export class TextureBoxNode extends Node {
 }
 
 export class PyramidNode extends Node {
-  constructor(public color1?: Vector, public  color2?: Vector) {
+  constructor(public area: Vector, public color1?: Vector, public  color2?: Vector) {
     super();
   }
 

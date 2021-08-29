@@ -139,8 +139,8 @@ window.addEventListener('load', () => {
 
 	const gn2 = new GroupNode(new Scaling(new Vector(2, 2, 2, 0)));
 	gn1.add(gn2);
-	const desktop = new AABoxNode(new Vector(0, 0, 0, 1));
-	// const desktop = new PyramidNode(new Vector(1, 0.5, 1, 1)); // TODO
+	// const desktop = new AABoxNode(new Vector(0, 0, 0, 1));
+	const desktop = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1)); // TODO
 	gn2.add(desktop);
 	const gn3 = new GroupNode(new Translation(new Vector(-1, 0, 1, 0)));
 	gn1.add(gn3);
@@ -250,7 +250,7 @@ window.addEventListener('load', () => {
 				break;
 			//phongValues random ändern
 			case "p":
-				phongValues.shininess = Math.random() * 32;
+				phongValues.shininess = Math.random() * 16;
 				phongValues.kA = Math.random() * 2;
 				phongValues.kD = Math.random() * 2;
 				phongValues.kS = Math.random() * 2;

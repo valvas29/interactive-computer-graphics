@@ -280,8 +280,7 @@ export class RasterSetupVisitor {
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.depthFunc(this.gl.LEQUAL);
 
-    this.gl.enable(this.gl.CULL_FACE);
-    this.gl.cullFace(this.gl.BACK);
+    this.gl.disable(this.gl.CULL_FACE);
 
     rootNode.accept(this);
   }
@@ -344,8 +343,8 @@ export class RasterSetupVisitor {
         node,
         new RasterPyramid(
             this.gl,
-            new Vector(-0.5, -0.5, -0.5, 1),
-            new Vector(0.5, 0.5, 0.5, 1),
+            new Vector(0, 0, 0, 1),
+            node.area,
             node.color1,
             node.color2
         )

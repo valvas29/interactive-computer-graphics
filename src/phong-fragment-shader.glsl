@@ -7,12 +7,12 @@ varying vec3 v_position;
 
 varying vec3 v_normal;
 
-const vec3 lightPos = vec3(1.0, 1.0, 1.0);
+const vec3 lightPos = vec3(1.0, 1.0, 1.0); // TODO
 uniform float shininess;
 uniform float kA;
 uniform float kD;
 uniform float kS;
-const vec3 camera = vec3(0.0, 0.0, 0.0);
+const vec3 camera = vec3(0.0, 0.0, 0.0); // TODO
 
 void main(void) {
   vec3 color3 = v_color.rgb;
