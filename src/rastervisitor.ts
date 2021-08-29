@@ -44,18 +44,24 @@ export class RasterVisitor implements Visitor {
    * Renders the Scenegraph
    * @param rootNode The root node of the Scenegraph
    * @param camera The camera used
-   * @param lightPositions The light light positions
+   * @param lightPositions The light positions
+   * @param phongValues phong-coefficients
    */
   render(
     rootNode: Node,
     camera: Camera | null,
-    lightPositions: Array<Vector>
+    lightPositions: Array<Vector>,
+    phongValues: any
   ) {
     // clear
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
     if (camera) {
       this.setupCamera(camera);
+    }
+
+    if (phongValues) {
+      this.passPhongValues(phongValues);
     }
 
     //MatrixStacks hier immer neu leeren, damit firefox nicht crasht
@@ -99,6 +105,16 @@ export class RasterVisitor implements Visitor {
       camera.near,
       camera.far
     );
+  }
+
+  passPhongValues(phongValues: any) {
+    const shader = this.shader;
+    shader.use();
+
+    shader.getUniformFloat("shininess").set(phongValues.shininess);
+    shader.getUniformFloat("kA").set(phongValues.kA);
+    shader.getUniformFloat("kD").set(phongValues.kD);
+    shader.getUniformFloat("kS").set(phongValues.kS);
   }
 
   /**

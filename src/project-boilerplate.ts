@@ -41,6 +41,7 @@ let visitorRaytracer: RayVisitor;
 let scenegraph: GroupNode;
 let animationNodes: Array<any>; //wenn Array vom Typ AnimationNode, kann die simulate-Methode nicht gefunden werden
 let lightPositions: Array<Vector>;
+let phongValues: any;
 let rendertype = "rasteriser";
 
 window.addEventListener('load', () => {
@@ -76,6 +77,12 @@ window.addEventListener('load', () => {
 	lightPositions = [
 		new Vector(1, 1, 1, 1)
 	];
+	phongValues = {
+		shininess: 32.0,
+		kA: 0.5,
+		kD: 0.9,
+		kS: 1.0
+	}
 
 	// construct scene graph
 	// für Quaterions const sg = new GroupNode(new SQT(new Vector(1, 1, 1, 0), { angle: 0.6, axis: new Vector(0, 1, 0, 0) }, new Vector(0, 0, 0, 0)));
@@ -169,7 +176,7 @@ window.addEventListener('load', () => {
 
 	function animate(timestamp: number) {
 		simulate(timestamp - lastTimestamp);
-		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, cameraRasteriser, lightPositions);
+		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, cameraRasteriser, lightPositions, phongValues);
 		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, cameraRaytracer, lightPositions);
 		lastTimestamp = timestamp;
 		window.requestAnimationFrame(animate);
