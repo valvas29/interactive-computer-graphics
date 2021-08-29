@@ -78,8 +78,8 @@ window.addEventListener('load', () => {
     const visitor = new RasterVisitor(gl, phongShader, textureShader, setupVisitor.objects);
 
     let animationNodes = [
-        new RotationNode(sg, new Vector(0, 0, 1, 0), 1),
-        new RotationNode(gn3, new Vector(0, 1, 0, 0),1)
+        new RotationNode(sg, new Vector(0, 0, 1, 0), 10),
+        new RotationNode(gn3, new Vector(0, 1, 0, 0),10)
     ];
 
     function simulate(deltaT: number) {
