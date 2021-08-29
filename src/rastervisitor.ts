@@ -1,10 +1,11 @@
 import RasterSphere from './raster-sphere';
 import RasterBox from './raster-box';
+import RasterPyramid from './raster-pyramid';
 import RasterTextureBox from './raster-texture-box';
 import Vector from './vector';
 import Matrix from './matrix';
 import Visitor from './visitor';
-import {AABoxNode, GroupNode, Node, SphereNode, TextureBoxNode} from './nodes';
+import {AABoxNode, GroupNode, Node, SphereNode, TextureBoxNode, PyramidNode} from './nodes';
 import Shader from './shader';
 
 interface Camera {
@@ -142,7 +143,6 @@ export class RasterVisitor implements Visitor {
     }
 
     let normal = fromWorld.transpose();
-
     normal.setVal(0, 3, 0);
     normal.setVal(1, 3, 0);
     normal.setVal(2, 3, 0);
@@ -169,6 +169,7 @@ export class RasterVisitor implements Visitor {
 
     // TODO Calculate the model matrix for the box
     let toWorld = this.matrixStack[this.matrixStack.length - 1];
+    let fromWorld = this.inverseStack[this.inverseStack.length - 1];
 
     shader.getUniformMatrix("M").set(toWorld);
     let V = shader.getUniformMatrix("V");
@@ -178,6 +179,20 @@ export class RasterVisitor implements Visitor {
     let P = shader.getUniformMatrix("P");
     if (P && this.perspective) {
       P.set(this.perspective);
+    }
+
+    let normal = fromWorld.transpose();
+    normal.setVal(0, 3, 0);
+    normal.setVal(1, 3, 0);
+    normal.setVal(2, 3, 0);
+    normal.setVal(3, 0, 0);
+    normal.setVal(3, 1, 0);
+    normal.setVal(3, 2, 0);
+    normal.setVal(3, 3, 1);
+
+    const N = shader.getUniformMatrix("N");
+    if (N) {
+      N.set(normal);
     }
 
     this.renderables.get(node).render(shader);
@@ -200,6 +215,26 @@ export class RasterVisitor implements Visitor {
       P.set(this.perspective);
     }
     shader.getUniformMatrix("V").set(this.lookat);
+
+    this.renderables.get(node).render(shader);
+  }
+
+  visitPyramidNode(node: PyramidNode) {
+    this.shader.use();
+    let shader = this.shader;
+
+    // TODO Calculate the model matrix for the box
+    let toWorld = this.matrixStack[this.matrixStack.length - 1];
+
+    shader.getUniformMatrix("M").set(toWorld);
+    let V = shader.getUniformMatrix("V");
+    if (V && this.lookat) {
+      V.set(this.lookat);
+    }
+    let P = shader.getUniformMatrix("P");
+    if (P && this.perspective) {
+      P.set(this.perspective);
+    }
 
     this.renderables.get(node).render(shader);
   }
@@ -292,6 +327,19 @@ export class RasterSetupVisitor {
         new Vector(0.5, 0.5, 0.5, 1),
         node.texture
       )
+    );
+  }
+
+  visitPyramidNode(node: PyramidNode) {
+    this.objects.set(
+        node,
+        new RasterPyramid(
+            this.gl,
+            new Vector(-0.5, -0.5, -0.5, 1),
+            new Vector(0.5, 0.5, 0.5, 1),
+            node.color1,
+            node.color2
+        )
     );
   }
 }

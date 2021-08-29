@@ -123,3 +123,13 @@ export class TextureBoxNode extends Node {
     visitor.visitTextureBoxNode(this);
   }
 }
+
+export class PyramidNode extends Node {
+  constructor(public color1?: Vector, public  color2?: Vector) {
+    super();
+  }
+
+  accept(visitor: Visitor) {
+    visitor.visitPyramidNode(this);
+  }
+}

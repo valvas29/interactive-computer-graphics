@@ -14,6 +14,11 @@ export default class RasterBox {
      */
     indexBuffer: WebGLBuffer;
     // TODO private variable for color buffer
+    /**
+     * The normals on the surface at each vertex location
+     */
+    normalBuffer: WebGLBuffer;
+
     colorBuffer: WebGLBuffer;
     /**
      * The amount of indices
@@ -39,58 +44,159 @@ export default class RasterBox {
         const mi = minPoint;
         const ma = maxPoint;
         let vertices = [
-            mi.x, mi.y, ma.z,
-            ma.x, mi.y, ma.z,
-            ma.x, ma.y, ma.z,
-            mi.x, ma.y, ma.z,
-            ma.x, mi.y, mi.z,
-            mi.x, mi.y, mi.z,
-            mi.x, ma.y, mi.z,
-            ma.x, ma.y, mi.z
+            // 3*8 = 24 vertices because every vertex has 3 different normals
+
+            // 0
+            mi.x, mi.y, ma.z, // 0 facing bottom
+            mi.x, mi.y, ma.z, // 1 facing front
+            mi.x, mi.y, ma.z, // 2 facing left
+
+            // 1
+            ma.x, mi.y, ma.z, // 3 bottom
+            ma.x, mi.y, ma.z, // 4 front
+            ma.x, mi.y, ma.z, // 5 right
+
+            // 2
+            ma.x, ma.y, ma.z, // 6 top
+            ma.x, ma.y, ma.z, // 7 front
+            ma.x, ma.y, ma.z, // 8 right
+
+            // 3
+            mi.x, ma.y, ma.z, // 9 top
+            mi.x, ma.y, ma.z, // 10 front
+            mi.x, ma.y, ma.z, // 11 left
+
+            // 4
+            ma.x, mi.y, mi.z, // 12 bottom
+            ma.x, mi.y, mi.z, // 13 back
+            ma.x, mi.y, mi.z, // 14 right
+
+            // 5
+            mi.x, mi.y, mi.z, // 15 bottom
+            mi.x, mi.y, mi.z, // 16 back
+            mi.x, mi.y, mi.z, // 17 left
+
+            // 6
+            mi.x, ma.y, mi.z, // 18 top
+            mi.x, ma.y, mi.z, // 19 back
+            mi.x, ma.y, mi.z, // 20 left
+
+            // 7
+            ma.x, ma.y, mi.z, // 21 top
+            ma.x, ma.y, mi.z, // 22 back
+            ma.x, ma.y, mi.z  // 23 right
         ];
         let indices = [
             // front
-            0, 1, 2, 2, 3, 0,
+            1, 4, 7, 1, 7, 10,
             // back
-            4, 5, 6, 6, 7, 4,
+            16, 13, 22, 16, 19, 22,
             // right
-            1, 4, 7, 7, 2, 1,
-            // top
-            3, 2, 7, 7, 6, 3,
-            // left
-            5, 0, 3, 3, 6, 5,
+            5, 14, 23, 23, 8, 5,
             // bottom
-            5, 4, 1, 1, 0, 5
+            0, 3, 12, 0, 12, 15,
+            // top
+            9, 6, 21, 9, 18, 21,
+            // left
+            2, 17, 20, 11, 20, 2
         ];
+        let colors = [
+            1.0, 0.0, 0.0, 1.0, // red
+            1.0, 0.0, 0.0, 1.0, // red
+            1.0, 0.0, 0.0, 1.0, // red
+
+            0.0, 1.0, 0.0, 1.0, // green
+            0.0, 1.0, 0.0, 1.0, // green
+            0.0, 1.0, 0.0, 1.0, // green
+
+            0.0, 0.0, 1.0, 1.0, // blue
+            0.0, 0.0, 1.0, 1.0, // blue
+            0.0, 0.0, 1.0, 1.0, // blue
+
+            1.0, 0.0, 0.0, 1.0, // red
+            1.0, 0.0, 0.0, 1.0, // red
+            1.0, 0.0, 0.0, 1.0, // red
+
+            0.0, 1.0, 0.0, 1.0, // green
+            0.0, 1.0, 0.0, 1.0, // green
+            0.0, 1.0, 0.0, 1.0, // green
+
+            0.0, 0.0, 1.0, 1.0, // blue
+            0.0, 0.0, 1.0, 1.0, // blue
+            0.0, 0.0, 1.0, 1.0, // blue
+
+            1.0, 0.0, 0.0, 1.0, // red
+            1.0, 0.0, 0.0, 1.0, // red
+            1.0, 0.0, 0.0, 1.0, // red
+
+            0.0, 1.0, 0.0, 1.0, // green
+            0.0, 1.0, 0.0, 1.0, // green
+            0.0, 1.0, 0.0, 1.0, // green
+        ];
+        let normals = [
+            // 0
+            // facing bottom
+            0, -1, 0,
+            // facing front
+            0, 0, 1,
+            // facing left
+            -1, 0, 0,
+
+            // 1
+            0, -1, 0, // bottom
+            0, 0, 1, // front
+            1, 0, 0, // right
+
+            // 2
+            0, 1, 0, //top
+            0, 0, 1, // front
+            1, 0, 0, // right
+
+            // 3
+            0, 1, 0, // top
+            0, 0, 1, // front
+            -1, 0, 0, // left
+
+            // 4
+            0, -1, 0, // bottom
+            0, 0, -1, // back
+            1, 0, 0, // right
+
+            // 5
+            0, -1, 0, // bottom
+            0, 0, -1, // back
+            -1, 0, 0, // left
+
+            //6
+            0, 1, 0, // top
+            0, 0, -1, // back
+            -1, 0, 0, // left
+
+            // 7
+            0, 1, 0, // top
+            0, 0, -1, // back
+            1, 0, 0// right
+        ];
+
         const vertexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
         this.vertexBuffer = vertexBuffer;
+
         const indexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
         this.indexBuffer = indexBuffer;
+
+        const normalBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, normalBuffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(normals), this.gl.STATIC_DRAW);
+        this.normalBuffer = normalBuffer;
         this.elements = indices.length;
 
-        // TODO create and fill a buffer for colours
         const colorBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-        //https://webglfundamentals.org/webgl/lessons/webgl-how-it-works.html -> Strg+F "colorBuffer"
-        // Pick 2 random colors.
-        var r1 = Math.random();
-        var b1 = Math.random();
-        var g1 = Math.random();
-
-        var r2 = Math.random();
-        var b2 = Math.random();
-        var g2 = Math.random();
-
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([ r1, b1, g1, 1,
-                                                                  r1, b1, g1, 1,
-                                                                  r1, b1, g1, 1,
-                                                                  r2, b2, g2, 1,
-                                                                  r2, b2, g2, 1,
-                                                                  r2, b2, g2, 1]), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
         this.colorBuffer = colorBuffer;
     }
 
@@ -109,7 +215,13 @@ export default class RasterBox {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
         const colorLocation = shader.getAttributeLocation("a_color");
         this.gl.enableVertexAttribArray(colorLocation);
-        this.gl.vertexAttribPointer(colorLocation, 3, this.gl.FLOAT, false, 0, 0);
+        this.gl.vertexAttribPointer(colorLocation, 4, this.gl.FLOAT, false, 0, 0);
+
+        // TODO bind normal buffer
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
+        const normalLocation = shader.getAttributeLocation("a_normal");
+        this.gl.enableVertexAttribArray(normalLocation);
+        this.gl.vertexAttribPointer(normalLocation, 3, this.gl.FLOAT, false, 0, 0);
 
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
         this.gl.drawElements(this.gl.TRIANGLES, this.elements, this.gl.UNSIGNED_SHORT, 0);
