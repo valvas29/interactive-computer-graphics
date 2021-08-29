@@ -109,8 +109,9 @@ export class AABoxNode extends Node {
    * The box's center is located at the origin
    * with all edges of length 1
    * @param color The colour of the cube
+   * @param outside if not outside then normals of the box are inversed for lighting in desktop
    */
-  constructor(public color: Vector) {
+  constructor(public color: Vector, public outside: boolean) {
     super();
   }
 
@@ -119,7 +120,7 @@ export class AABoxNode extends Node {
    * @param  {Visitor} visitor - The visitor
    */
   accept(visitor: Visitor) {
-    visitor.visitAABoxNode(this);
+    visitor.visitAABoxNode(this, this.outside);
   }
 }
 

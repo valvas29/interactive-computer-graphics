@@ -110,8 +110,8 @@ window.addEventListener('load', () => {
 		new Vector(1, 1, 1, 1)
 	];
 	phongValues = {
-		shininess: 32.0,
-		kA: 0.5,
+		shininess: 16.0,
+		kA: 0.3,
 		kD: 0.9,
 		kS: 1.0
 	}
@@ -132,34 +132,23 @@ window.addEventListener('load', () => {
 	//            S8
 	//          TexBox	   Sphere	 Pyramid
 
-	scenegraph = new GroupNode(new Translation(new Vector(0, 0, -3.5, 0)));
+	scenegraph = new GroupNode(new Translation(new Vector(0, 0, 0, 0)));
 
-	const gn1 = new GroupNode(new Rotation(new Vector(0, 1, 0, 0), 100));
+	const gn1 = new GroupNode(new Translation(new Vector(2, 0, 8, 0)));
+	const gn2 = new GroupNode(new Scaling(new Vector(10, 10, 10, 10)));
+	const desktop = new AABoxNode(new Vector(0, 0, 0, 1), false);
 	scenegraph.add(gn1);
-
-	const gn2 = new GroupNode(new Scaling(new Vector(2, 2, 2, 0)));
 	gn1.add(gn2);
-	// const desktop = new AABoxNode(new Vector(0, 0, 0, 1));
-	const desktop = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1)); // TODO
 	gn2.add(desktop);
-	const gn3 = new GroupNode(new Translation(new Vector(-1, 0, 1, 0)));
-	gn1.add(gn3);
-	const gn4 = new GroupNode(new Translation(new Vector(0.3, 0.8, 0.1, 0)));
-	const gn8 = new GroupNode(new Scaling(new Vector(0.2, 0.2, 0.2, 0)));
+
+
+
+	const pyramidNode = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1)); // TODO
 	const textureCube = new TextureBoxNode('hci-logo.png');
-	gn3.add(gn4);
-	gn4.add(gn8);
-	gn8.add(textureCube);
-
-	const gn5 = new GroupNode(new Translation(new Vector(0.8, -1.2, -2.5, 0)));
 	const sphere = new SphereNode(new Vector(.4, .1, .1, 1));
-	gn3.add(gn5);
-	gn5.add(sphere);
-	const gn6 = new GroupNode(new Translation(new Vector(1, 3, -2, 0)));
-	gn5.add(gn6);
-
 	const sphere2 = new SphereNode(new Vector(.1, .1, .4, 1));
-	gn6.add(sphere2);
+
+
 
 	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 10, 0)));
 	const camera = new CameraNode(Matrix.identity());
@@ -171,16 +160,16 @@ window.addEventListener('load', () => {
 	animationNodes = [];
 	animationNodes.push(
 		//FahrAnimationNodes
-		new TranslationNode(cameraNode, new Vector(-20, 0, 0, 0)),
-		new TranslationNode(cameraNode, new Vector(20, 0, 0, 0)),
-		new TranslationNode(cameraNode, new Vector(0, 0, -20, 0)),
-		new TranslationNode(cameraNode, new Vector(0, 0, 20, 0)),
-		new TranslationNode(cameraNode, new Vector(0, 20, 0, 0)),
-		new TranslationNode(cameraNode, new Vector(0, -20, 0, 0)),
-		new RotationNode(cameraNode, new Vector(0, 1, 0, 0), 15),
-		new RotationNode(cameraNode, new Vector(0, 1, 0, 0), -15),
-		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), 15),
-		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), -15));
+		new TranslationNode(cameraNode, new Vector(-30, 0, 0, 0)),
+		new TranslationNode(cameraNode, new Vector(30, 0, 0, 0)),
+		new TranslationNode(cameraNode, new Vector(0, 0, -30, 0)),
+		new TranslationNode(cameraNode, new Vector(0, 0, 30, 0)),
+		new TranslationNode(cameraNode, new Vector(0, 30, 0, 0)),
+		new TranslationNode(cameraNode, new Vector(0, -30, 0, 0)),
+		new RotationNode(cameraNode, new Vector(0, 1, 0, 0), 20),
+		new RotationNode(cameraNode, new Vector(0, 1, 0, 0), -20),
+		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), 20),
+		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), -20));
 
 		//new RotationNode(gn1, new Vector(0, 1, 0, 0),1));
 

@@ -1,5 +1,5 @@
 import RasterSphere from './raster-sphere';
-import RasterBox from './raster-box';
+import RasterBoxOutside from './raster-boxOutside';
 import RasterPyramid from './raster-pyramid';
 import RasterTextureBox from './raster-texture-box';
 import Vector from './vector';
@@ -9,6 +9,7 @@ import {AABoxNode, GroupNode, Node, SphereNode, TextureBoxNode, PyramidNode, Cam
 import Shader from './shader';
 import {CameraRasteriser, PhongValues} from "./project-boilerplate";
 import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
+import RasterBoxInside from "./raster-boxInside";
 
 interface Renderable {
   render(shader: Shader): void;
@@ -171,7 +172,7 @@ export class RasterVisitor implements Visitor {
    * Visits an axis aligned box node
    * @param  {AABoxNode} node - The node to visit
    */
-  visitAABoxNode(node: AABoxNode) {
+  visitAABoxNode(node: AABoxNode, outside: boolean): void {
     this.shader.use();
     let shader = this.shader;
 
@@ -309,16 +310,29 @@ export class RasterSetupVisitor {
   /**
    * Visits an axis aligned box node
    * @param  {AABoxNode} node - The node to visit
+   * @param outside if not outside then normals of the box are inversed for lighting in desktop
    */
-  visitAABoxNode(node: AABoxNode) {
-    this.objects.set(
-      node,
-      new RasterBox(
-        this.gl,
-        new Vector(-0.5, -0.5, -0.5, 1),
-        new Vector(0.5, 0.5, 0.5, 1)
-      )
-    );
+  visitAABoxNode(node: AABoxNode, outside: boolean) {
+    if (outside) {
+      this.objects.set(
+          node,
+          new RasterBoxOutside(
+              this.gl,
+              new Vector(-0.5, -0.5, -0.5, 1),
+              new Vector(0.5, 0.5, 0.5, 1)
+          )
+      );
+    }
+    else {
+      this.objects.set(
+          node,
+          new RasterBoxInside(
+              this.gl,
+              new Vector(-0.5, -0.5, -0.5, 1),
+              new Vector(0.5, 0.5, 0.5, 1)
+          )
+      );
+    }
   }
 
   /**

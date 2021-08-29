@@ -149,7 +149,7 @@ export default class RayVisitor implements Visitor {
      * Visits an axis aligned box node
      * @param node The node to visit
      */
-    visitAABoxNode(node: AABoxNode) {
+    visitAABoxNode(node: AABoxNode, outside: boolean): void {
         /*
         let toWorld = this.matrixStack[this.matrixStack.length - 1];
         let fromWorld = this.inverseStack[this.inverseStack.length - 1];

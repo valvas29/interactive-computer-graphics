@@ -1,7 +1,7 @@
 import {AABoxNode, CameraNode, GroupNode, Node, PyramidNode, SphereNode, TextureBoxNode} from "./nodes";
 import RasterSphere from "./raster-sphere";
 import Vector from "./vector";
-import RasterBox from "./raster-box";
+import RasterBoxOutside from "./raster-boxOutside";
 import RasterTextureBox from "./raster-texture-box";
 import Matrix from "./matrix";
 import Visitor from "./visitor";
@@ -70,7 +70,7 @@ export class FirstTraversalVisitorRay implements Visitor{
 	 * Visits an axis aligned box node
 	 * @param  {AABoxNode} node - The node to visit
 	 */
-	visitAABoxNode(node: AABoxNode) {
+	visitAABoxNode(node: AABoxNode, outside: boolean): void {
 
 	}
 

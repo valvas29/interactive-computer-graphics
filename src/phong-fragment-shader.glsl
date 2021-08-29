@@ -7,7 +7,7 @@ varying vec3 v_position;
 
 varying vec3 v_normal;
 
-const vec3 lightPos = vec3(1.0, 1.0, 1.0); // TODO
+const vec3 lightPos = vec3(10.0, 0.0, 15.0); // TODO
 uniform float shininess;
 uniform float kA;
 uniform float kD;
