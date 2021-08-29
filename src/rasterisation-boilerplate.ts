@@ -14,6 +14,7 @@ import Shader from './shader';
 import vertexShader from './basic-vertex-shader.glsl';
 import fragmentShader from './basic-fragment-shader.glsl';
 import { Scaling, Translation } from './transformation';
+import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
 
 window.addEventListener('load', () => {
     const canvas = document.getElementById("rasteriser") as HTMLCanvasElement;
@@ -49,9 +50,10 @@ window.addEventListener('load', () => {
         kD: 0.6,
         kS: 0.7
     }
+    let firstTraversalVisitor = new FirstTraversalVisitorRaster();
 
     // render
     const visitor = new RasterVisitor(gl, shader, null, setupVisitor.objects);
     shader.load();
-    visitor.render(sg, null, [], phongValues);
+    visitor.render(sg, null, [], phongValues, firstTraversalVisitor);
 });

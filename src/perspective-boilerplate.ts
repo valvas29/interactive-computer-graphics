@@ -14,6 +14,7 @@ import Shader from './shader';
 import perspectiveVertexShader from './perspective-vertex-shader.glsl';
 import fragmentShader from './basic-fragment-shader.glsl'
 import { Scaling, Translation } from './transformation';
+import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
 
 window.addEventListener('load', () => {
     const canvas = document.getElementById("rasteriser") as HTMLCanvasElement;
@@ -55,6 +56,8 @@ window.addEventListener('load', () => {
         kS: 0.7
     }
 
+    const firstTraversalVisitorRaster = new FirstTraversalVisitorRaster();
+
     const visitor = new RasterVisitor(gl, shader, null, setupVisitor.objects);
 
     function animate(timestamp: number) {
@@ -64,7 +67,7 @@ window.addEventListener('load', () => {
             Math.sin(timestamp / 1000),
             1
         );
-        visitor.render(sg, camera, [], phongValues);
+        visitor.render(sg, camera, [], phongValues, firstTraversalVisitorRaster);
         window.requestAnimationFrame(animate);
     }
 

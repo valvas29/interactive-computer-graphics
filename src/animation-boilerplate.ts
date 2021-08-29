@@ -19,6 +19,7 @@ import phongFragmentShader from './phong-fragment-shader.glsl';
 import textureVertexShader from './texture-vertex-perspective-shader.glsl';
 import textureFragmentShader from './texture-fragment-shader.glsl';
 import { Rotation, Translation } from './transformation';
+import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
 
 window.addEventListener('load', () => {
     const canvas = document.getElementById("rasteriser") as HTMLCanvasElement;
@@ -74,6 +75,7 @@ window.addEventListener('load', () => {
         kD: 0.6,
         kS: 0.7
     }
+    const firstTraversalVisitorRaster = new FirstTraversalVisitorRaster();
 
     const visitor = new RasterVisitor(gl, phongShader, textureShader, setupVisitor.objects);
 
@@ -92,7 +94,7 @@ window.addEventListener('load', () => {
 
     function animate(timestamp: number) {
         simulate(timestamp - lastTimestamp);
-        visitor.render(sg, camera, [], phongValues);
+        visitor.render(sg, camera, [], phongValues, firstTraversalVisitorRaster);
         lastTimestamp = timestamp;
         window.requestAnimationFrame(animate);
     }

@@ -7,6 +7,8 @@ import {
 } from './nodes';
 import RayVisitor from './rayvisitor';
 import { Rotation, Scaling, Translation } from './transformation';
+import {FirstTraversalVisitorRay} from "./firstTraversalVisitorRay";
+import phong from "./phong";
 
 window.addEventListener('load', () => {
     const canvas = document.getElementById("raytracer") as HTMLCanvasElement;
@@ -33,6 +35,13 @@ window.addEventListener('load', () => {
         height: canvas.height,
         alpha: Math.PI / 3
     }
+    const phongValues = {
+        shininess: 32.0,
+        kA: 0.5,
+        kD: 0.9,
+        kS: 1.0
+    }
+    const firstTraversalVisitorRay = new FirstTraversalVisitorRay();
 
     const visitor = new RayVisitor(ctx, canvas.width, canvas.height);
 
@@ -51,7 +60,8 @@ window.addEventListener('load', () => {
         lastTimestamp = timestamp;
         gnRotation.angle = animationTime / 2000;
 
-        visitor.render(sg, camera, lightPositions);
+
+        visitor.render(sg, camera, lightPositions, phongValues, firstTraversalVisitorRay);
         animationHandle = window.requestAnimationFrame(animate);
     }
 
