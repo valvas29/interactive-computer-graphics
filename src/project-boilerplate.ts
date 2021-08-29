@@ -24,6 +24,7 @@ import {Rotation, Scaling, SQT, Translation} from './transformation';
 import Quaternion from './quaternion';
 import RayVisitor from "./rayvisitor";
 import Matrix from "./matrix";
+import phong from "./phong";
 
 //Eigener Canvas für Rendertypen, da ein Canvas nur einen Context unterstützt
 let canvasRasteriser: HTMLCanvasElement;
@@ -209,6 +210,13 @@ window.addEventListener('load', () => {
 					canvasRaytracer.style.zIndex = "0";
 					canvasRaytracer.style.visibility = "hidden";
 				}
+				break;
+			//phongValues random ändern
+			case "p":
+				phongValues.shininess = Math.random() * 32;
+				phongValues.kA = Math.random() * 2;
+				phongValues.kD = Math.random() * 2;
+				phongValues.kS = Math.random() * 2;
 				break;
 			//nach links fahren
 			case "a":
