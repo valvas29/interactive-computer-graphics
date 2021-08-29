@@ -26,6 +26,30 @@ import RayVisitor from "./rayvisitor";
 import Matrix from "./matrix";
 import phong from "./phong";
 
+export interface CameraRasteriser {
+	eye: Vector,
+	center: Vector,
+	up: Vector,
+	fovy: number,
+	aspect: number,
+	near: number,
+	far: number
+}
+
+export interface CameraRaytracer {
+	origin: Vector,
+	width: number,
+	height: number,
+	alpha: number
+}
+
+export interface PhongValues {
+	shininess: number,
+	kA: number,
+	kD: number,
+	kS: number
+}
+
 //Eigener Canvas für Rendertypen, da ein Canvas nur einen Context unterstützt
 let canvasRasteriser: HTMLCanvasElement;
 let canvasRaytracer: HTMLCanvasElement;
@@ -33,8 +57,8 @@ let gl: WebGL2RenderingContext;
 let ctx2d: CanvasRenderingContext2D;
 let phongShader: Shader;
 let textureShader: Shader;
-let cameraRasteriser: any;
-let cameraRaytracer: any;
+let cameraRasteriser: CameraRasteriser;
+let cameraRaytracer: CameraRaytracer;
 let setupVisitor: RasterSetupVisitor;
 let visitorRasteriser: RasterVisitor;
 let visitorRaytracer: RayVisitor;
@@ -42,7 +66,7 @@ let visitorRaytracer: RayVisitor;
 let scenegraph: GroupNode;
 let animationNodes: Array<any>; //wenn Array vom Typ AnimationNode, kann die simulate-Methode nicht gefunden werden
 let lightPositions: Array<Vector>;
-let phongValues: any;
+let phongValues: PhongValues;
 let rendertype = "rasteriser";
 
 window.addEventListener('load', () => {
@@ -61,7 +85,7 @@ window.addEventListener('load', () => {
 	);
 
 	cameraRasteriser = {
-		eye: new Vector(0, 2, -0.1, 1),
+		eye: new Vector(0, 0, -30, 1),
 		center: new Vector(0, 0, 0, 1),
 		up: new Vector(0, 1, 0, 0),
 		fovy: 60,
@@ -103,13 +127,9 @@ window.addEventListener('load', () => {
 
 	scenegraph = new GroupNode(new Translation(new Vector(0, 0, -3.5, 0)));
 
-	const cameraNode = new GroupNode(new Translation(new Vector(0, 0, 5, 0)));
-	const camera = new CameraNode(Matrix.identity());
-	cameraNode.add(camera);
-	scenegraph.add(cameraNode);
-
 	const gn1 = new GroupNode(new Rotation(new Vector(0, 1, 0, 0), 100));
 	scenegraph.add(gn1);
+
 	const gn2 = new GroupNode(new Scaling(new Vector(2, 2, 2, 0)));
 	gn1.add(gn2);
 	const desktop = new AABoxNode(new Vector(0, 0, 0, 1));
@@ -122,15 +142,22 @@ window.addEventListener('load', () => {
 	gn3.add(gn4);
 	gn4.add(gn8);
 	gn8.add(textureCube);
+
+	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 5, 0)));
+	const camera = new CameraNode(Matrix.identity());
+	cameraNode.add(camera);
+	gn8.add(cameraNode);
+
 	const gn5 = new GroupNode(new Translation(new Vector(0.8, -1.2, -2.5, 0)));
 	const sphere = new SphereNode(new Vector(.4, .1, .1, 1));
 	gn3.add(gn5);
 	gn5.add(sphere);
 	const gn6 = new GroupNode(new Translation(new Vector(1, 3, -2, 0)));
 	gn5.add(gn6);
+
 	const sphere2 = new SphereNode(new Vector(.1, .1, .4, 1));
-	gn3.add(gn5);
 	gn6.add(sphere2);
+
 
 	//Euler-Rotations
 	animationNodes = [];

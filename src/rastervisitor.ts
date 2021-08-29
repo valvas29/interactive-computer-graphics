@@ -6,16 +6,8 @@ import Matrix from './matrix';
 import Visitor from './visitor';
 import {AABoxNode, CameraNode, GroupNode, Node, SphereNode, TextureBoxNode} from './nodes';
 import Shader from './shader';
-
-interface Camera {
-  eye: Vector,
-  center: Vector,
-  up: Vector,
-  fovy: number,
-  aspect: number,
-  near: number,
-  far: number
-}
+import {CameraRasteriser, PhongValues} from "./project-boilerplate";
+import {FirstTraversalVisitor} from "./firstTraversalVisitor";
 
 interface Renderable {
   render(shader: Shader): void;
@@ -26,7 +18,6 @@ interface Renderable {
  * to render a Scenegraph
  */
 export class RasterVisitor implements Visitor {
-  // TODO declare instance variables here
   matrixStack: Matrix[];
   inverseStack: Matrix[];
 
@@ -37,7 +28,6 @@ export class RasterVisitor implements Visitor {
    * @param textureshader The texture shader to use
    */
   constructor(private gl: WebGL2RenderingContext, private shader: Shader, private textureshader: Shader, private renderables: WeakMap<Node, Renderable>) {
-    // TODO setup
   }
 
   /**
@@ -49,9 +39,9 @@ export class RasterVisitor implements Visitor {
    */
   render(
     rootNode: Node,
-    camera: Camera | null,
+    camera: CameraRasteriser | null,
     lightPositions: Array<Vector>,
-    phongValues: any
+    phongValues: PhongValues
   ) {
     // clear
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
@@ -70,6 +60,12 @@ export class RasterVisitor implements Visitor {
 
     this.matrixStack.push(Matrix.identity());
     this.inverseStack.push(Matrix.identity());
+
+    //first traversal
+    let firstTraversalVisitor = new FirstTraversalVisitor();
+    firstTraversalVisitor.setup(rootNode);
+    this.lookat = firstTraversalVisitor.lookat;
+    this.perspective = firstTraversalVisitor.perspective;
 
     // traverse and render
     rootNode.accept(this);
@@ -93,7 +89,7 @@ export class RasterVisitor implements Visitor {
    * Helper function to setup camera matrices
    * @param camera The camera used
    */
-  setupCamera(camera: Camera) {
+  setupCamera(camera: CameraRasteriser) {
     this.lookat = Matrix.lookat(
       camera.eye,
       camera.center,
@@ -142,7 +138,6 @@ export class RasterVisitor implements Visitor {
     const shader = this.shader;
     shader.use();
 
-    // TODO Calculate the model matrix for the sphere
     let toWorld = this.matrixStack[this.matrixStack.length - 1];
     let fromWorld = this.inverseStack[this.inverseStack.length - 1];
 
@@ -183,7 +178,6 @@ export class RasterVisitor implements Visitor {
     this.shader.use();
     let shader = this.shader;
 
-    // TODO Calculate the model matrix for the box
     let toWorld = this.matrixStack[this.matrixStack.length - 1];
 
     shader.getUniformMatrix("M").set(toWorld);
@@ -207,7 +201,6 @@ export class RasterVisitor implements Visitor {
     this.textureshader.use();
     let shader = this.textureshader;
 
-    // TODO calculate the model matrix for the box
     let toWorld = this.matrixStack[this.matrixStack.length - 1];
 
     shader.getUniformMatrix("M").set(toWorld);
@@ -325,7 +318,6 @@ export class RasterSetupVisitor {
       )
     );
   }
-  visitCameraNode(node: CameraNode) {
 
-  }
+  visitCameraNode(node: CameraNode) {}
 }
