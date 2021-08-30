@@ -94,6 +94,7 @@ export class FirstTraversalVisitorRaster implements Visitor{
 	/**
 	 * Visits an axis aligned box node
 	 * @param  {AABoxNode} node - The node to visit
+	 * @param outside
 	 */
 	visitAABoxNode(node: AABoxNode, outside: boolean): void {
 
@@ -108,19 +109,21 @@ export class FirstTraversalVisitorRaster implements Visitor{
 
 	}
 
-	visitCameraNode(node: CameraNode) {
-		let matrix = this.matrixStack[this.matrixStack.length - 1].mul(node.matrix);
+	visitCameraNode(node: CameraNode, active: boolean) {
+		if (active) {
+			let matrix = this.matrixStack[this.matrixStack.length - 1].mul(node.matrix);
 
-		let cameraRasteriser = {
-			eye: matrix.mulVec(new Vector(0, 0, 0, 1)),
-			center: matrix.mulVec(new Vector(0, 0, -1, 1)),
-			up: matrix.mulVec(new Vector(0, 1, 0, 0)),
-			fovy: 60,
-			aspect: 1000 / 600,
-			near: 0.1,
-			far: 100
-		};
-		this.setupCamera(cameraRasteriser);
+			let cameraRasteriser = {
+				eye: matrix.mulVec(new Vector(0, 0, 0, 1)),
+				center: matrix.mulVec(new Vector(0, 0, -1, 1)),
+				up: matrix.mulVec(new Vector(0, 1, 0, 0)),
+				fovy: 60,
+				aspect: 1000 / 600,
+				near: 0.1,
+				far: 100
+			};
+			this.setupCamera(cameraRasteriser);
+		}
 	}
 
 	visitPyramidNode(node: PyramidNode): void {

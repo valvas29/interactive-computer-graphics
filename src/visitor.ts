@@ -7,5 +7,5 @@ export default interface Visitor {
     visitAABoxNode(node: AABoxNode, outside: boolean): void;
     visitTextureBoxNode(node: TextureBoxNode): void;
     visitPyramidNode(node: PyramidNode): void;
-	visitCameraNode(node: CameraNode): void;
+	visitCameraNode(node: CameraNode, active: boolean): void;
 }

@@ -38,6 +38,86 @@ export class AnimationNode {
 }
 
 /**
+ * Class representing a Jumping Animation
+ * @extends AnimationNode
+ */
+export class JumperNode extends AnimationNode {
+
+  /**
+   * The height to jump
+   */
+  height: number;
+
+  /**
+   * The speed for jumping
+   */
+  speed: number;
+
+  /**
+   * The translation vector
+   */
+  vector: Vector;
+
+  up: boolean;//helper
+  down: boolean;//helper
+
+  /**
+   * initial YValue of the groupnodes' transformation matrix
+   */
+  groupNodeYValue: number;
+
+  /**
+   * Creates a new JumperNode
+   * @param groupNode The group node to attach to
+   * @param height only positive integers
+   * @param speed The speed for jumping
+   */
+  constructor(groupNode: GroupNode, height: number, speed: number) {
+    super(groupNode);
+    this.height = height;
+    this.speed = speed;
+    this.up = true;
+    this.down = false;
+    this.vector = new Vector(0,  speed, 0, 0);
+    this.groupNodeYValue = groupNode.transform.getMatrix().getVal(1, 3);
+  }
+
+  /**
+   * Advances the animation by deltaT
+   * @param deltaT The time difference, the animation is advanced by
+   */
+  simulate(deltaT: number) {
+    if (this.active) {
+      let matrix = this.groupNode.transform.getMatrix();
+      let difference = matrix.getVal(1, 3) - this.groupNodeYValue;
+
+      if (!this.down && difference < this.height) {
+        this.up = true;
+      }
+      else {
+        this.up = false;
+        this.down = true;
+      }
+      if (!this.up && difference >= 0) {
+        this.down = true;
+      }
+      else {
+        this.down = false;
+        this.up = true;
+      }
+
+      if (this.up) this.vector.y = this.speed;
+      else this.vector.y = -this.speed;
+
+      let deltaVector = this.vector.mul(0.0001 * deltaT);
+      let translation = new Translation(deltaVector);
+      translation.matrix = matrix.mul(translation.getMatrix());
+      this.groupNode.transform = translation;
+    }
+  }
+}
+
+/**
  * Class representing a Translation Animation
  * @extends AnimationNode
  */

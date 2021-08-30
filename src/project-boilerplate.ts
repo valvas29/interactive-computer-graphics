@@ -13,7 +13,7 @@ import {
 import Shader from './shader';
 import {
 	SlerpNode,
-	RotationNode, TranslationNode, AnimationNode
+	RotationNode, TranslationNode, AnimationNode, JumperNode
 } from './animation-nodes';
 import phongVertexShader from './phong-vertex-perspective-shader.glsl';
 import phongFragmentShader from './phong-fragment-shader.glsl';
@@ -73,6 +73,10 @@ let firstTraversalVisitorRay: FirstTraversalVisitorRay;
 
 let scenegraph: GroupNode;
 let animationNodes: AnimationNodes; //wenn Array vom Typ AnimationNode, kann die simulate-Methode nicht gefunden werden
+let freeFlightAnimationNodes: any[];
+let otherAnimationNodes: any[];
+let cameraNodes: any[];
+let activeCamera: CameraNode;
 let lightPositions: Array<Vector>;
 let phongValues: PhongValues;
 let rendertype = "rasteriser";
@@ -110,7 +114,6 @@ window.addEventListener('load', () => {
 		alpha: Math.PI / 3
 	}
 	 */
-
 	lightPositions = [
 		new Vector(1, 1, 1, 1)
 	];
@@ -120,24 +123,24 @@ window.addEventListener('load', () => {
 		kD: 0.9,
 		kS: 1.0
 	}
-	const freeFlightNodes = [];
-	const otherAnimationNodes = [];
+	freeFlightAnimationNodes = [];
+	otherAnimationNodes = [];
+	cameraNodes = [];
 
 	// construct scene graph
 	// für Quaterions const sg = new GroupNode(new SQT(new Vector(1, 1, 1, 0), { angle: 0.6, axis: new Vector(0, 1, 0, 0) }, new Vector(0, 0, 0, 0)));
+	/*
+	       T(SG)
+	         |
+	         +--------+-----+
+	         |
+		   T(gn1)
+			 |
+	       S(gn2)
+	         |
+	       Desktop
 
-	//       T(SG)
-	//         |
-	//		 R(gn1)
-	//		   |
-	//    +----+-----+
-	//  S(gn2)     T(gn3)
-	//    |          |
-	//	 Box	  +--+--------+---------+
-	//          T(gn4)     T(gn5)	  T(gn6)
-	//            |
-	//            S8
-	//          TexBox	   Sphere	 Pyramid
+	 */
 
 	scenegraph = new GroupNode(new Translation(new Vector(0, 0, 0, 0)));
 
@@ -150,6 +153,7 @@ window.addEventListener('load', () => {
 
 	const gn3 = new GroupNode(new Translation(new Vector(0, 0, 0, 0)));
 	scenegraph.add(gn3);
+
 
 	for (let i = 0; i < 10; i++) {
 		for (let j = 0; j < 10; j++) {
@@ -166,18 +170,32 @@ window.addEventListener('load', () => {
 		}
 	}
 
+	const gn4 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
 	const textureCube = new TextureBoxNode('hci-logo.png');
+	scenegraph.add(gn4);
+	gn4.add(textureCube);
+	otherAnimationNodes.push(
+		new JumperNode(gn4, 2, 20));
+
 	const sphere = new SphereNode(new Vector(.4, .1, .1, 1));
 	const sphere2 = new SphereNode(new Vector(.1, .1, .4, 1));
 
-
 	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 12, 0)));
-	const camera = new CameraNode(Matrix.identity());
-	cameraNode.add(camera);
+	const camera1 = new CameraNode(Matrix.identity(), true);
 	scenegraph.add(cameraNode);
+	cameraNode.add(camera1);
 
+	const cameraNode2 = new GroupNode(new Translation(new Vector(0, 1.2, 1.7, 0)));
+	const camera2 = new CameraNode(Matrix.identity(), false);
+	gn4.add(cameraNode2);
+	cameraNode2.add(camera2);
 
-	freeFlightNodes.push(
+	//alle cams in array sammeln und activeCamera speichern
+	cameraNodes.push(camera1)
+	cameraNodes.push(camera2);
+	activeCamera = camera1;
+
+	freeFlightAnimationNodes.push(
 		//FahrAnimationNodes
 		new TranslationNode(cameraNode, new Vector(-30, 0, 0, 0)),
 		new TranslationNode(cameraNode, new Vector(30, 0, 0, 0)),
@@ -191,11 +209,11 @@ window.addEventListener('load', () => {
 		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), -20));
 
 	//Fahranimationen defaultmäßig aus, nur bei keydown-events
-	freeFlightNodes.forEach(el => el.turnOffActive());
+	freeFlightAnimationNodes.forEach(el => el.turnOffActive());
 
 	//Alle Animationen zusammenführen
 	animationNodes = {
-		freeFlightNodes: freeFlightNodes,
+		freeFlightNodes: freeFlightAnimationNodes,
 		otherAnimationNodes: otherAnimationNodes
 	}
 
@@ -233,6 +251,17 @@ window.addEventListener('load', () => {
 
 	window.addEventListener('keydown', function (event) {
 		switch (event.key) {
+			case "c":
+				activeCamera.setActiveStatus(false);
+				if (activeCamera === camera1) {
+					camera2.setActiveStatus(true);
+					activeCamera = camera2;
+				}
+				else {
+					camera1.setActiveStatus(true);
+					activeCamera = camera1;
+				}
+				break;
 			//switch rendertype
 			case "k":
 				if (rendertype === "rasteriser") {

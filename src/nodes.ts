@@ -58,7 +58,7 @@ export class CameraNode extends Node {
   /**
    * Camera
    */
-  constructor(public matrix: Matrix) {
+  constructor(public matrix: Matrix, public active: boolean) {
     super();
   }
 
@@ -67,7 +67,11 @@ export class CameraNode extends Node {
    * @param visitor The visitor
    */
   accept(visitor: Visitor) {
-    visitor.visitCameraNode(this);
+    visitor.visitCameraNode(this, this.active);
+  }
+
+  setActiveStatus(val: boolean) {
+    this.active = val;
   }
 }
 
