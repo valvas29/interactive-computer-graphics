@@ -51,6 +51,11 @@ export interface PhongValues {
 	kS: number
 }
 
+interface AnimationNodes {
+	freeFlightNodes: any[],
+	otherAnimationNodes: any[]
+}
+
 //Eigener Canvas für Rendertypen, da ein Canvas nur einen Context unterstützt
 let canvasRasteriser: HTMLCanvasElement;
 let canvasRaytracer: HTMLCanvasElement;
@@ -67,7 +72,7 @@ let firstTraversalVisitorRaster: FirstTraversalVisitorRaster;
 let firstTraversalVisitorRay: FirstTraversalVisitorRay;
 
 let scenegraph: GroupNode;
-let animationNodes: Array<any>; //wenn Array vom Typ AnimationNode, kann die simulate-Methode nicht gefunden werden
+let animationNodes: AnimationNodes; //wenn Array vom Typ AnimationNode, kann die simulate-Methode nicht gefunden werden
 let lightPositions: Array<Vector>;
 let phongValues: PhongValues;
 let rendertype = "rasteriser";
@@ -115,6 +120,8 @@ window.addEventListener('load', () => {
 		kD: 0.9,
 		kS: 1.0
 	}
+	const freeFlightNodes = [];
+	const otherAnimationNodes = [];
 
 	// construct scene graph
 	// für Quaterions const sg = new GroupNode(new SQT(new Vector(1, 1, 1, 0), { angle: 0.6, axis: new Vector(0, 1, 0, 0) }, new Vector(0, 0, 0, 0)));
@@ -141,24 +148,36 @@ window.addEventListener('load', () => {
 	gn1.add(gn2);
 	gn2.add(desktop);
 
+	const gn3 = new GroupNode(new Translation(new Vector(0, 0, 0, 0)));
+	scenegraph.add(gn3);
 
+	for (let i = 0; i < 10; i++) {
+		for (let j = 0; j < 10; j++) {
+			const gn1 = new GroupNode(new Translation(new Vector(j-3, i-4, 3, 0)));
+			const gn2 = new GroupNode(new Rotation(new Vector(1, 0, 0, 0), 1.5708));
+			const pyramidNode = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1));
+			gn3.add(gn1);
+			gn1.add(gn2);
+			gn2.add(pyramidNode);
+			let interpolation = i + j + 1;
+			otherAnimationNodes.push(
+				new TranslationNode(gn1, new Vector(-interpolation, -interpolation, 0, 0)),
+				new RotationNode(gn1, new Vector(0, 0, 1, 0),interpolation * 2));
+		}
+	}
 
-	const pyramidNode = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1)); // TODO
 	const textureCube = new TextureBoxNode('hci-logo.png');
 	const sphere = new SphereNode(new Vector(.4, .1, .1, 1));
 	const sphere2 = new SphereNode(new Vector(.1, .1, .4, 1));
 
 
-
-	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 10, 0)));
+	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 12, 0)));
 	const camera = new CameraNode(Matrix.identity());
 	cameraNode.add(camera);
 	scenegraph.add(cameraNode);
 
 
-	//Euler-Rotations
-	animationNodes = [];
-	animationNodes.push(
+	freeFlightNodes.push(
 		//FahrAnimationNodes
 		new TranslationNode(cameraNode, new Vector(-30, 0, 0, 0)),
 		new TranslationNode(cameraNode, new Vector(30, 0, 0, 0)),
@@ -171,19 +190,14 @@ window.addEventListener('load', () => {
 		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), 20),
 		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), -20));
 
-		//new RotationNode(gn1, new Vector(0, 1, 0, 0),1));
-
 	//Fahranimationen defaultmäßig aus, nur bei keydown-events
-	animationNodes[0].turnOffActive();
-	animationNodes[1].turnOffActive();
-	animationNodes[2].turnOffActive();
-	animationNodes[3].turnOffActive();
-	animationNodes[4].turnOffActive();
-	animationNodes[5].turnOffActive();
-	animationNodes[6].turnOffActive();
-	animationNodes[7].turnOffActive();
-	animationNodes[8].turnOffActive();
-	animationNodes[9].turnOffActive();
+	freeFlightNodes.forEach(el => el.turnOffActive());
+
+	//Alle Animationen zusammenführen
+	animationNodes = {
+		freeFlightNodes: freeFlightNodes,
+		otherAnimationNodes: otherAnimationNodes
+	}
 
 	// setup for rendering
 	setupVisitor = new RasterSetupVisitor(gl);
@@ -194,7 +208,10 @@ window.addEventListener('load', () => {
 	visitorRaytracer = new RayVisitor(ctx2d, canvasRaytracer.width, canvasRaytracer.height);
 
 	function simulate(deltaT: number) {
-		for (let animationNode of animationNodes) {
+		for (let animationNode of animationNodes.freeFlightNodes) {
+			animationNode.simulate(deltaT);
+		}
+		for (let animationNode of animationNodes.otherAnimationNodes) {
 			animationNode.simulate(deltaT);
 		}
 	}
@@ -246,43 +263,43 @@ window.addEventListener('load', () => {
 				break;
 			//nach links fahren
 			case "a":
-				animationNodes[0].turnOnActive();
+				animationNodes.freeFlightNodes[0].turnOnActive();
 				break;
 			//nach rechts fahren
 			case "d":
-				animationNodes[1].turnOnActive();
+				animationNodes.freeFlightNodes[1].turnOnActive();
 				break;
 			//nach vorne fahren
 			case "w":
-				animationNodes[2].turnOnActive();
+				animationNodes.freeFlightNodes[2].turnOnActive();
 				break;
 			//nach hinten fahren
 			case "s":
-				animationNodes[3].turnOnActive();
+				animationNodes.freeFlightNodes[3].turnOnActive();
 				break;
 			//nach oben fahren
 			case "q":
-				animationNodes[4].turnOnActive();
+				animationNodes.freeFlightNodes[4].turnOnActive();
 				break;
 			//nach unten fahren
 			case "e":
-				animationNodes[5].turnOnActive();
+				animationNodes.freeFlightNodes[5].turnOnActive();
 				break;
 			//nach links drehen
 			case "ArrowLeft":
-				animationNodes[6].turnOnActive();
+				animationNodes.freeFlightNodes[6].turnOnActive();
 				break;
 			//nach rechts drehen
 			case "ArrowRight":
-				animationNodes[7].turnOnActive();
+				animationNodes.freeFlightNodes[7].turnOnActive();
 				break;
 			//nach oben drehen
 			case "ArrowUp":
-				animationNodes[8].turnOnActive();
+				animationNodes.freeFlightNodes[8].turnOnActive();
 				break;
 			//nach unten drehen
 			case "ArrowDown":
-				animationNodes[9].turnOnActive();
+				animationNodes.freeFlightNodes[9].turnOnActive();
 				break;
 		}
 	});
@@ -291,43 +308,43 @@ window.addEventListener('load', () => {
 		switch (event.key) {
 			//nach links fahren
 			case "a":
-				animationNodes[0].turnOffActive();
+				animationNodes.freeFlightNodes[0].turnOffActive();
 				break;
 			//nach rechts fahren
 			case "d":
-				animationNodes[1].turnOffActive();
+				animationNodes.freeFlightNodes[1].turnOffActive();
 				break;
 			//nach vorne fahren
 			case "w":
-				animationNodes[2].turnOffActive();
+				animationNodes.freeFlightNodes[2].turnOffActive();
 				break;
 			//nach hinten fahren
 			case "s":
-				animationNodes[3].turnOffActive();
+				animationNodes.freeFlightNodes[3].turnOffActive();
 				break;
 			//nach oben fahren
 			case "q":
-				animationNodes[4].turnOffActive();
+				animationNodes.freeFlightNodes[4].turnOffActive();
 				break;
 			//nach unten fahren
 			case "e":
-				animationNodes[5].turnOffActive();
+				animationNodes.freeFlightNodes[5].turnOffActive();
 				break;
 			//nach links drehen
 			case "ArrowLeft":
-				animationNodes[6].turnOffActive();
+				animationNodes.freeFlightNodes[6].turnOffActive();
 				break;
 			//nach rechts drehen
 			case "ArrowRight":
-				animationNodes[7].turnOffActive();
+				animationNodes.freeFlightNodes[7].turnOffActive();
 				break;
 			//nach oben drehen
 			case "ArrowUp":
-				animationNodes[8].turnOffActive();
+				animationNodes.freeFlightNodes[8].turnOffActive();
 				break;
 			//nach unten drehen
 			case "ArrowDown":
-				animationNodes[9].turnOffActive();
+				animationNodes.freeFlightNodes[9].turnOffActive();
 				break;
 		}
 	});
