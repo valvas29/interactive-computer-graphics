@@ -68,14 +68,13 @@ window.addEventListener('load', () => {
         kD: 0.6,
         kS: 0.7
     }
-    const firstTraversalVisitorRaster = new FirstTraversalVisitorRaster();
 
     const visitor = new RasterVisitor(gl, phongShader, textureShader, setupVisitor.objects);
 
     function animate(timestamp: number) {
         gn0.transform = new Rotation(new Vector(0, 0, 1, 0), timestamp / 1000);
         gn3.transform = new Rotation(new Vector(0, 1, 0, 0), timestamp / 1000);
-        visitor.render(sg, camera, [], phongValues, firstTraversalVisitorRaster);
+        visitor.render(sg, camera, [], phongValues, null);
         window.requestAnimationFrame(animate);
     }
 

@@ -53,7 +53,7 @@ export default class RayVisitor implements Visitor {
      */
     render(
         rootNode: Node,
-        camera: { origin: Vector, width: number, height: number, alpha: number },
+        camera: { origin: Vector, width: number, height: number, alpha: number } | null,
         lightPositions: Array<Vector>,
         phongValues: PhongValues,
         firstTraversalVisitorRay: FirstTraversalVisitorRay
@@ -62,15 +62,21 @@ export default class RayVisitor implements Visitor {
         let data = this.imageData.data;
         data.fill(0);
 
+        if (camera) {
+            this.camera = camera;
+        }
+
         // raytrace
         const width = this.imageData.width;
         const height = this.imageData.height;
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
 
-                //first traversal
-                firstTraversalVisitorRay.setup(rootNode);
-                this.camera = firstTraversalVisitorRay.camera;
+                if (firstTraversalVisitorRay) {
+                    //first traversal
+                    firstTraversalVisitorRay.setup(rootNode);
+                    this.camera = firstTraversalVisitorRay.camera;
+                }
 
                 this.ray = Ray.makeRay(x, y, this.camera);
 
@@ -148,6 +154,7 @@ export default class RayVisitor implements Visitor {
     /**
      * Visits an axis aligned box node
      * @param node The node to visit
+     * @param outside
      */
     visitAABoxNode(node: AABoxNode, outside: boolean): void {
         /*

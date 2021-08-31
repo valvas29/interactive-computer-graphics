@@ -30,11 +30,15 @@ export class FirstTraversalVisitorRaster implements Visitor{
 	perspective: Matrix;
 
 	/**
+	 * store the eye information of camera to pass it to phong shader
+	 */
+	eye: Vector;
+
+	/**
 	 * Creates a new FirstTraversalVisitorRaster
 	 */
-	constructor() {
+	constructor() {}
 
-	}
 
 	/**
 	 * Sets up all needed buffers
@@ -65,6 +69,7 @@ export class FirstTraversalVisitorRaster implements Visitor{
 			camera.near,
 			camera.far
 		);
+		this.eye = camera.eye;
 	}
 
 	/**

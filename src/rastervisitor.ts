@@ -50,6 +50,10 @@ export class RasterVisitor implements Visitor {
     // clear
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
+    if (camera) {
+      this.setupCamera(camera);
+    }
+
     if (phongValues) {
       this.passPhongValues(phongValues);
     }
@@ -61,10 +65,13 @@ export class RasterVisitor implements Visitor {
     this.matrixStack.push(Matrix.identity());
     this.inverseStack.push(Matrix.identity());
 
-    //first traversal
-    firstTraversalVisitor.setup(rootNode);
-    this.lookat = firstTraversalVisitor.lookat;
-    this.perspective = firstTraversalVisitor.perspective;
+    if (firstTraversalVisitor) {
+      //first traversal
+      firstTraversalVisitor.setup(rootNode);
+      this.lookat = firstTraversalVisitor.lookat;
+      this.perspective = firstTraversalVisitor.perspective;
+      this.passCameraPosition(firstTraversalVisitor.eye);
+    }
 
     // traverse and render
     rootNode.accept(this);
@@ -112,6 +119,13 @@ export class RasterVisitor implements Visitor {
     shader.getUniformFloat("kS").set(phongValues.kS);
   }
 
+  private passCameraPosition(eye: Vector) {
+    const shader = this.shader;
+    shader.use();
+
+    shader.getUniformVec3("camera").set(eye);
+  }
+
   /**
    * Visits a group node
    * @param node The node to visit
@@ -143,11 +157,11 @@ export class RasterVisitor implements Visitor {
     shader.getUniformMatrix("M").set(toWorld);
 
     const V = shader.getUniformMatrix("V");
-    if (V && this.lookat) {  //was heißt das, wo ist der boolean?
+    if (V && this.lookat) {
       V.set(this.lookat);
     }
     const P = shader.getUniformMatrix("P");
-    if (P && this.perspective) { //was heißt das, wo ist der boolean?
+    if (P && this.perspective) {
       P.set(this.perspective);
     }
 
@@ -171,6 +185,7 @@ export class RasterVisitor implements Visitor {
   /**
    * Visits an axis aligned box node
    * @param  {AABoxNode} node - The node to visit
+   * @param outside
    */
   visitAABoxNode(node: AABoxNode, outside: boolean): void {
     this.shader.use();
@@ -262,7 +277,7 @@ export class RasterSetupVisitor {
 
   /**
    * Creates a new RasterSetupVisitor
-   * @param context The 3D context in which to create buffers
+   * @param gl The 3D context in which to create buffers
    */
   constructor(private gl: WebGL2RenderingContext) {
     this.objects = new WeakMap();

@@ -12,7 +12,8 @@ uniform float shininess;
 uniform float kA;
 uniform float kD;
 uniform float kS;
-const vec3 camera = vec3(2.0, 0.0, 10.0); // TODO
+//const vec3 camera = vec3(2.0, 0.0, 10.0); // wenn cam nicht im Render gepasst wird, mus sie hier definiert sein
+uniform vec3 camera;
 
 void main(void) {
   vec3 color3 = v_color.rgb;

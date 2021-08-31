@@ -13,7 +13,7 @@ import {
 import Shader from './shader';
 import {
 	SlerpNode,
-	RotationNode, TranslationNode, AnimationNode, JumperNode
+	RotationNode, TranslationNode, AnimationNode, JumperNode, ScalingNode, CycleNode
 } from './animation-nodes';
 import phongVertexShader from './phong-vertex-perspective-shader.glsl';
 import phongFragmentShader from './phong-fragment-shader.glsl';
@@ -26,6 +26,7 @@ import Matrix from "./matrix";
 import phong from "./phong";
 import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
 import {FirstTraversalVisitorRay} from "./firstTraversalVisitorRay";
+import AABox from "./aabox";
 
 export interface CameraRasteriser {
 	eye: Vector,
@@ -145,39 +146,42 @@ window.addEventListener('load', () => {
 	scenegraph = new GroupNode(new Translation(new Vector(0, 0, 0, 0)));
 
 	const gn1 = new GroupNode(new Translation(new Vector(2, 0, 8, 0)));
-	const gn2 = new GroupNode(new Scaling(new Vector(10, 10, 10, 10)));
-	const desktop = new AABoxNode(new Vector(0, 0, 0, 1), false);
+	const gn2 = new GroupNode(new Scaling(new Vector(10, 10, 10, 1)));
+	const desktop = new AABoxNode(new Vector(0, 0, 0, 0), false);
 	scenegraph.add(gn1);
 	gn1.add(gn2);
 	gn2.add(desktop);
 
-	const gn3 = new GroupNode(new Translation(new Vector(0, 0, 0, 0)));
+	const gn3 = new GroupNode(new Translation(new Vector(-3, 5, 3, 0)));
+	const gn4 = new GroupNode(new Rotation(new Vector(1, 0, 0, 0), 1.5708));
+	const pyramid = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1));
 	scenegraph.add(gn3);
-
-
-	for (let i = 0; i < 10; i++) {
-		for (let j = 0; j < 10; j++) {
-			const gn1 = new GroupNode(new Translation(new Vector(j-3, i-4, 3, 0)));
-			const gn2 = new GroupNode(new Rotation(new Vector(1, 0, 0, 0), 1.5708));
-			const pyramidNode = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1));
-			gn3.add(gn1);
-			gn1.add(gn2);
-			gn2.add(pyramidNode);
-			let interpolation = i + j + 1;
-			otherAnimationNodes.push(
-				new TranslationNode(gn1, new Vector(-interpolation, -interpolation, 0, 0)),
-				new RotationNode(gn1, new Vector(0, 0, 1, 0),interpolation * 2));
-		}
-	}
-
-	const gn4 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
-	const textureCube = new TextureBoxNode('hci-logo.png');
-	scenegraph.add(gn4);
-	gn4.add(textureCube);
+	gn3.add(gn4);
+	gn4.add(pyramid);
 	otherAnimationNodes.push(
-		new JumperNode(gn4, 2, 20));
+		new ScalingNode(gn4, true));
 
-	const sphere = new SphereNode(new Vector(.4, .1, .1, 1));
+	const gn5 = new GroupNode(new Translation(new Vector(3, -3, 0, 0)));
+	const sphere = new SphereNode(new Vector(.5, .2, .2, 1));
+	gn3.add(gn5);
+	gn5.add(sphere);
+	otherAnimationNodes.push(
+		new JumperNode(gn5, 2, 30));
+
+	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
+	const aaBox = new AABoxNode(new Vector(0, 0, 0, 0), true);
+	gn3.add(gn6);
+	gn6.add(aaBox);
+	otherAnimationNodes.push(
+		new CycleNode(gn6, new Vector(10, 0, 0, 0), new Vector (0, 1, 0, 0), 10));
+
+	const gn7 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
+	const textureCube = new TextureBoxNode('hci-logo.png');
+	scenegraph.add(gn7);
+	gn7.add(textureCube);
+
+	const barrel = new SphereNode(new Vector(0.3, 0.3, 0.3, 1));
+	const crosshair1 = new AABoxNode(new Vector(0, 0, 0, 1), true);
 	const sphere2 = new SphereNode(new Vector(.1, .1, .4, 1));
 
 	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 12, 0)));
@@ -187,7 +191,7 @@ window.addEventListener('load', () => {
 
 	const cameraNode2 = new GroupNode(new Translation(new Vector(0, 1.2, 1.7, 0)));
 	const camera2 = new CameraNode(Matrix.identity(), false);
-	gn4.add(cameraNode2);
+	gn6.add(cameraNode2);
 	cameraNode2.add(camera2);
 
 	//alle cams in array sammeln und activeCamera speichern
@@ -197,12 +201,12 @@ window.addEventListener('load', () => {
 
 	freeFlightAnimationNodes.push(
 		//FahrAnimationNodes
-		new TranslationNode(cameraNode, new Vector(-30, 0, 0, 0)),
-		new TranslationNode(cameraNode, new Vector(30, 0, 0, 0)),
-		new TranslationNode(cameraNode, new Vector(0, 0, -30, 0)),
-		new TranslationNode(cameraNode, new Vector(0, 0, 30, 0)),
-		new TranslationNode(cameraNode, new Vector(0, 30, 0, 0)),
-		new TranslationNode(cameraNode, new Vector(0, -30, 0, 0)),
+		new TranslationNode(cameraNode, new Vector(-50, 0, 0, 0)),
+		new TranslationNode(cameraNode, new Vector(50, 0, 0, 0)),
+		new TranslationNode(cameraNode, new Vector(0, 0, -50, 0)),
+		new TranslationNode(cameraNode, new Vector(0, 0, 50, 0)),
+		new TranslationNode(cameraNode, new Vector(0, 50, 0, 0)),
+		new TranslationNode(cameraNode, new Vector(0, -50, 0, 0)),
 		new RotationNode(cameraNode, new Vector(0, 1, 0, 0), 20),
 		new RotationNode(cameraNode, new Vector(0, 1, 0, 0), -20),
 		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), 20),
@@ -243,6 +247,7 @@ window.addEventListener('load', () => {
 		lastTimestamp = timestamp;
 		window.requestAnimationFrame(animate);
 	}
+
 	Promise.all(
 		[phongShader.load(), textureShader.load()]
 	).then(x =>
@@ -256,8 +261,7 @@ window.addEventListener('load', () => {
 				if (activeCamera === camera1) {
 					camera2.setActiveStatus(true);
 					activeCamera = camera2;
-				}
-				else {
+				} else {
 					camera1.setActiveStatus(true);
 					activeCamera = camera1;
 				}
@@ -272,8 +276,7 @@ window.addEventListener('load', () => {
 
 					canvasRaytracer.style.zIndex = "1";
 					canvasRaytracer.style.visibility = "visible";
-				}
-				else {
+				} else {
 					rendertype = "rasteriser";
 
 					canvasRasteriser.style.zIndex = "1";
@@ -285,7 +288,7 @@ window.addEventListener('load', () => {
 				break;
 			//phongValues random ändern
 			case "p":
-				phongValues.shininess = Math.random() * 16;
+				phongValues.shininess = Math.random() * 32;
 				phongValues.kA = Math.random() * 2;
 				phongValues.kD = Math.random() * 2;
 				phongValues.kS = Math.random() * 2;

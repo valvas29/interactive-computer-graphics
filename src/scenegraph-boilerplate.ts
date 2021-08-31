@@ -41,7 +41,6 @@ window.addEventListener('load', () => {
         kD: 0.9,
         kS: 1.0
     }
-    const firstTraversalVisitorRay = new FirstTraversalVisitorRay();
 
     const visitor = new RayVisitor(ctx, canvas.width, canvas.height);
 
@@ -61,7 +60,7 @@ window.addEventListener('load', () => {
         gnRotation.angle = animationTime / 2000;
 
 
-        visitor.render(sg, camera, lightPositions, phongValues, firstTraversalVisitorRay);
+        visitor.render(sg, camera, lightPositions, phongValues, null);
         animationHandle = window.requestAnimationFrame(animate);
     }
 

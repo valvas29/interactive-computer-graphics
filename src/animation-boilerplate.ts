@@ -75,7 +75,6 @@ window.addEventListener('load', () => {
         kD: 0.6,
         kS: 0.7
     }
-    const firstTraversalVisitorRaster = new FirstTraversalVisitorRaster();
 
     const visitor = new RasterVisitor(gl, phongShader, textureShader, setupVisitor.objects);
 
@@ -94,7 +93,7 @@ window.addEventListener('load', () => {
 
     function animate(timestamp: number) {
         simulate(timestamp - lastTimestamp);
-        visitor.render(sg, camera, [], phongValues, firstTraversalVisitorRaster);
+        visitor.render(sg, camera, [], phongValues, null);
         lastTimestamp = timestamp;
         window.requestAnimationFrame(animate);
     }
