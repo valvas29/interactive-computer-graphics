@@ -161,7 +161,7 @@ window.addEventListener('load', () => {
 	otherAnimationNodes.push(
 		new ScalingNode(gn4, true));
 
-	const gn5 = new GroupNode(new Translation(new Vector(3, -3, 0, 0)));
+	const gn5 = new GroupNode(new Translation(new Vector(4, -3, 2, 0)));
 	const sphere = new SphereNode(new Vector(.5, .2, .2, 1));
 	gn3.add(gn5);
 	gn5.add(sphere);
