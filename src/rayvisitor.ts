@@ -10,6 +10,8 @@ import {
     AABoxNode, TextureBoxNode, CameraNode, PyramidNode
 } from './nodes';
 import AABox from './aabox';
+import {CameraRaytracer, PhongValues} from "./project-boilerplate";
+import {FirstTraversalVisitorRay} from "./firstTraversalVisitorRay";
 
 const UNIT_SPHERE = new Sphere(new Vector(0, 0, 0, 1), 1, new Vector(0, 0, 0, 1));
 const UNIT_AABOX = new AABox(new Vector(-0.5, -0.5, -0.5, 1), new Vector(0.5, 0.5, 0.5, 1), new Vector(0, 0, 0, 1));
@@ -29,6 +31,7 @@ export default class RayVisitor implements Visitor {
     intersection: Intersection | null;
     intersectionColor: Vector;
     ray: Ray;
+    camera: CameraRaytracer;
 
     /**
      * Creates a new RayVisitor
@@ -45,22 +48,37 @@ export default class RayVisitor implements Visitor {
      * @param rootNode The root node of the Scenegraph
      * @param camera The camera used
      * @param lightPositions The light light positions
+     * @param phongValues phong-coefficients
+     * @param firstTraversalVisitorRay
      */
     render(
         rootNode: Node,
-        camera: { origin: Vector, width: number, height: number, alpha: number },
-        lightPositions: Array<Vector>
+        camera: { origin: Vector, width: number, height: number, alpha: number } | null,
+        lightPositions: Array<Vector>,
+        phongValues: PhongValues,
+        firstTraversalVisitorRay: FirstTraversalVisitorRay
     ) {
         // clear
         let data = this.imageData.data;
         data.fill(0);
+
+        if (camera) {
+            this.camera = camera;
+        }
 
         // raytrace
         const width = this.imageData.width;
         const height = this.imageData.height;
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
-                this.ray = Ray.makeRay(x, y, camera);
+
+                if (firstTraversalVisitorRay) {
+                    //first traversal
+                    firstTraversalVisitorRay.setup(rootNode);
+                    this.camera = firstTraversalVisitorRay.camera;
+                }
+
+                this.ray = Ray.makeRay(x, y, this.camera);
 
                 //MatrixStacks hier immer neu leeren, damit firefox nicht crasht
                 this.matrixStack = [];
@@ -68,6 +86,7 @@ export default class RayVisitor implements Visitor {
 
                 this.matrixStack.push(Matrix.identity());
                 this.inverseStack.push(Matrix.identity());
+
                 this.intersection = null;
                 rootNode.accept(this);
 
@@ -78,7 +97,7 @@ export default class RayVisitor implements Visitor {
                         data[4 * (width * y + x) + 2] = 0;
                         data[4 * (width * y + x) + 3] = 255;
                     } else {
-                        let color = phong(this.intersectionColor, this.intersection, lightPositions, 10, camera.origin);
+                        let color = phong(this.intersectionColor, this.intersection, lightPositions, this.camera.origin, phongValues);
                         data[4 * (width * y + x) + 0] = color.r * 255;
                         data[4 * (width * y + x) + 1] = color.g * 255;
                         data[4 * (width * y + x) + 2] = color.b * 255;
@@ -135,8 +154,10 @@ export default class RayVisitor implements Visitor {
     /**
      * Visits an axis aligned box node
      * @param node The node to visit
+     * @param outside
      */
-    visitAABoxNode(node: AABoxNode) {
+    visitAABoxNode(node: AABoxNode, outside: boolean): void {
+        /*
         let toWorld = this.matrixStack[this.matrixStack.length - 1];
         let fromWorld = this.inverseStack[this.inverseStack.length - 1];
 
@@ -156,6 +177,7 @@ export default class RayVisitor implements Visitor {
                 this.intersectionColor = node.color;
             }
         }
+         */
     }
 
     /**
@@ -165,8 +187,11 @@ export default class RayVisitor implements Visitor {
     visitTextureBoxNode(node: TextureBoxNode) {
     }
 
-    visitCameraNode(node: CameraNode): void {}
+    /**
+     * Visits a camera node
+     * @param node The node to visit
+     */
+    visitCameraNode(node: CameraNode) {}
 
-    visitPyramidNode(node: PyramidNode): void {
-    }
+    visitPyramidNode(node: PyramidNode): void {}
 }

@@ -1,6 +1,6 @@
 import Vector from './vector';
 import { GroupNode } from './nodes';
-import {Rotation, SQT, Translation} from './transformation';
+import {Rotation, Scaling, SQT, Translation} from './transformation';
 import Quaternion from './quaternion';
 import Matrix from "./matrix";
 
@@ -34,6 +34,229 @@ export class AnimationNode {
 
   turnOffActive() {
     this.active = false;
+  }
+}
+
+
+/**
+ * Class representing a Cycle Animation
+ * @extends AnimationNode
+ */
+export class CycleNode extends AnimationNode {
+  /**
+   * the translation vector
+   */
+  translation: Vector;
+
+  /**
+   * which axis to rotate
+   */
+  axisRotation: Vector;
+
+  /**
+   * how fast to rotate
+   */
+  speed: number;
+
+
+  /**
+   * Creates a new CycleNode
+   * @param groupNode The group node to attach to
+   * @param translation which axis to translate
+   * @param axisRotation which axis to rotate
+   * @param rotationSpeed how fast to translate
+   */
+  constructor(groupNode: GroupNode, translation: Vector, axisRotation: Vector, rotationSpeed: number) {
+    super(groupNode);
+    this.translation = translation;
+    this.axisRotation = axisRotation;
+    this.speed = rotationSpeed;
+  }
+
+  /**
+   * Advances the animation by deltaT
+   * @param deltaT The time difference, the animation is advanced by
+   */
+  simulate(deltaT: number) {
+    // change the matrix of the attached
+    // group node to reflect a translation
+    if (this.active) {
+      let matrix = this.groupNode.transform.getMatrix();
+
+      let deltaTranslationVector = this.translation.mul(0.0001 * deltaT);
+      let translation = new Translation(deltaTranslationVector);
+      translation.matrix = matrix.mul(translation.getMatrix());
+
+      let rotation = new Rotation(this.axisRotation, this.speed * 0.0001 * deltaT);
+
+      translation.matrix = translation.matrix.mul(rotation.matrix);
+
+      this.groupNode.transform = translation;
+    }
+  }
+}
+
+/**
+ * Class representing a Jumping Animation
+ * @extends AnimationNode
+ */
+export class JumperNode extends AnimationNode {
+
+  /**
+   * The height to jump
+   */
+  height: number;
+
+  /**
+   * The speed for jumping
+   */
+  speed: number;
+
+  /**
+   * The translation vector
+   */
+  vector: Vector;
+
+  up: boolean;//helper
+  down: boolean;//helper
+
+  /**
+   * initial YValue of the groupnodes' transformation matrix
+   */
+  groupNodeYValue: number;
+
+  /**
+   * Creates a new JumperNode
+   * @param groupNode The group node to attach to
+   * @param height only positive integers
+   * @param speed The speed for jumping
+   */
+  constructor(groupNode: GroupNode, height: number, speed: number) {
+    super(groupNode);
+    this.height = height;
+    this.speed = speed;
+    this.up = true;
+    this.down = false;
+    this.vector = new Vector(0,  speed, 0, 0);
+    this.groupNodeYValue = groupNode.transform.getMatrix().getVal(1, 3);
+  }
+
+  /**
+   * Advances the animation by deltaT
+   * @param deltaT The time difference, the animation is advanced by
+   */
+  simulate(deltaT: number) {
+    if (this.active) {
+      let matrix = this.groupNode.transform.getMatrix();
+      let difference = matrix.getVal(1, 3) - this.groupNodeYValue;
+
+      if (!this.down && difference < this.height) {
+        this.up = true;
+      }
+      else {
+        this.up = false;
+        this.down = true;
+      }
+      if (!this.up && difference >= 0) {
+        this.down = true;
+      }
+      else {
+        this.down = false;
+        this.up = true;
+      }
+
+      if (this.up) this.vector.y = this.speed;
+      else this.vector.y = -this.speed;
+
+      let deltaVector = this.vector.mul(0.0001 * deltaT);
+      let translation = new Translation(deltaVector);
+      translation.matrix = matrix.mul(translation.getMatrix());
+      this.groupNode.transform = translation;
+    }
+  }
+}
+
+/**
+ * Class representing a Scaling Animation
+ * @extends AnimationNode
+ */
+export class ScalingNode extends AnimationNode {
+  /**
+   * translation The translation vector that shall be expressed by the matrix
+   */
+  vector: Vector
+
+  /**
+   * The initial x Value of the Size of the groupnode
+   * (could also use y or z value)
+   */
+  groupNodeSizeXDirection: number;
+
+  /**
+   * Determines if growing or shrinking
+   */
+  limit: number;
+
+  grow: boolean;//helper
+  shrink: boolean;//helper
+
+  /**
+   * Creates a new ScalingNode, scales to triple/third size, scales back -> repeat
+   * @param groupNode The group node to attach to
+   * @param scaleUp scaleUp or down
+   */
+  constructor(groupNode: GroupNode, scaleUp: boolean) {
+    super(groupNode);
+    this.vector = new Vector(1, 1, 1, 1);
+    this.groupNodeSizeXDirection = groupNode.transform.getMatrix().getVal(0,0);
+    if (scaleUp) {
+      this.grow = true;
+      this.shrink = false;
+      this.limit = 3;
+    }
+    else {
+      this.grow = false;
+      this.shrink = true;
+      this.limit = 1;
+    }
+  }
+
+  /**
+   * Advances the animation by deltaT
+   * @param deltaT The time difference, the animation is advanced by
+   */
+  simulate(deltaT: number) {
+    // change the matrix of the attached
+    // group node to reflect a translation
+    if (this.active) {
+      let matrix = this.groupNode.transform.getMatrix();
+
+      let difference = matrix.getVal(0, 0) / this.groupNodeSizeXDirection;
+
+      if (!this.shrink && difference < this.limit) {
+        this.grow = true;
+      }
+      else {
+        this.grow = false;
+        this.shrink = true;
+      }
+      if (!this.grow && difference >= this.limit / 3) {
+        this.shrink = true;
+      }
+      else {
+        this.shrink = false;
+        this.grow = true;
+      }
+
+      let deltaHelper = new Vector(1, 1, 1, 1).mul(0.0005 * deltaT);
+      let deltaVector;
+      if (this.grow) deltaVector = this.vector.add(deltaHelper);
+      else deltaVector = this.vector.sub(deltaHelper);
+
+      let scaling = new Scaling(deltaVector);
+      scaling.matrix = matrix.mul(scaling.getMatrix());
+      this.groupNode.transform = scaling;
+    }
   }
 }
 

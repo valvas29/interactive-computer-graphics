@@ -18,7 +18,12 @@ window.addEventListener('load', () => {
     const lightPositions = [
         new Vector(1, 1, -1, 1),
     ];
-    let shininess = 10;
+    const phongValues = {
+        shininess: 32.0,
+        kA: 0.5,
+        kD: 0.9,
+        kS: 1.0
+    }
     const camera = {
         origin: new Vector(0, 0, 0, 1),
         width: canvas.width,
@@ -53,7 +58,7 @@ window.addEventListener('load', () => {
                     } else {
                         let color = phong(
                             Object.assign(Object.create(Vector.prototype), minObj.color),
-                            minIntersection, lightPositions, shininess, camera.origin);
+                            minIntersection, lightPositions, camera.origin, phongValues);
                         setPixel(x, y, color);
                     }
 
@@ -66,10 +71,10 @@ window.addEventListener('load', () => {
 
     const shininessElement = document.getElementById("shininess") as HTMLInputElement;
     shininessElement.onchange = function () {
-        shininess = Number(shininessElement.value);
+        phongValues.shininess = Number(shininessElement.value);
         window.requestAnimationFrame(animate);
     }
-    shininess = Number(shininessElement.value);
+    phongValues.shininess = Number(shininessElement.value);
 
     window.requestAnimationFrame(animate);
 });

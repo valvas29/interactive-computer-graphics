@@ -4,7 +4,7 @@ import Shader from './shader';
 /**
  * A class creating buffers for an axis aligned box to render it with WebGL
  */
-export default class RasterBox {
+export default class RasterBoxOutside {
     /**
      * The buffer containing the box's vertices
      */
@@ -101,37 +101,37 @@ export default class RasterBox {
             2, 20, 17, 11, 20, 2
         ];
         let colors = [
-            1.0, 0.0, 0.0, 1.0, // red
-            1.0, 0.0, 0.0, 1.0, // red
-            1.0, 0.0, 0.0, 1.0, // red
+            0.0, 0.5, 0.5, 1.0, // blue
+            0.0, 0.5, 0.5, 1.0, // blue
+            0.0, 0.5, 0.5, 1.0, // blue
 
-            0.0, 1.0, 0.0, 1.0, // green
-            0.0, 1.0, 0.0, 1.0, // green
-            0.0, 1.0, 0.0, 1.0, // green
+            0.0, 0.5, 0.5, 1.0, // blue
+            0.0, 0.5, 0.5, 1.0, // blue
+            0.0, 0.5, 0.5, 1.0, // blue
 
-            0.0, 0.0, 1.0, 1.0, // blue
-            0.0, 0.0, 1.0, 1.0, // blue
-            0.0, 0.0, 1.0, 1.0, // blue
+            0.5, 0.0, 0.5, 1.0, // violet
+            0.5, 0.0, 0.5, 1.0, // violet
+            0.5, 0.0, 0.5, 1.0, // violet
 
-            1.0, 0.0, 0.0, 1.0, // red
-            1.0, 0.0, 0.0, 1.0, // red
-            1.0, 0.0, 0.0, 1.0, // red
+            0.5, 0.0, 0.5, 1.0, // violet
+            0.5, 0.0, 0.5, 1.0, // violet
+            0.5, 0.0, 0.5, 1.0, // violet
 
-            0.0, 1.0, 0.0, 1.0, // green
-            0.0, 1.0, 0.0, 1.0, // green
-            0.0, 1.0, 0.0, 1.0, // green
+            0.0, 0.5, 0.5, 1.0, // blue
+            0.0, 0.5, 0.5, 1.0, // blue
+            0.0, 0.5, 0.5, 1.0, // blue
 
-            0.0, 0.0, 1.0, 1.0, // blue
-            0.0, 0.0, 1.0, 1.0, // blue
-            0.0, 0.0, 1.0, 1.0, // blue
+            0.0, 0.5, 0.5, 1.0, // blue
+            0.0, 0.5, 0.5, 1.0, // blue
+            0.0, 0.5, 0.5, 1.0, // blue
 
-            1.0, 0.0, 0.0, 1.0, // red
-            1.0, 0.0, 0.0, 1.0, // red
-            1.0, 0.0, 0.0, 1.0, // red
+            0.5, 0.0, 0.5, 1.0, // violet
+            0.5, 0.0, 0.5, 1.0, // violet
+            0.5, 0.0, 0.5, 1.0, // violet
 
-            0.0, 1.0, 0.0, 1.0, // green
-            0.0, 1.0, 0.0, 1.0, // green
-            0.0, 1.0, 0.0, 1.0, // green
+            0.5, 0.0, 0.5, 1.0, // violet
+            0.5, 0.0, 0.5, 1.0, // violet
+            0.5, 0.0, 0.5, 1.0, // violet
         ];
         let normals = [
             // 0

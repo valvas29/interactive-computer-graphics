@@ -14,6 +14,7 @@ import Shader from './shader';
 import vertexShader from './basic-vertex-shader.glsl';
 import fragmentShader from './basic-fragment-shader.glsl';
 import { Scaling, Translation } from './transformation';
+import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
 
 window.addEventListener('load', () => {
     const canvas = document.getElementById("rasteriser") as HTMLCanvasElement;
@@ -29,9 +30,7 @@ window.addEventListener('load', () => {
     gn3.add(sphere1);
     const gn2 = new GroupNode(new Translation(new Vector(-.2, -0.2, 0, 0)));
     sg.add(gn2);
-    const cube = new AABoxNode(
-        new Vector(1, 0, 0, 1)
-    );
+    const cube = new AABoxNode(new Vector(1, 0, 0, 1), true);
     gn2.add(cube);
 
     // setup for rendering
@@ -49,9 +48,10 @@ window.addEventListener('load', () => {
         kD: 0.6,
         kS: 0.7
     }
+    let firstTraversalVisitor = new FirstTraversalVisitorRaster();
 
     // render
     const visitor = new RasterVisitor(gl, shader, null, setupVisitor.objects);
     shader.load();
-    visitor.render(sg, null, [], phongValues);
+    visitor.render(sg, null, [], phongValues, firstTraversalVisitor);
 });

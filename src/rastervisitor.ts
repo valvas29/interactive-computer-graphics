@@ -1,5 +1,5 @@
 import RasterSphere from './raster-sphere';
-import RasterBox from './raster-box';
+import RasterBoxOutside from './raster-boxOutside';
 import RasterPyramid from './raster-pyramid';
 import RasterTextureBox from './raster-texture-box';
 import Vector from './vector';
@@ -8,7 +8,8 @@ import Visitor from './visitor';
 import {AABoxNode, GroupNode, Node, SphereNode, TextureBoxNode, PyramidNode, CameraNode} from './nodes';
 import Shader from './shader';
 import {CameraRasteriser, PhongValues} from "./project-boilerplate";
-import {FirstTraversalVisitor} from "./firstTraversalVisitor";
+import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
+import RasterBoxInside from "./raster-boxInside";
 
 interface Renderable {
   render(shader: Shader): void;
@@ -37,12 +38,14 @@ export class RasterVisitor implements Visitor {
    * @param camera The camera used
    * @param lightPositions The light positions
    * @param phongValues phong-coefficients
+   * @param firstTraversalVisitor
    */
   render(
     rootNode: Node,
     camera: CameraRasteriser | null,
     lightPositions: Array<Vector>,
-    phongValues: PhongValues
+    phongValues: PhongValues,
+    firstTraversalVisitor: FirstTraversalVisitorRaster
   ) {
     // clear
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
@@ -62,11 +65,13 @@ export class RasterVisitor implements Visitor {
     this.matrixStack.push(Matrix.identity());
     this.inverseStack.push(Matrix.identity());
 
-    //first traversal
-    let firstTraversalVisitor = new FirstTraversalVisitor();
-    firstTraversalVisitor.setup(rootNode);
-    this.lookat = firstTraversalVisitor.lookat;
-    this.perspective = firstTraversalVisitor.perspective;
+    if (firstTraversalVisitor) {
+      //first traversal
+      firstTraversalVisitor.setup(rootNode);
+      this.lookat = firstTraversalVisitor.lookat;
+      this.perspective = firstTraversalVisitor.perspective;
+      this.passCameraPosition(firstTraversalVisitor.eye);
+    }
 
     // traverse and render
     rootNode.accept(this);
@@ -123,6 +128,13 @@ export class RasterVisitor implements Visitor {
     textureShader.getUniformFloat("kS").set(phongValues.kS);
   }
 
+  private passCameraPosition(eye: Vector) {
+    const shader = this.shader;
+    shader.use();
+
+    shader.getUniformVec3("camera").set(eye);
+  }
+
   /**
    * Visits a group node
    * @param node The node to visit
@@ -154,11 +166,11 @@ export class RasterVisitor implements Visitor {
     shader.getUniformMatrix("M").set(toWorld);
 
     const V = shader.getUniformMatrix("V");
-    if (V && this.lookat) {  //was heißt das, wo ist der boolean?
+    if (V && this.lookat) {
       V.set(this.lookat);
     }
     const P = shader.getUniformMatrix("P");
-    if (P && this.perspective) { //was heißt das, wo ist der boolean?
+    if (P && this.perspective) {
       P.set(this.perspective);
     }
 
@@ -182,8 +194,9 @@ export class RasterVisitor implements Visitor {
   /**
    * Visits an axis aligned box node
    * @param  {AABoxNode} node - The node to visit
+   * @param outside
    */
-  visitAABoxNode(node: AABoxNode) {
+  visitAABoxNode(node: AABoxNode, outside: boolean): void {
     this.shader.use();
     let shader = this.shader;
 
@@ -256,7 +269,6 @@ export class RasterVisitor implements Visitor {
     this.shader.use();
     let shader = this.shader;
 
-    // TODO Calculate the model matrix for the box
     let toWorld = this.matrixStack[this.matrixStack.length - 1];
     let fromWorld = this.inverseStack[this.inverseStack.length - 1];
 
@@ -288,18 +300,7 @@ export class RasterVisitor implements Visitor {
   }
 
   visitCameraNode(node: CameraNode): void {
-    let matrix = this.matrixStack[this.matrixStack.length - 1].mul(node.matrix);
 
-    let cameraRasteriser = {
-      eye: matrix.mulVec(new Vector(0, 0, 0, 1)),
-      center: matrix.mulVec(new Vector(0, 0, -1, 1)),
-      up: matrix.mulVec(new Vector(0, 1, 0, 0)),
-      fovy: 60,
-      aspect: 1000 / 600,
-      near: 0.1,
-      far: 100
-    };
-    this.setupCamera(cameraRasteriser);
   }
 }
 
@@ -315,7 +316,7 @@ export class RasterSetupVisitor {
 
   /**
    * Creates a new RasterSetupVisitor
-   * @param context The 3D context in which to create buffers
+   * @param gl The 3D context in which to create buffers
    */
   constructor(private gl: WebGL2RenderingContext) {
     this.objects = new WeakMap();
@@ -363,16 +364,29 @@ export class RasterSetupVisitor {
   /**
    * Visits an axis aligned box node
    * @param  {AABoxNode} node - The node to visit
+   * @param outside if not outside then normals of the box are inversed for lighting in desktop
    */
-  visitAABoxNode(node: AABoxNode) {
-    this.objects.set(
-      node,
-      new RasterBox(
-        this.gl,
-        new Vector(-0.5, -0.5, -0.5, 1),
-        new Vector(0.5, 0.5, 0.5, 1)
-      )
-    );
+  visitAABoxNode(node: AABoxNode, outside: boolean) {
+    if (outside) {
+      this.objects.set(
+          node,
+          new RasterBoxOutside(
+              this.gl,
+              new Vector(-0.5, -0.5, -0.5, 1),
+              new Vector(0.5, 0.5, 0.5, 1)
+          )
+      );
+    }
+    else {
+      this.objects.set(
+          node,
+          new RasterBoxInside(
+              this.gl,
+              new Vector(-0.5, -0.5, -0.5, 1),
+              new Vector(0.5, 0.5, 0.5, 1)
+          )
+      );
+    }
   }
 
   /**
