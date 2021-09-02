@@ -90,8 +90,8 @@ export class FirstTraversalVisitorRay implements Visitor{
 
 			let cameraRaytracer = {
 				origin: matrix.mulVec(new Vector(0, 0, 0, 1)),
-				width: 200,
-				height: 200,
+				width: 1000,
+				height: 600,
 				alpha: Math.PI / 3
 			}
 			this.camera = cameraRaytracer;

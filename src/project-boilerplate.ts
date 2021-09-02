@@ -256,7 +256,6 @@ window.addEventListener('load', () => {
 
 	window.addEventListener('keydown', function (event) {
 		switch (event.key) {
-			//switch cam
 			case "c":
 				activeCamera.setActiveStatus(false);
 				if (activeCamera === camera1) {
