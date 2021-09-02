@@ -119,8 +119,8 @@ window.addEventListener('load', () => {
 		new Vector(1, 1, 1, 1)
 	];
 	phongValues = {
-		shininess: 32.0,
-		kA: 0.5,
+		shininess: 16.0,
+		kA: 0.3,
 		kD: 0.9,
 		kS: 1.0
 	}
@@ -247,6 +247,7 @@ window.addEventListener('load', () => {
 		lastTimestamp = timestamp;
 		window.requestAnimationFrame(animate);
 	}
+
 	Promise.all(
 		[phongShader.load(), textureShader.load()]
 	).then(x =>
@@ -255,6 +256,17 @@ window.addEventListener('load', () => {
 
 	window.addEventListener('keydown', function (event) {
 		switch (event.key) {
+			//switch cam
+			case "c":
+				activeCamera.setActiveStatus(false);
+				if (activeCamera === camera1) {
+					camera2.setActiveStatus(true);
+					activeCamera = camera2;
+				} else {
+					camera1.setActiveStatus(true);
+					activeCamera = camera1;
+				}
+				break;
 			//switch rendertype
 			case "k":
 				if (rendertype === "rasteriser") {
