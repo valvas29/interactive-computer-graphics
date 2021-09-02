@@ -1,4 +1,6 @@
-attribute vec3 a_position; 
+precision mediump float;
+
+attribute vec3 a_position;
 attribute vec2 a_texCoord; 
 varying vec2 v_texCoord;
 attribute vec3 a_normal;

@@ -112,6 +112,15 @@ export class RasterVisitor implements Visitor {
     shader.getUniformFloat("kA").set(phongValues.kA);
     shader.getUniformFloat("kD").set(phongValues.kD);
     shader.getUniformFloat("kS").set(phongValues.kS);
+
+
+    const textureShader = this.textureshader;
+    textureShader.use();
+
+    textureShader.getUniformFloat("shininess").set(phongValues.shininess);
+    textureShader.getUniformFloat("kA").set(phongValues.kA);
+    textureShader.getUniformFloat("kD").set(phongValues.kD);
+    textureShader.getUniformFloat("kS").set(phongValues.kS);
   }
 
   /**
@@ -217,6 +226,7 @@ export class RasterVisitor implements Visitor {
     let shader = this.textureshader;
 
     let toWorld = this.matrixStack[this.matrixStack.length - 1];
+    let fromWorld = this.inverseStack[this.inverseStack.length - 1];
 
     shader.getUniformMatrix("M").set(toWorld);
     let P = shader.getUniformMatrix("P");
@@ -224,6 +234,20 @@ export class RasterVisitor implements Visitor {
       P.set(this.perspective);
     }
     shader.getUniformMatrix("V").set(this.lookat);
+
+    let normal = fromWorld.transpose();
+    normal.setVal(0, 3, 0);
+    normal.setVal(1, 3, 0);
+    normal.setVal(2, 3, 0);
+    normal.setVal(3, 0, 0);
+    normal.setVal(3, 1, 0);
+    normal.setVal(3, 2, 0);
+    normal.setVal(3, 3, 1);
+
+    const N = shader.getUniformMatrix("N");
+    if (N) {
+      N.set(normal);
+    }
 
     this.renderables.get(node).render(shader);
   }
@@ -234,6 +258,7 @@ export class RasterVisitor implements Visitor {
 
     // TODO Calculate the model matrix for the box
     let toWorld = this.matrixStack[this.matrixStack.length - 1];
+    let fromWorld = this.inverseStack[this.inverseStack.length - 1];
 
     shader.getUniformMatrix("M").set(toWorld);
     let V = shader.getUniformMatrix("V");
@@ -243,6 +268,20 @@ export class RasterVisitor implements Visitor {
     let P = shader.getUniformMatrix("P");
     if (P && this.perspective) {
       P.set(this.perspective);
+    }
+
+    let normal = fromWorld.transpose();
+    normal.setVal(0, 3, 0);
+    normal.setVal(1, 3, 0);
+    normal.setVal(2, 3, 0);
+    normal.setVal(3, 0, 0);
+    normal.setVal(3, 1, 0);
+    normal.setVal(3, 2, 0);
+    normal.setVal(3, 3, 1);
+
+    const N = shader.getUniformMatrix("N");
+    if (N) {
+      N.set(normal);
     }
 
     this.renderables.get(node).render(shader);

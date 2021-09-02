@@ -20,10 +20,8 @@ import phongFragmentShader from './phong-fragment-shader.glsl';
 import textureVertexShader from './texture-vertex-perspective-shader.glsl';
 import textureFragmentShader from './texture-fragment-shader.glsl';
 import {Rotation, Scaling, SQT, Translation} from './transformation';
-import Quaternion from './quaternion';
 import RayVisitor from "./rayvisitor";
 import Matrix from "./matrix";
-import phong from "./phong";
 
 export interface CameraRasteriser {
 	eye: Vector,

@@ -183,7 +183,7 @@ export default class RasterPyramid {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, normalBuffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(normals), this.gl.STATIC_DRAW);
         this.normalBuffer = normalBuffer;
-        this.elements = indices.length;
+
 
         // TODO create and fill a buffer for colours
         const colorBuffer = gl.createBuffer();

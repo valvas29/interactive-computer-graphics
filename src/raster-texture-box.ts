@@ -13,6 +13,9 @@ export default class RasterTextureBox {
      * The buffer containing the box's texture
      */
     texBuffer: WebGLBuffer;
+
+    normalBuffer: WebGLBuffer;
+
     /**
      * The buffer containing the box's texture coordinates
      */
@@ -66,6 +69,32 @@ export default class RasterTextureBox {
             ma.x, mi.y, ma.z, mi.x, mi.y, ma.z, mi.x, mi.y, mi.z
         ];
 
+        let normals = [
+            // front
+            0, 0, 1, 0, 0, 1, 0, 0, 1,
+            0, 0, 1, 0, 0, 1, 0, 0, 1,
+
+            // back
+            0, 0, -1, 0, 0, -1, 0, 0, -1,
+            0, 0, -1, 0, 0, -1, 0, 0, -1,
+
+            // right
+            1, 0, 0, 1, 0, 0, 1, 0, 0,
+            1, 0, 0, 1, 0, 0, 1, 0, 0,
+
+            // top
+            0, 1, 0, 0, 1, 0, 0, 1, 0,
+            0, 1, 0, 0, 1, 0, 0, 1, 0,
+
+            // left
+            -1, 0, 0, -1, 0, 0, -1, 0, 0,
+            -1, 0, 0, -1, 0, 0, -1, 0, 0,
+
+            // bottom
+            0, -1, 0, 0, -1, 0, 0, -1, 0,
+            0, -1, 0, 0, -1, 0, 0, -1, 0
+        ];
+
         const vertexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -110,6 +139,11 @@ export default class RasterTextureBox {
         gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(uv),
             gl.STATIC_DRAW);
         this.texCoords = uvBuffer;
+
+        const normalBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, normalBuffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(normals), this.gl.STATIC_DRAW);
+        this.normalBuffer = normalBuffer;
     }
 
     /**
@@ -130,6 +164,12 @@ export default class RasterTextureBox {
         this.gl.enableVertexAttribArray(texCoordLocation);
         this.gl.vertexAttribPointer(texCoordLocation, 2, this.gl.FLOAT, false, 0, 0);
 
+        // TODO bind normal buffer
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
+        const normalLocation = shader.getAttributeLocation("a_normal");
+        this.gl.enableVertexAttribArray(normalLocation);
+        this.gl.vertexAttribPointer(normalLocation, 3, this.gl.FLOAT, false, 0, 0);
+
 
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.texBuffer);
@@ -139,5 +179,7 @@ export default class RasterTextureBox {
         this.gl.disableVertexAttribArray(positionLocation);
         // TODO disable texture vertex attrib array
         this.gl.disableVertexAttribArray(texCoordLocation);
+
+        this.gl.disableVertexAttribArray(normalLocation);
     }
 }
