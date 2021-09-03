@@ -3,33 +3,80 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Project</title>
-  <script type="text/javascript" src="project.bundle.js"></script>
-  <link rel="icon" type="image/png" href="hci-logo.png">
+    <meta charset="UTF-8">
+    <title>Project</title>
+    <script type="text/javascript" src="project.bundle.js"></script>
+    <link rel="icon" type="image/png" href="hci-logo.png">
 </head>
 
 <body>
 <nav class="navbar navbar-light bg-light">
-  <div class="container">
-    <a class="navbar-brand" href="/index.html">
-      <img src="hci-logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
-      ICG
-    </a>
-    <div class="navbar-brand">Project</div>
-  </div>
+    <div class="container">
+        <a class="navbar-brand" href="/index.html">
+            <img src="hci-logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
+            ICG
+        </a>
+        <div class="navbar-brand">Project</div>
+    </div>
 </nav>
 <br>
 
-<div class="container">
-  <div class="row">
-    Textiger Text
-    <figure class="figure col-sm-6">
-      <canvas id="rasteriser" class="figure-img mx-auto d-block rounded" width="1000" height="600" style="position: absolute; left: 200px; border:1px solid #000000"></canvas>
-      <canvas id="raytracer" class="figure-img mx-auto d-block rounded" width="1000" height="600" style="position: absolute; left: 200px; border:1px solid #000000; visibility: hidden; z-index: 0"></canvas>
-    </figure>
-  </div>
+<div style="margin-left: 200px">
+    <div class="row" style="margin-bottom: 10px">
+        <div class="column">
+            <div>
+                Renderer: &nbsp;<kbd>K</kbd>
+            </div>
+            <div style="margin-left: 10px; margin-top: 10px">
+                <button id="rasterizer_b" type="button" class="btn btn-info">Rasterizer</button>
+                <button id="raytracer_b" type="button" class="btn btn-outline-info">Raytracer</button>
+            </div>
+            <br>
+            <div>
+                <b>Steuerung:</b>
+                <div style="margin-left: 10px">
+                    Kamera:
+                    <br>
+                    &nbsp;<kbd>W</kbd>&nbsp;<kbd>A</kbd>&nbsp;<kbd>S</kbd>&nbsp;<kbd>D</kbd>&nbsp;, um die Kamera in x und z Richtung zu bewegen <br>
+                    &nbsp;<kbd>Q</kbd>&nbsp;<kbd>E</kbd>&nbsp;, um die Kamera in y Richtung zu bewegen <br>
+                    &nbsp;<kbd>↑</kbd>&nbsp;<kbd>←</kbd>&nbsp;<kbd>↓</kbd>&nbsp;<kbd>→</kbd>&nbsp;, um den Blickwinkel der Kamera zu verändern <br>
+                    <br>
+                    &nbsp;<kbd>C</kbd>&nbsp;, um die Kamera an den rotierenden Würfel zu <br> &nbsp;hängen, beziehungsweise wieder in den Free-Flight-Modus <br>&nbsp;zurückzukehren
+                </div>
+                <div style="margin-left: 10px;margin-top: 30px">
+                    Animationsknoten1:
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <figure class="figure col-sm-6">
+            <canvas id="rasteriser" class="figure-img mx-auto d-block rounded" width="1000" height="600"
+                    style="position: absolute; left: 200px; border:1px solid #000000"></canvas>
+            <canvas id="raytracer" class="figure-img mx-auto d-block rounded" width="1000" height="600"
+                    style="position: absolute; left: 200px; border:1px solid #000000; visibility: hidden; z-index: 0"></canvas>
+        </figure>
+        </div>
+    </div>
 </div>
+<script>
+    let rasterizer_b = document.getElementById('rasterizer_b');
+    let raytracer_b = document.getElementById('raytracer_b');
+
+    window.addEventListener('keydown', (event) => {
+        switch (event.key) {
+            case "k":
+                if (rasterizer_b.className === "btn btn-info"){
+                    rasterizer_b.className = "btn btn-outline-info";
+                    raytracer_b.className = "btn btn-info";
+                }else{
+                    rasterizer_b.className = "btn btn-info";
+                    raytracer_b.className = "btn btn-outline-info";
+                }
+                break;
+        }
+    });
+
+</script>
 </body>
 
 </html>

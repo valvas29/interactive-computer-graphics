@@ -1,5 +1,5 @@
 
-import {GroupNode, SphereNode, AABoxNode, TextureBoxNode, PyramidNode, CameraNode} from './nodes';
+import {GroupNode, SphereNode, AABoxNode, TextureBoxNode, PyramidNode, CameraNode, LightNode} from './nodes';
 
 export default interface Visitor {
     visitGroupNode(node: GroupNode): void;
@@ -8,4 +8,5 @@ export default interface Visitor {
     visitTextureBoxNode(node: TextureBoxNode): void;
     visitPyramidNode(node: PyramidNode): void;
 	visitCameraNode(node: CameraNode, active: boolean): void;
+    visitLightNode(node: LightNode): void;
 }

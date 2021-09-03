@@ -5,7 +5,7 @@ import RasterTextureBox from './raster-texture-box';
 import Vector from './vector';
 import Matrix from './matrix';
 import Visitor from './visitor';
-import {AABoxNode, GroupNode, Node, SphereNode, TextureBoxNode, PyramidNode, CameraNode} from './nodes';
+import {AABoxNode, GroupNode, Node, SphereNode, TextureBoxNode, PyramidNode, CameraNode, LightNode} from './nodes';
 import Shader from './shader';
 import {CameraRasteriser, PhongValues} from "./project-boilerplate";
 import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
@@ -50,7 +50,7 @@ export class RasterVisitor implements Visitor {
     // clear
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-    if (camera) {
+    if (camera) { // TODO ? explain
       this.setupCamera(camera);
     }
 
@@ -302,6 +302,10 @@ export class RasterVisitor implements Visitor {
   visitCameraNode(node: CameraNode): void {
 
   }
+
+  visitLightNode(node: LightNode): void {
+
+  }
 }
 
 /** 
@@ -420,6 +424,10 @@ export class RasterSetupVisitor {
   }
   
   visitCameraNode(node: CameraNode) {
+
+  }
+
+  visitLightNode(node: LightNode) {
 
   }
 }

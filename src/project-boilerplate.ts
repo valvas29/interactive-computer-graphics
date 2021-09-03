@@ -254,6 +254,44 @@ window.addEventListener('load', () => {
 		window.requestAnimationFrame(animate)
 	);
 
+	let rasterizer_b = document.getElementById("rasterizer_b");
+
+	rasterizer_b.addEventListener('click', function (event) {
+		if (rasterizer_b.className === "btn btn-info"){
+
+		}else{
+			rendertype = "rasteriser";
+
+			canvasRasteriser.style.zIndex = "0";
+			canvasRasteriser.style.visibility = "hidden";
+
+			canvasRaytracer.style.zIndex = "1";
+			canvasRaytracer.style.visibility = "visible";
+
+			rasterizer_b.className = "btn btn-info";
+			raytracer_b.className = "btn btn-outline-info";
+		}
+	});
+
+	let raytracer_b = document.getElementById("raytracer_b");
+
+	raytracer_b.addEventListener('click', function (event) {
+		if (raytracer_b.className === "btn btn-info"){
+
+		}else{
+			rendertype = "raytracer";
+
+			canvasRasteriser.style.zIndex = "1";
+			canvasRasteriser.style.visibility = "visible";
+
+			canvasRaytracer.style.zIndex = "0";
+			canvasRaytracer.style.visibility = "hidden";
+
+			rasterizer_b.className = "btn btn-outline-info";
+			raytracer_b.className = "btn btn-info";
+		}
+	});
+
 	window.addEventListener('keydown', function (event) {
 		switch (event.key) {
 			case "c":
@@ -381,3 +419,4 @@ window.addEventListener('load', () => {
 		}
 	});
 });
+

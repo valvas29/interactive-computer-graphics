@@ -7,7 +7,7 @@ import Visitor from './visitor';
 import phong from './phong';
 import {
     Node, GroupNode, SphereNode,
-    AABoxNode, TextureBoxNode, CameraNode, PyramidNode
+    AABoxNode, TextureBoxNode, CameraNode, PyramidNode, LightNode
 } from './nodes';
 import AABox from './aabox';
 import {CameraRaytracer, PhongValues} from "./project-boilerplate";
@@ -192,6 +192,7 @@ export default class RayVisitor implements Visitor {
      * @param node The node to visit
      */
     visitCameraNode(node: CameraNode) {}
+    visitLightNode(node: LightNode) {}
 
     visitPyramidNode(node: PyramidNode): void {}
 }

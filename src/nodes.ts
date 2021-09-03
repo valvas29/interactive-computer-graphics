@@ -75,6 +75,24 @@ export class CameraNode extends Node {
   }
 }
 
+export class LightNode extends Node {
+
+  /**
+   * Lichtquelle / Light
+   */
+  constructor(public matrix: Matrix) {
+    super();
+  }
+
+  /**
+   * Accepts a visitor according to the visitor pattern
+   * @param visitor The visitor
+   */
+  accept(visitor: Visitor) {
+    visitor.visitLightNode(this);
+  }
+}
+
 /**
  * Class representing a Sphere in the Scenegraph
  * @extends Node
