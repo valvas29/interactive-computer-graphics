@@ -62,7 +62,11 @@ export default class RayVisitor implements Visitor {
         let data = this.imageData.data;
         data.fill(0);
 
-        if (camera) {
+        if (firstTraversalVisitorRay) {
+            //first traversal
+            firstTraversalVisitorRay.setup(rootNode);
+            this.camera = firstTraversalVisitorRay.camera;
+        }else{
             this.camera = camera;
         }
 
@@ -72,11 +76,6 @@ export default class RayVisitor implements Visitor {
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
 
-                if (firstTraversalVisitorRay) {
-                    //first traversal
-                    firstTraversalVisitorRay.setup(rootNode);
-                    this.camera = firstTraversalVisitorRay.camera;
-                }
 
                 this.ray = Ray.makeRay(x, y, this.camera);
 

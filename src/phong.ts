@@ -12,6 +12,7 @@ import {PhongValues} from "./project-boilerplate";
  * @param phongValues
  * @return The resulting colour
  */
+
 export default function phong(color: Vector, intersection: Intersection, lightPositions: Array<Vector>, cameraPosition: Vector, phongValues: PhongValues): Vector {
   //https://codepen.io/shubniggurath/pen/jRwPKm?editors=1000
   //http://jsfiddle.net/soulwire/vBuTR/
@@ -21,6 +22,7 @@ export default function phong(color: Vector, intersection: Intersection, lightPo
   const kD = phongValues.kD;
   const kS = phongValues.kS;
 
+  color = new Vector(color.r, color.g, color.b, 1);
 
   let viewDirection = cameraPosition.sub(intersection.point);
 

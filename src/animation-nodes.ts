@@ -190,7 +190,7 @@ export class ScalingNode extends AnimationNode {
    * The initial x Value of the Size of the groupnode
    * (could also use y or z value)
    */
-  groupNodeSizeXDirection: number;
+  groupNodeSizeYDirection: number;
 
   /**
    * Determines if growing or shrinking
@@ -208,7 +208,7 @@ export class ScalingNode extends AnimationNode {
   constructor(groupNode: GroupNode, scaleUp: boolean) {
     super(groupNode);
     this.vector = new Vector(1, 1, 1, 1);
-    this.groupNodeSizeXDirection = groupNode.transform.getMatrix().getVal(0,0);
+    this.groupNodeSizeYDirection = groupNode.transform.getMatrix().getVal(1,1);
     if (scaleUp) {
       this.grow = true;
       this.shrink = false;
@@ -231,7 +231,7 @@ export class ScalingNode extends AnimationNode {
     if (this.active) {
       let matrix = this.groupNode.transform.getMatrix();
 
-      let difference = matrix.getVal(0, 0) / this.groupNodeSizeXDirection;
+      let difference = matrix.getVal(1, 1) / this.groupNodeSizeYDirection;
 
       if (!this.shrink && difference < this.limit) {
         this.grow = true;

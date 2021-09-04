@@ -1,4 +1,4 @@
-import {AABoxNode, CameraNode, GroupNode, Node, PyramidNode, SphereNode, TextureBoxNode} from "./nodes";
+import {AABoxNode, CameraNode, GroupNode, Node, PyramidNode, SphereNode, TextureBoxNode, LightNode} from "./nodes";
 import RasterSphere from "./raster-sphere";
 import Vector from "./vector";
 import RasterBoxOutside from "./raster-boxOutside";
@@ -11,7 +11,7 @@ import {CameraRasteriser, CameraRaytracer} from "./project-boilerplate";
  * Class traversing the Scene Graph before the actual traversal
  * to extract camera- and light-information
  * */
-export class FirstTraversalVisitorRay implements Visitor{
+export class FirstTraversalVisitorRay implements Visitor {
 	matrixStack: Matrix[];
 	inverseStack: Matrix[];
 
@@ -84,14 +84,18 @@ export class FirstTraversalVisitorRay implements Visitor{
 
 	}
 
+	visitLightNode(node: LightNode): void {
+
+	}
+
 	visitCameraNode(node: CameraNode, active: boolean) {
 		if (active) {
-			let matrix = this.matrixStack[this.matrixStack.length - 1].mul(node.matrix);
+			let toWorld = this.matrixStack[this.matrixStack.length - 1];
 
 			let cameraRaytracer = {
-				origin: matrix.mulVec(new Vector(0, 0, 0, 1)),
-				width: 1000,
-				height: 600,
+				origin: toWorld.mulVec(new Vector(0, 0, 0, 1)),
+				width: 600,
+				height: 500,
 				alpha: Math.PI / 3
 			}
 			this.camera = cameraRaytracer;

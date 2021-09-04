@@ -24,7 +24,11 @@ void main(void) {
 
   vec3 ambient = color3 * kA;
   vec3 diffuse = color3 * max(0.0, dot(v_normal, lightDirection)) * kD;
-  vec3 specular = color3 * pow(max(0.0, dot(reflectDirection, viewDirection)), shininess) * kS;
+  vec3 specular;
+  if(max(0.0, dot(v_normal, lightDirection)) > 0.0){
+    specular = color3 * pow(max(0.0, dot(reflectDirection, viewDirection)), shininess) * kS;
+  }
+
 
   gl_FragColor = vec4(ambient + diffuse + specular, v_color.a);
 }

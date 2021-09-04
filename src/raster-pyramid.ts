@@ -14,7 +14,7 @@ export default class RasterPyramid {
      */
     indexBuffer: WebGLBuffer;
     normalBuffer: WebGLBuffer;
-    // TODO private variable for color buffer
+
     colorBuffer: WebGLBuffer;
     /**
      * The amount of indices

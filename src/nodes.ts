@@ -58,7 +58,7 @@ export class CameraNode extends Node {
   /**
    * Camera
    */
-  constructor(public matrix: Matrix, public active: boolean) {
+  constructor(public active: boolean) {
     super();
   }
 

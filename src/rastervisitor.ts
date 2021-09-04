@@ -50,10 +50,6 @@ export class RasterVisitor implements Visitor {
     // clear
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-    if (camera) { // TODO ? explain
-      this.setupCamera(camera);
-    }
-
     if (phongValues) {
       this.passPhongValues(phongValues);
     }
@@ -71,6 +67,8 @@ export class RasterVisitor implements Visitor {
       this.lookat = firstTraversalVisitor.lookat;
       this.perspective = firstTraversalVisitor.perspective;
       this.passCameraPosition(firstTraversalVisitor.eye);
+    }else{
+      this.setupCamera(camera);
     }
 
     // traverse and render

@@ -108,13 +108,15 @@ window.addEventListener('load', () => {
 		near: 0.1,
 		far: 100
 	};
+
+	 */
 	cameraRaytracer = {
-		origin: new Vector(0, 0, 5, 1),
+		origin: new Vector(2, 0, 30, 1),
 		width: canvasRaytracer.width,
 		height: canvasRaytracer.height,
 		alpha: Math.PI / 3
 	}
-	 */
+
 	lightPositions = [
 		new Vector(1, 1, 1, 1)
 	];
@@ -165,11 +167,11 @@ window.addEventListener('load', () => {
 	const sphere = new SphereNode(new Vector(.5, .2, .2, 1));
 	gn3.add(gn5);
 	gn5.add(sphere);
-	otherAnimationNodes.push(
-		new JumperNode(gn5, 2, 30));
+	// otherAnimationNodes.push(
+		// new RotationNode(gn5, new Vector (0, 1, 0, 0), 20));
 
 	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
-	const aaBox = new AABoxNode(new Vector(0, 0, 0, 0), true);
+	const aaBox = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1));//new AABoxNode(new Vector(0, 0, 0, 0), true);
 	gn3.add(gn6);
 	gn6.add(aaBox);
 	otherAnimationNodes.push(
@@ -179,18 +181,20 @@ window.addEventListener('load', () => {
 	const textureCube = new TextureBoxNode('hci-logo.png');
 	scenegraph.add(gn7);
 	gn7.add(textureCube);
+	otherAnimationNodes.push(
+		new RotationNode(gn7, new Vector (0, 1, 0, 0), 20));
 
 	const barrel = new SphereNode(new Vector(0.3, 0.3, 0.3, 1));
 	const crosshair1 = new AABoxNode(new Vector(0, 0, 0, 1), true);
 	const sphere2 = new SphereNode(new Vector(.1, .1, .4, 1));
 
-	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 12, 0)));
-	const camera1 = new CameraNode(Matrix.identity(), true);
+	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 30, 0)));
+	const camera1 = new CameraNode(true);
 	scenegraph.add(cameraNode);
 	cameraNode.add(camera1);
 
-	const cameraNode2 = new GroupNode(new Translation(new Vector(0, 1.2, 1.7, 0)));
-	const camera2 = new CameraNode(Matrix.identity(), false);
+	const cameraNode2 = new GroupNode(new Translation(new Vector(0, 0, 0, 0)));
+	const camera2 = new CameraNode( false);
 	gn6.add(cameraNode2);
 	cameraNode2.add(camera2);
 
@@ -243,7 +247,7 @@ window.addEventListener('load', () => {
 	function animate(timestamp: number) {
 		simulate(timestamp - lastTimestamp);
 		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, null, lightPositions, phongValues, firstTraversalVisitorRaster);
-		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, null, lightPositions, phongValues, firstTraversalVisitorRay);
+		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, cameraRaytracer, lightPositions, phongValues, null);
 		lastTimestamp = timestamp;
 		window.requestAnimationFrame(animate);
 	}
@@ -262,11 +266,11 @@ window.addEventListener('load', () => {
 		}else{
 			rendertype = "rasteriser";
 
-			canvasRasteriser.style.zIndex = "0";
-			canvasRasteriser.style.visibility = "hidden";
+			canvasRasteriser.style.zIndex = "1";
+			canvasRasteriser.style.visibility = "visible";
 
-			canvasRaytracer.style.zIndex = "1";
-			canvasRaytracer.style.visibility = "visible";
+			canvasRaytracer.style.zIndex = "0";
+			canvasRaytracer.style.visibility = "hidden";
 
 			rasterizer_b.className = "btn btn-info";
 			raytracer_b.className = "btn btn-outline-info";
@@ -281,11 +285,11 @@ window.addEventListener('load', () => {
 		}else{
 			rendertype = "raytracer";
 
-			canvasRasteriser.style.zIndex = "1";
-			canvasRasteriser.style.visibility = "visible";
+			canvasRasteriser.style.zIndex = "0";
+			canvasRasteriser.style.visibility = "hidden";
 
-			canvasRaytracer.style.zIndex = "0";
-			canvasRaytracer.style.visibility = "hidden";
+			canvasRaytracer.style.zIndex = "1";
+			canvasRaytracer.style.visibility = "visible";
 
 			rasterizer_b.className = "btn btn-outline-info";
 			raytracer_b.className = "btn btn-info";

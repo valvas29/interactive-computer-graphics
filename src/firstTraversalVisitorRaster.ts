@@ -1,4 +1,4 @@
-import {AABoxNode, CameraNode, GroupNode, Node, PyramidNode, SphereNode, TextureBoxNode} from "./nodes";
+import {AABoxNode, CameraNode, GroupNode, LightNode, Node, PyramidNode, SphereNode, TextureBoxNode} from "./nodes";
 import RasterSphere from "./raster-sphere";
 import Vector from "./vector";
 import RasterBoxOutside from "./raster-boxOutside";
@@ -114,16 +114,20 @@ export class FirstTraversalVisitorRaster implements Visitor{
 
 	}
 
+	visitLightNode(node: LightNode): void {
+
+	}
+
 	visitCameraNode(node: CameraNode, active: boolean) {
 		if (active) {
-			let matrix = this.matrixStack[this.matrixStack.length - 1].mul(node.matrix);
+			let toWorld = this.matrixStack[this.matrixStack.length - 1];
 
 			let cameraRasteriser = {
-				eye: matrix.mulVec(new Vector(0, 0, 0, 1)),
-				center: matrix.mulVec(new Vector(0, 0, -1, 1)),
-				up: matrix.mulVec(new Vector(0, 1, 0, 0)),
+				eye: toWorld.mulVec(new Vector(0, 0, 0, 1)),
+				center: toWorld.mulVec(new Vector(0, 0, -1, 1)),
+				up: toWorld.mulVec(new Vector(0, 1, 0, 0)),
 				fovy: 60,
-				aspect: 1000 / 600,
+				aspect: 600 / 500,
 				near: 0.1,
 				far: 100
 			};

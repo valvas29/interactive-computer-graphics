@@ -15,7 +15,7 @@ window.addEventListener('load', () => {
     const ctx = canvas.getContext("2d");
 
     const sg = new GroupNode(new Translation(new Vector(0, 0, -5, 0)));
-    const gnRotation = new Rotation(new Vector(1, 0, 0, 0), 0)
+    const gnRotation = new Rotation(new Vector(0, 1, 0, 0), 0)
     const gn = new GroupNode(gnRotation);
     sg.add(gn);
     const gn1 = new GroupNode(new Translation(new Vector(1.2, .5, 0, 0)));
@@ -36,10 +36,10 @@ window.addEventListener('load', () => {
         alpha: Math.PI / 3
     }
     const phongValues = {
-        shininess: 32.0,
+        shininess: 16.0,
         kA: 0.5,
         kD: 0.9,
-        kS: 1.0
+        kS: 0.6
     }
 
     const visitor = new RayVisitor(ctx, canvas.width, canvas.height);
