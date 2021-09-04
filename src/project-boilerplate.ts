@@ -72,63 +72,36 @@ let visitorRaytracer: RayVisitor;
 let firstTraversalVisitorRaster: FirstTraversalVisitorRaster;
 let firstTraversalVisitorRay: FirstTraversalVisitorRay;
 
-let scenegraph: GroupNode;
+let sg: GroupNode;
 let animationNodes: AnimationNodes; //wenn Array vom Typ AnimationNode, kann die simulate-Methode nicht gefunden werden
 let freeFlightAnimationNodes: any[];
 let otherAnimationNodes: any[];
 let cameraNodes: any[];
 let activeCamera: CameraNode;
-let lightPositions: Array<Vector>;
 let phongValues: PhongValues;
-let rendertype = "rasteriser";
+let rendertype = "raytracer";
 
 window.addEventListener('load', () => {
-	canvasRasteriser = document.getElementById("rasteriser") as HTMLCanvasElement;
+
 	canvasRaytracer = document.getElementById("raytracer") as HTMLCanvasElement;
-	gl = canvasRasteriser.getContext("webgl2");
+
 	ctx2d = canvasRaytracer.getContext("2d");
 
-	phongShader = new Shader(gl,
-		phongVertexShader,
-		phongFragmentShader
-	);
-	textureShader = new Shader(gl,
-		textureVertexShader,
-		textureFragmentShader
-	);
-
-	//Kameras werden nicht benötigt, sind im Szenengraphen
-	/*
-	cameraRasteriser = {
-		eye: new Vector(0, 0, -30, 1),
-		center: new Vector(0, 0, 0, 1),
-		up: new Vector(0, 1, 0, 0),
-		fovy: 60,
-		aspect: canvasRasteriser.width / canvasRasteriser.height,
-		near: 0.1,
-		far: 100
-	};
-
-	 */
 	cameraRaytracer = {
-		origin: new Vector(2, 0, 30, 1),
+		origin: new Vector(0, 0, 20, 1),
 		width: canvasRaytracer.width,
 		height: canvasRaytracer.height,
 		alpha: Math.PI / 3
 	}
 
-	lightPositions = [
-		new Vector(1, 1, 1, 1)
-	];
 	phongValues = {
 		shininess: 16.0,
 		kA: 0.3,
 		kD: 0.9,
 		kS: 1.0
 	}
-	freeFlightAnimationNodes = [];
+
 	otherAnimationNodes = [];
-	cameraNodes = [];
 
 	// construct scene graph
 	// für Quaterions const sg = new GroupNode(new SQT(new Vector(1, 1, 1, 0), { angle: 0.6, axis: new Vector(0, 1, 0, 0) }, new Vector(0, 0, 0, 0)));
@@ -145,19 +118,20 @@ window.addEventListener('load', () => {
 
 	 */
 
-	scenegraph = new GroupNode(new Translation(new Vector(0, 0, 0, 0)));
+
+	sg = new GroupNode(new Translation(new Vector(0, 0, 0, 0)));
 
 	const gn1 = new GroupNode(new Translation(new Vector(2, 0, 8, 0)));
 	const gn2 = new GroupNode(new Scaling(new Vector(10, 10, 10, 1)));
 	const desktop = new AABoxNode(new Vector(0, 0, 0, 0), false);
-	scenegraph.add(gn1);
+	sg.add(gn1);
 	gn1.add(gn2);
 	gn2.add(desktop);
 
 	const gn3 = new GroupNode(new Translation(new Vector(-3, 5, 3, 0)));
 	const gn4 = new GroupNode(new Rotation(new Vector(1, 0, 0, 0), 1.5708));
 	const pyramid = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1));
-	scenegraph.add(gn3);
+	sg.add(gn3);
 	gn3.add(gn4);
 	gn4.add(pyramid);
 	otherAnimationNodes.push(
@@ -167,8 +141,8 @@ window.addEventListener('load', () => {
 	const sphere = new SphereNode(new Vector(.5, .2, .2, 1));
 	gn3.add(gn5);
 	gn5.add(sphere);
-	// otherAnimationNodes.push(
-		// new RotationNode(gn5, new Vector (0, 1, 0, 0), 20));
+	otherAnimationNodes.push(
+	new RotationNode(gn5, new Vector (0, 1, 0, 0), 20));
 
 	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
 	const aaBox = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1));//new AABoxNode(new Vector(0, 0, 0, 0), true);
@@ -179,7 +153,7 @@ window.addEventListener('load', () => {
 
 	const gn7 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
 	const textureCube = new TextureBoxNode('hci-logo.png');
-	scenegraph.add(gn7);
+	sg.add(gn7);
 	gn7.add(textureCube);
 	otherAnimationNodes.push(
 		new RotationNode(gn7, new Vector (0, 1, 0, 0), 20));
@@ -190,7 +164,7 @@ window.addEventListener('load', () => {
 
 	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 30, 0)));
 	const camera1 = new CameraNode(true);
-	scenegraph.add(cameraNode);
+	sg.add(cameraNode);
 	cameraNode.add(camera1);
 
 	const cameraNode2 = new GroupNode(new Translation(new Vector(0, 0, 0, 0)));
@@ -198,46 +172,34 @@ window.addEventListener('load', () => {
 	gn6.add(cameraNode2);
 	cameraNode2.add(camera2);
 
-	//alle cams in array sammeln und activeCamera speichern
-	cameraNodes.push(camera1)
-	cameraNodes.push(camera2);
-	activeCamera = camera1;
 
-	freeFlightAnimationNodes.push(
-		//FahrAnimationNodes
-		new TranslationNode(cameraNode, new Vector(-50, 0, 0, 0)),
-		new TranslationNode(cameraNode, new Vector(50, 0, 0, 0)),
-		new TranslationNode(cameraNode, new Vector(0, 0, -50, 0)),
-		new TranslationNode(cameraNode, new Vector(0, 0, 50, 0)),
-		new TranslationNode(cameraNode, new Vector(0, 50, 0, 0)),
-		new TranslationNode(cameraNode, new Vector(0, -50, 0, 0)),
-		new RotationNode(cameraNode, new Vector(0, 1, 0, 0), 20),
-		new RotationNode(cameraNode, new Vector(0, 1, 0, 0), -20),
-		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), 20),
-		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), -20));
+	/*
 
-	//Fahranimationen defaultmäßig aus, nur bei keydown-events
-	freeFlightAnimationNodes.forEach(el => el.turnOffActive());
+   const sg = new GroupNode(new Translation(new Vector(0, 0, -5, 0)));
+   const gnRotation = new Rotation(new Vector(0, 1, 0, 0), 0)
+   const gn = new GroupNode(gnRotation);
+   sg.add(gn);
+   const gn1 = new GroupNode(new Translation(new Vector(1.2, .5, 0, 0)));
+   gn.add(gn1);
+   gn1.add(new SphereNode(new Vector(.4, 0, 0, 1)));
+   const gn2 = new GroupNode(new Translation(new Vector(-0.8, 1, 1, 0)));
+   gn.add(gn2);
+   const gn3 = new GroupNode(new Scaling(new Vector(0.4, 0.4, 0.4, 0)));
+   gn2.add(gn3);
+   otherAnimationNodes.push(new RotationNode(gn1, new Vector(0, 1, 0, 0), 20));
+   gn3.add(new SphereNode(new Vector(0, 0, .3, 1)));
 
-	//Alle Animationen zusammenführen
-	animationNodes = {
-		freeFlightNodes: freeFlightAnimationNodes,
-		otherAnimationNodes: otherAnimationNodes
-	}
+	 */
 
-	// setup for rendering
-	setupVisitor = new RasterSetupVisitor(gl);
-	setupVisitor.setup(scenegraph);
-	firstTraversalVisitorRaster = new FirstTraversalVisitorRaster();
-	firstTraversalVisitorRay = new FirstTraversalVisitorRay();
-	visitorRasteriser = new RasterVisitor(gl, phongShader, textureShader, setupVisitor.objects);
+
+	const lightPositions = [
+		new Vector(10, 10, 10, 1)
+	];
+
 	visitorRaytracer = new RayVisitor(ctx2d, canvasRaytracer.width, canvasRaytracer.height);
 
 	function simulate(deltaT: number) {
-		for (let animationNode of animationNodes.freeFlightNodes) {
-			animationNode.simulate(deltaT);
-		}
-		for (let animationNode of animationNodes.otherAnimationNodes) {
+		for (let animationNode of otherAnimationNodes) {
 			animationNode.simulate(deltaT);
 		}
 	}
@@ -246,181 +208,11 @@ window.addEventListener('load', () => {
 
 	function animate(timestamp: number) {
 		simulate(timestamp - lastTimestamp);
-		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, null, lightPositions, phongValues, firstTraversalVisitorRaster);
-		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, cameraRaytracer, lightPositions, phongValues, null);
+		visitorRaytracer.render(sg, cameraRaytracer, lightPositions, phongValues, null);
 		lastTimestamp = timestamp;
 		window.requestAnimationFrame(animate);
 	}
 
-	Promise.all(
-		[phongShader.load(), textureShader.load()]
-	).then(x =>
-		window.requestAnimationFrame(animate)
-	);
-
-	let rasterizer_b = document.getElementById("rasterizer_b");
-
-	rasterizer_b.addEventListener('click', function (event) {
-		if (rasterizer_b.className === "btn btn-info"){
-
-		}else{
-			rendertype = "rasteriser";
-
-			canvasRasteriser.style.zIndex = "1";
-			canvasRasteriser.style.visibility = "visible";
-
-			canvasRaytracer.style.zIndex = "0";
-			canvasRaytracer.style.visibility = "hidden";
-
-			rasterizer_b.className = "btn btn-info";
-			raytracer_b.className = "btn btn-outline-info";
-		}
-	});
-
-	let raytracer_b = document.getElementById("raytracer_b");
-
-	raytracer_b.addEventListener('click', function (event) {
-		if (raytracer_b.className === "btn btn-info"){
-
-		}else{
-			rendertype = "raytracer";
-
-			canvasRasteriser.style.zIndex = "0";
-			canvasRasteriser.style.visibility = "hidden";
-
-			canvasRaytracer.style.zIndex = "1";
-			canvasRaytracer.style.visibility = "visible";
-
-			rasterizer_b.className = "btn btn-outline-info";
-			raytracer_b.className = "btn btn-info";
-		}
-	});
-
-	window.addEventListener('keydown', function (event) {
-		switch (event.key) {
-			case "c":
-				activeCamera.setActiveStatus(false);
-				if (activeCamera === camera1) {
-					camera2.setActiveStatus(true);
-					activeCamera = camera2;
-				} else {
-					camera1.setActiveStatus(true);
-					activeCamera = camera1;
-				}
-				break;
-			//switch rendertype
-			case "k":
-				if (rendertype === "rasteriser") {
-					rendertype = "raytracer";
-
-					canvasRasteriser.style.zIndex = "0";
-					canvasRasteriser.style.visibility = "hidden";
-
-					canvasRaytracer.style.zIndex = "1";
-					canvasRaytracer.style.visibility = "visible";
-				} else {
-					rendertype = "rasteriser";
-
-					canvasRasteriser.style.zIndex = "1";
-					canvasRasteriser.style.visibility = "visible";
-
-					canvasRaytracer.style.zIndex = "0";
-					canvasRaytracer.style.visibility = "hidden";
-				}
-				break;
-			//phongValues random ändern
-			case "p":
-				phongValues.shininess = Math.random() * 32;
-				phongValues.kA = Math.random() * 2;
-				phongValues.kD = Math.random() * 2;
-				phongValues.kS = Math.random() * 2;
-				break;
-			//nach links fahren
-			case "a":
-				animationNodes.freeFlightNodes[0].turnOnActive();
-				break;
-			//nach rechts fahren
-			case "d":
-				animationNodes.freeFlightNodes[1].turnOnActive();
-				break;
-			//nach vorne fahren
-			case "w":
-				animationNodes.freeFlightNodes[2].turnOnActive();
-				break;
-			//nach hinten fahren
-			case "s":
-				animationNodes.freeFlightNodes[3].turnOnActive();
-				break;
-			//nach oben fahren
-			case "q":
-				animationNodes.freeFlightNodes[4].turnOnActive();
-				break;
-			//nach unten fahren
-			case "e":
-				animationNodes.freeFlightNodes[5].turnOnActive();
-				break;
-			//nach links drehen
-			case "ArrowLeft":
-				animationNodes.freeFlightNodes[6].turnOnActive();
-				break;
-			//nach rechts drehen
-			case "ArrowRight":
-				animationNodes.freeFlightNodes[7].turnOnActive();
-				break;
-			//nach oben drehen
-			case "ArrowUp":
-				animationNodes.freeFlightNodes[8].turnOnActive();
-				break;
-			//nach unten drehen
-			case "ArrowDown":
-				animationNodes.freeFlightNodes[9].turnOnActive();
-				break;
-		}
-	});
-
-	window.addEventListener('keyup', function (event) {
-		switch (event.key) {
-			//nach links fahren
-			case "a":
-				animationNodes.freeFlightNodes[0].turnOffActive();
-				break;
-			//nach rechts fahren
-			case "d":
-				animationNodes.freeFlightNodes[1].turnOffActive();
-				break;
-			//nach vorne fahren
-			case "w":
-				animationNodes.freeFlightNodes[2].turnOffActive();
-				break;
-			//nach hinten fahren
-			case "s":
-				animationNodes.freeFlightNodes[3].turnOffActive();
-				break;
-			//nach oben fahren
-			case "q":
-				animationNodes.freeFlightNodes[4].turnOffActive();
-				break;
-			//nach unten fahren
-			case "e":
-				animationNodes.freeFlightNodes[5].turnOffActive();
-				break;
-			//nach links drehen
-			case "ArrowLeft":
-				animationNodes.freeFlightNodes[6].turnOffActive();
-				break;
-			//nach rechts drehen
-			case "ArrowRight":
-				animationNodes.freeFlightNodes[7].turnOffActive();
-				break;
-			//nach oben drehen
-			case "ArrowUp":
-				animationNodes.freeFlightNodes[8].turnOffActive();
-				break;
-			//nach unten drehen
-			case "ArrowDown":
-				animationNodes.freeFlightNodes[9].turnOffActive();
-				break;
-		}
-	});
+	window.requestAnimationFrame(animate);
 });
 

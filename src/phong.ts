@@ -36,10 +36,14 @@ export default function phong(color: Vector, intersection: Intersection, lightPo
 
     diff += Math.max(intersection.normal.dot(lightDirection.normalize()), 0.0);
 
-    spec += Math.pow(Math.max(viewDirection.normalize().dot(reflectDirection.normalize()), 0.0), phongValues.shininess);
+    if(Math.max(intersection.normal.dot(lightDirection.normalize()), 0.0)> 0.0){
+      spec += Math.pow(Math.max(viewDirection.normalize().dot(reflectDirection.normalize()), 0.0), phongValues.shininess);
+    }
+
   }
 
   let diffuse = lightColor.mul(diff).mul(kD);
+
   let specular = lightColor.mul(spec).mul(kS);
 
   return ambient.add(diffuse).add(specular);
