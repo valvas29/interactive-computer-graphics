@@ -4,7 +4,7 @@ import Vector from './vector';
 import {
 	AABoxNode,
 	GroupNode, PyramidNode, CameraNode, SphereNode,
-	TextureBoxNode
+	TextureBoxNode, LightNode
 } from './nodes';
 import {
 	RasterVisitor,
@@ -108,14 +108,13 @@ window.addEventListener('load', () => {
 		near: 0.1,
 		far: 100
 	};
-
-	 */
 	cameraRaytracer = {
 		origin: new Vector(2, 0, 30, 1),
 		width: canvasRaytracer.width,
 		height: canvasRaytracer.height,
 		alpha: Math.PI / 3
 	}
+	 */
 
 	lightPositions = [
 		new Vector(1, 1, 1, 1)
@@ -184,11 +183,14 @@ window.addEventListener('load', () => {
 	otherAnimationNodes.push(
 		new RotationNode(gn7, new Vector (0, 1, 0, 0), 20));
 
-	const barrel = new SphereNode(new Vector(0.3, 0.3, 0.3, 1));
-	const crosshair1 = new AABoxNode(new Vector(0, 0, 0, 1), true);
-	const sphere2 = new SphereNode(new Vector(.1, .1, .4, 1));
+	const light1 = new LightNode();
+	const light2 = new LightNode();
+	const light3 = new LightNode();
+	scenegraph.add(light1);
+	gn3.add(light2);
+	scenegraph.add(light3);
 
-	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 30, 0)));
+	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 12, 0)));
 	const camera1 = new CameraNode(true);
 	scenegraph.add(cameraNode);
 	cameraNode.add(camera1);
@@ -246,8 +248,8 @@ window.addEventListener('load', () => {
 
 	function animate(timestamp: number) {
 		simulate(timestamp - lastTimestamp);
-		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, null, lightPositions, phongValues, firstTraversalVisitorRaster);
-		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, cameraRaytracer, lightPositions, phongValues, null);
+		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, null, null, phongValues, firstTraversalVisitorRaster);
+		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, null, lightPositions, phongValues, firstTraversalVisitorRay);
 		lastTimestamp = timestamp;
 		window.requestAnimationFrame(animate);
 	}

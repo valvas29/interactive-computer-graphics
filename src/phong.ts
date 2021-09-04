@@ -14,33 +14,35 @@ import {PhongValues} from "./project-boilerplate";
  */
 
 export default function phong(color: Vector, intersection: Intersection, lightPositions: Array<Vector>, cameraPosition: Vector, phongValues: PhongValues): Vector {
-  //https://codepen.io/shubniggurath/pen/jRwPKm?editors=1000
-  //http://jsfiddle.net/soulwire/vBuTR/
-  //reflect function: https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/reflect.xhtml
-  const lightColor = new Vector(0.8, 0.8, 0.8, 0);
-  const kA = phongValues.kA;
-  const kD = phongValues.kD;
-  const kS = phongValues.kS;
+	//https://codepen.io/shubniggurath/pen/jRwPKm?editors=1000
+	//http://jsfiddle.net/soulwire/vBuTR/
+	//reflect function: https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/reflect.xhtml
+	const lightColor = new Vector(0.8, 0.8, 0.8, 0);
+	const kA = phongValues.kA;
+	const kD = phongValues.kD;
+	const kS = phongValues.kS;
 
-  color = new Vector(color.r, color.g, color.b, 1);
+	color = new Vector(color.r, color.g, color.b, 1);
 
-  let viewDirection = cameraPosition.sub(intersection.point);
+	let viewDirection = cameraPosition.sub(intersection.point);
 
-  let ambient = color.mul(kA);
+	let ambient = color.mul(kA);
 
-  let diff = 0;
-  let spec = 0;
-  for (let i = 0; i < lightPositions.length; i++) {
-    let lightDirection = lightPositions[i].sub(intersection.point);
-    let reflectDirection = lightDirection.normalize().mul(-1).sub(intersection.normal.mul(intersection.normal.dot(lightDirection.normalize().mul(-1)) * 2.0));
+	let diff = 0;
+	let spec = 0;
+	for (let i = 0; i < lightPositions.length; i++) {
+		let lightDirection = lightPositions[i].sub(intersection.point);
+		let reflectDirection = lightDirection.normalize().mul(-1).sub(intersection.normal.mul(intersection.normal.dot(lightDirection.normalize().mul(-1)) * 2.0));
 
-    diff += Math.max(intersection.normal.dot(lightDirection.normalize()), 0.0);
+		diff += Math.max(intersection.normal.dot(lightDirection.normalize()), 0.0);
+		if (Math.max(intersection.normal.dot(lightDirection.normalize()), 0.0) > 0.0) {
+			spec += Math.pow(Math.max(viewDirection.normalize().dot(reflectDirection.normalize()), 0.0), phongValues.shininess);
+		}
+	}
 
-    spec += Math.pow(Math.max(viewDirection.normalize().dot(reflectDirection.normalize()), 0.0), phongValues.shininess);
-  }
 
-  let diffuse = lightColor.mul(diff).mul(kD);
-  let specular = lightColor.mul(spec).mul(kS);
+	let diffuse = lightColor.mul(diff).mul(kD);
+	let specular = lightColor.mul(spec).mul(kS);
 
-  return ambient.add(diffuse).add(specular);
+	return ambient.add(diffuse).add(specular);
 }

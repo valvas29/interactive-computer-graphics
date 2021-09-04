@@ -34,6 +34,8 @@ export class FirstTraversalVisitorRaster implements Visitor{
 	 */
 	eye: Vector;
 
+	lightPositions: Array<Vector>;
+
 	/**
 	 * Creates a new FirstTraversalVisitorRaster
 	 */
@@ -50,6 +52,7 @@ export class FirstTraversalVisitorRaster implements Visitor{
 		this.inverseStack = [];
 		this.matrixStack.push(Matrix.identity());
 		this.inverseStack.push(Matrix.identity());
+		this.lightPositions = [];
 		rootNode.accept(this);
 	}
 
@@ -115,7 +118,9 @@ export class FirstTraversalVisitorRaster implements Visitor{
 	}
 
 	visitLightNode(node: LightNode): void {
+		let toWorld = this.matrixStack[this.matrixStack.length - 1];
 
+		this.lightPositions.push(toWorld.mulVec(new Vector(0, 0, 0, 1)));
 	}
 
 	visitCameraNode(node: CameraNode, active: boolean) {

@@ -80,7 +80,7 @@ export class LightNode extends Node {
   /**
    * Lichtquelle / Light
    */
-  constructor(public matrix: Matrix) {
+  constructor() {
     super();
   }
 

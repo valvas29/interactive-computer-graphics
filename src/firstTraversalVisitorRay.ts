@@ -21,6 +21,7 @@ export class FirstTraversalVisitorRay implements Visitor {
 	 * view coordinate system
 	 */
 	camera: CameraRaytracer;
+	lightPositions: Array<Vector>;
 
 	/**
 	 * Creates a new FirstTraversalVisitorRay
@@ -85,7 +86,9 @@ export class FirstTraversalVisitorRay implements Visitor {
 	}
 
 	visitLightNode(node: LightNode): void {
+		let toWorld = this.matrixStack[this.matrixStack.length - 1];
 
+		this.lightPositions.push(toWorld.mulVec(new Vector(0, 0, 0, 1)));
 	}
 
 	visitCameraNode(node: CameraNode, active: boolean) {
