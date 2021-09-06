@@ -165,12 +165,12 @@ window.addEventListener('load', () => {
 	controlledAnimationNodes.push(
 		new ScalingNode(gn4, true));
 
-	const gn5 = new GroupNode(new Translation(new Vector(4, -3, 2, 0)));
+	const gn5 = new GroupNode(new Translation(new Vector(4, -8, 2, 0)));
 	const sphere1 = new SphereNode(new Vector(.5, .2, .2, 1));
 	gn3.add(gn5);
 	gn5.add(sphere1);
-	//otherAnimationNodes.push(
-		//new JumperNode(gn5, 2, 15));
+	otherAnimationNodes.push(
+		new JumperNode(gn5, 7, 20));
 
 	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
 	const aaBox = new AABoxNode(new Vector(0, 0, 0, 0), true);
@@ -206,7 +206,7 @@ window.addEventListener('load', () => {
 	gn3.add(lightNode3);
 	lightNode3.add(light3);
 
-	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 12, 0)));
+	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 14, 0)));
 	const camera1 = new CameraNode(true);
 	scenegraph.add(cameraNode);
 	cameraNode.add(camera1);
