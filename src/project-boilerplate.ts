@@ -150,7 +150,7 @@ window.addEventListener('load', () => {
 	scenegraph = new GroupNode(new Translation(new Vector(0, 0, -10, 0)));
 
 	const gn1 = new GroupNode(new Translation(new Vector(2, 0, 8, 0)));
-	const gn2 = new GroupNode(new Scaling(new Vector(10, 10, 10, 1)));
+	const gn2 = new GroupNode(new Scaling(new Vector(15, 15, 15, 1)));
 	const desktop = new AABoxNode(new Vector(0, 0, 0, 0), false);
 	scenegraph.add(gn1);
 	gn1.add(gn2);
@@ -166,11 +166,11 @@ window.addEventListener('load', () => {
 		new ScalingNode(gn4, true));
 
 	const gn5 = new GroupNode(new Translation(new Vector(4, -3, 2, 0)));
-	const sphere = new SphereNode(new Vector(.5, .2, .2, 1));
+	const sphere1 = new SphereNode(new Vector(.5, .2, .2, 1));
 	gn3.add(gn5);
-	gn5.add(sphere);
+	gn5.add(sphere1);
 	otherAnimationNodes.push(
-		new JumperNode(gn5, 1, 15));
+		new JumperNode(gn5, 2, 15));
 
 	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
 	const aaBox = new AABoxNode(new Vector(0, 0, 0, 0), true);
@@ -183,18 +183,28 @@ window.addEventListener('load', () => {
 	const textureCube = new TextureBoxNode('hci-logo.png');
 	scenegraph.add(gn7);
 	gn7.add(textureCube);
-	//otherAnimationNodes.push(
-		//new RotationNode(gn7, new Vector (1, 0, 0, 0), 20));
+	otherAnimationNodes.push(
+		new RotationNode(gn7, new Vector (1, 0, 0, 0), 20));
 
-	const gn8 = new GroupNode(new Translation(new Vector(1, 1, 9, 0)));
-	scenegraph.add(gn8);
+	const gn8 = new GroupNode(new Translation(new Vector(-1, -3, -2, 0)));
+	const sphere2 = new SphereNode(new Vector(0, .7, .2, 1));
+	gn6.add(gn8);
+	gn8.add(sphere2);
 
 	const light1 = new LightNode();
+	const lightNode1 = new GroupNode(new Translation(new Vector(-3, -3, 9, 0)));
+	scenegraph.add(lightNode1);
+	lightNode1.add(light1);
+
 	const light2 = new LightNode();
+	const lightNode2 = new GroupNode(new Translation(new Vector(1, -1, 4, 0)));
+	gn5.add(lightNode2);
+	lightNode2.add(light2);
+
 	const light3 = new LightNode();
-	gn8.add(light1);
-	//gn3.add(light2);
-	//gn5.add(light3);
+	const lightNode3 = new GroupNode(new Translation(new Vector(8, -1, 1, 0)));
+	gn3.add(lightNode3);
+	lightNode3.add(light3);
 
 	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 12, 0)));
 	const camera1 = new CameraNode(true);

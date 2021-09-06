@@ -40,7 +40,7 @@ void main(void) {
     if (max(0.0, dot(v_normal, lightDirection1)) > 0.0){
         spec += pow(max(0.0, dot(reflectDirection1, viewDirection)), shininess);
     }
-    /*
+
     vec3 lightDirection2 = normalize(v_lightPosition2 - v_position);
     vec3 reflectDirection2 = normalize(v_normal * (dot(v_normal, lightDirection2) * 2.0) - lightDirection1);
 
@@ -56,7 +56,7 @@ void main(void) {
     if (max(0.0, dot(v_normal, lightDirection3)) > 0.0){
         spec += pow(max(0.0, dot(reflectDirection3, viewDirection)), shininess);
     }
-    */
+
 
     vec3 diffuse = textureColorVec3 * diff * kD;
     vec3 specular = textureColorVec3 * spec * kS;
