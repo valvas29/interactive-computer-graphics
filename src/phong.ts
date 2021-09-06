@@ -17,7 +17,7 @@ export default function phong(color: Vector, intersection: Intersection, lightPo
 	//https://codepen.io/shubniggurath/pen/jRwPKm?editors=1000
 	//http://jsfiddle.net/soulwire/vBuTR/
 	//reflect function: https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/reflect.xhtml
-	const lightColor = new Vector(0.8, 0.8, 0.8, 0);
+	const lightColor = new Vector(0.5, 0.5, 0.5, 0);
 	const kA = phongValues.kA;
 	const kD = phongValues.kD;
 	const kS = phongValues.kS;
@@ -41,8 +41,8 @@ export default function phong(color: Vector, intersection: Intersection, lightPo
 	}
 
 
-	let diffuse = lightColor.mul(diff).mul(kD);
-	let specular = lightColor.mul(spec).mul(kS);
+	let diffuse = color.mul(diff).mul(kD);
+	let specular = color.mul(spec).mul(kS);
 
 	return ambient.add(diffuse).add(specular);
 }

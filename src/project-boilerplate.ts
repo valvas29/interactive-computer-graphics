@@ -169,8 +169,8 @@ window.addEventListener('load', () => {
 	const sphere1 = new SphereNode(new Vector(.5, .2, .2, 1));
 	gn3.add(gn5);
 	gn5.add(sphere1);
-	otherAnimationNodes.push(
-		new JumperNode(gn5, 2, 15));
+	//otherAnimationNodes.push(
+		//new JumperNode(gn5, 2, 15));
 
 	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
 	const aaBox = new AABoxNode(new Vector(0, 0, 0, 0), true);

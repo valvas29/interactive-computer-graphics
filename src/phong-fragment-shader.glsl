@@ -59,7 +59,6 @@ void main(void) {
         spec += pow(max(0.0, dot(reflectDirection3, viewDirection)), shininess);
     }
 
-
     vec3 diffuse = color3 * diff * kD;
     vec3 specular = color3 * spec * kS;
 

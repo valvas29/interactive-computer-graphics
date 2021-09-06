@@ -100,7 +100,7 @@ export class FirstTraversalVisitorRay implements Visitor {
 				origin: toWorld.mulVec(new Vector(0, 0, 0, 1)),
 				width: 600,
 				height: 500,
-				alpha: Math.PI / 3
+				alpha: Math.PI / 2.6
 			}
 			this.camera = cameraRaytracer;
 		}
