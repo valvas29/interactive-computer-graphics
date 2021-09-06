@@ -54,6 +54,7 @@ export interface PhongValues {
 
 interface AnimationNodes {
 	freeFlightNodes: any[],
+	controlledAnimationNodes: any[];
 	otherAnimationNodes: any[]
 }
 
@@ -75,6 +76,7 @@ let firstTraversalVisitorRay: FirstTraversalVisitorRay;
 let scenegraph: GroupNode;
 let animationNodes: AnimationNodes; //wenn Array vom Typ AnimationNode, kann die simulate-Methode nicht gefunden werden
 let freeFlightAnimationNodes: any[];
+let controlledAnimationNodes: any[];
 let otherAnimationNodes: any[];
 let cameraNodes: any[];
 let activeCamera: CameraNode;
@@ -126,6 +128,7 @@ window.addEventListener('load', () => {
 		kS: 1.0
 	}
 	freeFlightAnimationNodes = [];
+	controlledAnimationNodes = [];
 	otherAnimationNodes = [];
 	cameraNodes = [];
 
@@ -144,7 +147,7 @@ window.addEventListener('load', () => {
 
 	 */
 
-	scenegraph = new GroupNode(new Translation(new Vector(0, 0, 0, 0)));
+	scenegraph = new GroupNode(new Translation(new Vector(0, 0, -10, 0)));
 
 	const gn1 = new GroupNode(new Translation(new Vector(2, 0, 8, 0)));
 	const gn2 = new GroupNode(new Scaling(new Vector(10, 10, 10, 1)));
@@ -159,21 +162,21 @@ window.addEventListener('load', () => {
 	scenegraph.add(gn3);
 	gn3.add(gn4);
 	gn4.add(pyramid);
-	otherAnimationNodes.push(
+	controlledAnimationNodes.push(
 		new ScalingNode(gn4, true));
 
 	const gn5 = new GroupNode(new Translation(new Vector(4, -3, 2, 0)));
 	const sphere = new SphereNode(new Vector(.5, .2, .2, 1));
 	gn3.add(gn5);
 	gn5.add(sphere);
-	// otherAnimationNodes.push(
-		// new RotationNode(gn5, new Vector (0, 1, 0, 0), 20));
+	otherAnimationNodes.push(
+		new JumperNode(gn5, 1, 20));
 
 	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
-	const aaBox = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1));//new AABoxNode(new Vector(0, 0, 0, 0), true);
+	const aaBox = new AABoxNode(new Vector(1, 0.5, 1, 1), true);//new AABoxNode(new Vector(0, 0, 0, 0), true);
 	gn3.add(gn6);
 	gn6.add(aaBox);
-	otherAnimationNodes.push(
+	controlledAnimationNodes.push(
 		new CycleNode(gn6, new Vector(10, 0, 0, 0), new Vector (0, 1, 0, 0), 10));
 
 	const gn7 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
@@ -183,12 +186,15 @@ window.addEventListener('load', () => {
 	otherAnimationNodes.push(
 		new RotationNode(gn7, new Vector (0, 1, 0, 0), 20));
 
+	const gn8 = new GroupNode(new Translation(new Vector(1, 1, 9, 0)));
+	scenegraph.add(gn8);
+
 	const light1 = new LightNode();
 	const light2 = new LightNode();
 	const light3 = new LightNode();
-	scenegraph.add(light1);
-	gn3.add(light2);
-	scenegraph.add(light3);
+	gn8.add(light1);
+	//gn3.add(light2);
+	//gn5.add(light3);
 
 	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 12, 0)));
 	const camera1 = new CameraNode(true);
@@ -218,12 +224,14 @@ window.addEventListener('load', () => {
 		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), 20),
 		new RotationNode(cameraNode, new Vector(1, 0, 0, 0), -20));
 
-	//Fahranimationen defaultmäßig aus, nur bei keydown-events
+	//Fahranimationen und ControlledAnimationNodes defaultmäßig aus, nur bei keydown-events
 	freeFlightAnimationNodes.forEach(el => el.turnOffActive());
+	controlledAnimationNodes.forEach(el => el.turnOffActive());
 
 	//Alle Animationen zusammenführen
 	animationNodes = {
 		freeFlightNodes: freeFlightAnimationNodes,
+		controlledAnimationNodes: controlledAnimationNodes,
 		otherAnimationNodes: otherAnimationNodes
 	}
 
@@ -239,6 +247,9 @@ window.addEventListener('load', () => {
 		for (let animationNode of animationNodes.freeFlightNodes) {
 			animationNode.simulate(deltaT);
 		}
+		for (let animationNode of animationNodes.controlledAnimationNodes) {
+			animationNode.simulate(deltaT);
+		}
 		for (let animationNode of animationNodes.otherAnimationNodes) {
 			animationNode.simulate(deltaT);
 		}
@@ -250,6 +261,7 @@ window.addEventListener('load', () => {
 		simulate(timestamp - lastTimestamp);
 		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, null, null, phongValues, firstTraversalVisitorRaster);
 		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, null, lightPositions, phongValues, firstTraversalVisitorRay);
+
 		lastTimestamp = timestamp;
 		window.requestAnimationFrame(animate);
 	}
@@ -267,6 +279,8 @@ window.addEventListener('load', () => {
 
 		}else{
 			rendertype = "rasteriser";
+
+			otherAnimationNodes.forEach(el => el.turnOnActive());
 
 			canvasRasteriser.style.zIndex = "1";
 			canvasRasteriser.style.visibility = "visible";
@@ -286,6 +300,8 @@ window.addEventListener('load', () => {
 
 		}else{
 			rendertype = "raytracer";
+
+			otherAnimationNodes.forEach(el => el.turnOffActive());
 
 			canvasRasteriser.style.zIndex = "0";
 			canvasRasteriser.style.visibility = "hidden";
@@ -315,6 +331,8 @@ window.addEventListener('load', () => {
 				if (rendertype === "rasteriser") {
 					rendertype = "raytracer";
 
+					otherAnimationNodes.forEach(el => el.turnOffActive());
+
 					canvasRasteriser.style.zIndex = "0";
 					canvasRasteriser.style.visibility = "hidden";
 
@@ -322,6 +340,8 @@ window.addEventListener('load', () => {
 					canvasRaytracer.style.visibility = "visible";
 				} else {
 					rendertype = "rasteriser";
+
+					otherAnimationNodes.forEach(el => el.turnOnActive());
 
 					canvasRasteriser.style.zIndex = "1";
 					canvasRasteriser.style.visibility = "visible";
@@ -336,6 +356,14 @@ window.addEventListener('load', () => {
 				phongValues.kA = Math.random() * 2;
 				phongValues.kD = Math.random() * 2;
 				phongValues.kS = Math.random() * 2;
+				break;
+			//controlledAnimationNode[0]
+			case "u":
+				animationNodes.controlledAnimationNodes[0].turnOnActive();
+				break;
+			//controlledAnimationNode[1]
+			case "i":
+				animationNodes.controlledAnimationNodes[1].turnOnActive();
 				break;
 			//nach links fahren
 			case "a":
@@ -382,6 +410,14 @@ window.addEventListener('load', () => {
 
 	window.addEventListener('keyup', function (event) {
 		switch (event.key) {
+			//controlledAnimationNode[0]
+			case "u":
+				animationNodes.controlledAnimationNodes[0].turnOffActive();
+				break;
+			//controlledAnimationNode[1]
+			case "i":
+				animationNodes.controlledAnimationNodes[1].turnOffActive();
+				break;
 			//nach links fahren
 			case "a":
 				animationNodes.freeFlightNodes[0].turnOffActive();

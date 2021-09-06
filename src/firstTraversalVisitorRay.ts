@@ -40,6 +40,7 @@ export class FirstTraversalVisitorRay implements Visitor {
 		this.inverseStack = [];
 		this.matrixStack.push(Matrix.identity());
 		this.inverseStack.push(Matrix.identity());
+		this.lightPositions = [];
 		rootNode.accept(this);
 	}
 

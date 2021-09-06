@@ -20,6 +20,8 @@ varying vec3 v_normal;
 // TODO
 varying vec3 v_position;
 
+//TODO OOOOOOOOOOO FALSCHER SHADER, WIRD NICHT BENUTZT
+
 void main() {
   gl_Position = V * M * vec4(a_position, 1.0);
   
