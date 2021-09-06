@@ -32,6 +32,7 @@ export default class RayVisitor implements Visitor {
 	intersectionColor: Vector;
 	ray: Ray;
 	camera: CameraRaytracer;
+	lightPositions: Array<Vector>;
 
 	/**
 	 * Creates a new RayVisitor
@@ -54,7 +55,7 @@ export default class RayVisitor implements Visitor {
 	render(
 		rootNode: Node,
 		camera: { origin: Vector, width: number, height: number, alpha: number } | null,
-		lightPositions: Array<Vector>,
+		lightPositions: Array<Vector> | null,
 		phongValues: PhongValues,
 		firstTraversalVisitorRay: FirstTraversalVisitorRay
 	) {
@@ -66,6 +67,7 @@ export default class RayVisitor implements Visitor {
 			//first traversal
 			firstTraversalVisitorRay.setup(rootNode);
 			this.camera = firstTraversalVisitorRay.camera;
+			this.lightPositions = firstTraversalVisitorRay.lightPositions;
 		} else {
 			this.camera = camera;
 		}
@@ -96,7 +98,7 @@ export default class RayVisitor implements Visitor {
 						data[4 * (width * y + x) + 2] = 0;
 						data[4 * (width * y + x) + 3] = 255;
 					} else {
-						let color = phong(this.intersectionColor, this.intersection, lightPositions, this.camera.origin, phongValues);
+						let color = phong(this.intersectionColor, this.intersection, this.lightPositions, this.camera.origin, phongValues);
 						data[4 * (width * y + x) + 0] = color.r * 255;
 						data[4 * (width * y + x) + 1] = color.g * 255;
 						data[4 * (width * y + x) + 2] = color.b * 255;

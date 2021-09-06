@@ -128,20 +128,26 @@ export class RasterVisitor implements Visitor {
 	}
 
 	private passCameraPosition(eye: Vector) {
-		//TODO for texture shader also
 		const shader = this.shader;
 		shader.use();
-
 		shader.getUniformVec3("cameraPosition").set(eye);
+
+		const textureShader = this.textureshader;
+		textureShader.use();
+		textureShader.getUniformVec3("cameraPosition").set(eye);
 	}
 
 	private passLightPositions(lightPositions: Array<Vector>) {
-		//TODO for texture shader also
 		const shader = this.shader;
 		shader.use();
-
 		for (let i = 0; i < lightPositions.length; i++) {
 			shader.getUniformVec3("lightPosition" + (i + 1)).set(lightPositions[i]);
+		}
+
+		const textureShader = this.textureshader;
+		textureShader.use();
+		for (let i = 0; i < lightPositions.length; i++) {
+			textureShader.getUniformVec3("lightPosition" + (i + 1)).set(lightPositions[i]);
 		}
 	}
 

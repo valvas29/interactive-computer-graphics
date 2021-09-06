@@ -170,10 +170,10 @@ window.addEventListener('load', () => {
 	gn3.add(gn5);
 	gn5.add(sphere);
 	otherAnimationNodes.push(
-		new JumperNode(gn5, 1, 20));
+		new JumperNode(gn5, 1, 15));
 
 	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
-	const aaBox = new AABoxNode(new Vector(1, 0.5, 1, 1), true);//new AABoxNode(new Vector(0, 0, 0, 0), true);
+	const aaBox = new AABoxNode(new Vector(0, 0, 0, 0), true);
 	gn3.add(gn6);
 	gn6.add(aaBox);
 	controlledAnimationNodes.push(
@@ -183,8 +183,8 @@ window.addEventListener('load', () => {
 	const textureCube = new TextureBoxNode('hci-logo.png');
 	scenegraph.add(gn7);
 	gn7.add(textureCube);
-	otherAnimationNodes.push(
-		new RotationNode(gn7, new Vector (0, 1, 0, 0), 20));
+	//otherAnimationNodes.push(
+		//new RotationNode(gn7, new Vector (1, 0, 0, 0), 20));
 
 	const gn8 = new GroupNode(new Translation(new Vector(1, 1, 9, 0)));
 	scenegraph.add(gn8);
@@ -260,7 +260,7 @@ window.addEventListener('load', () => {
 	function animate(timestamp: number) {
 		simulate(timestamp - lastTimestamp);
 		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, null, null, phongValues, firstTraversalVisitorRaster);
-		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, null, lightPositions, phongValues, firstTraversalVisitorRay);
+		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, null, null, phongValues, firstTraversalVisitorRay);
 
 		lastTimestamp = timestamp;
 		window.requestAnimationFrame(animate);
