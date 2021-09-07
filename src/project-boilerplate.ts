@@ -312,6 +312,8 @@ window.addEventListener('load', () => {
 			rendertype = "raytracer";
 
 			otherAnimationNodes.forEach(el => el.turnOffActive());
+			//Nur gn5-Animation an
+			otherAnimationNodes[0].turnOnActive();
 
 			canvasRasteriser.style.zIndex = "0";
 			canvasRasteriser.style.visibility = "hidden";
@@ -342,6 +344,8 @@ window.addEventListener('load', () => {
 					rendertype = "raytracer";
 
 					otherAnimationNodes.forEach(el => el.turnOffActive());
+					//Nur gn5-Animation an
+					otherAnimationNodes[0].turnOnActive();
 
 					canvasRasteriser.style.zIndex = "0";
 					canvasRasteriser.style.visibility = "hidden";
