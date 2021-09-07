@@ -146,9 +146,14 @@ export class JumperNode extends AnimationNode {
    * @param deltaT The time difference, the animation is advanced by
    */
   simulate(deltaT: number) {
+    //TODO deltaT ist jetzt fix, dass die Kugel nicht mehr wegfliegt
+    if (deltaT > 1000) deltaT = 1000;
+
     if (this.active) {
       let matrix = this.groupNode.transform.getMatrix();
       let difference = matrix.getVal(1, 3) - this.groupNodeYValue;
+
+      if (difference )
 
       if (!this.down && difference < this.height) {
         this.up = true;

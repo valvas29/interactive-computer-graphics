@@ -192,18 +192,18 @@ window.addEventListener('load', () => {
 	gn6.add(gn8);
 	gn8.add(sphere2);
 
-	const light1 = new LightNode();
 	const lightNode1 = new GroupNode(new Translation(new Vector(-3, -3, 9, 0)));
+	const light1 = new LightNode();
 	scenegraph.add(lightNode1);
 	lightNode1.add(light1);
 
-	const light2 = new LightNode();
 	const lightNode2 = new GroupNode(new Translation(new Vector(1, -1, 4, 0)));
+	const light2 = new LightNode();
 	gn5.add(lightNode2);
 	lightNode2.add(light2);
 
-	const light3 = new LightNode();
 	const lightNode3 = new GroupNode(new Translation(new Vector(8, -1, 1, 0)));
+	const light3 = new LightNode();
 	gn3.add(lightNode3);
 	lightNode3.add(light3);
 
