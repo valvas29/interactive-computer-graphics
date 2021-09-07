@@ -121,11 +121,12 @@ window.addEventListener('load', () => {
 	lightPositions = [
 		new Vector(1, 1, 1, 1)
 	];
+	//TODO Änderungen an phongValues auch im project.html für die Slider ändern
 	phongValues = {
 		shininess: 16.0,
-		kA: 0.3,
-		kD: 0.9,
-		kS: 1.0
+		kA: 0.2,
+		kD: 0.7,
+		kS: 0.7
 	}
 	freeFlightAnimationNodes = [];
 	controlledAnimationNodes = [];
@@ -282,6 +283,25 @@ window.addEventListener('load', () => {
 		window.requestAnimationFrame(animate)
 	);
 
+	//SLIDERS
+	const kA = document.getElementById("kA") as HTMLInputElement;
+	kA.onchange = function () {
+		phongValues.kA = Number(kA.value);
+	}
+	const kD = document.getElementById("kD") as HTMLInputElement;
+	kD.onchange = function () {
+		phongValues.kD = Number(kD.value);
+	}
+	const kS = document.getElementById("kS") as HTMLInputElement;
+	kS.onchange = function () {
+		phongValues.kS = Number(kS.value);
+	}
+	const shininessElement = document.getElementById("shininess") as HTMLInputElement;
+	shininessElement.onchange = function () {
+		phongValues.shininess = Number(shininessElement.value);
+	}
+
+	//RENDERER-BUTTONS
 	let rasterizer_b = document.getElementById("rasterizer_b");
 
 	rasterizer_b.addEventListener('click', function (event) {
@@ -326,6 +346,7 @@ window.addEventListener('load', () => {
 		}
 	});
 
+	//EVENT-LISTENERS
 	window.addEventListener('keydown', function (event) {
 		switch (event.key) {
 			case "c":
