@@ -212,7 +212,7 @@ window.addEventListener('load', () => {
 	scenegraph.add(cameraNode);
 	cameraNode.add(camera1);
 
-	const cameraNode2 = new GroupNode(new Translation(new Vector(0, 0, 0, 0)));
+	const cameraNode2 = new GroupNode(new Translation(new Vector(0, 1.5, 2.5, 0)));
 	const camera2 = new CameraNode( false);
 	gn6.add(cameraNode2);
 	cameraNode2.add(camera2);
@@ -384,13 +384,6 @@ window.addEventListener('load', () => {
 					canvasRaytracer.style.zIndex = "0";
 					canvasRaytracer.style.visibility = "hidden";
 				}
-				break;
-			//phongValues random ändern
-			case "p":
-				phongValues.shininess = Math.random() * 32;
-				phongValues.kA = Math.random() * 2;
-				phongValues.kD = Math.random() * 2;
-				phongValues.kS = Math.random() * 2;
 				break;
 			//controlledAnimationNode[0]
 			case "u":
