@@ -28,34 +28,37 @@ void main(void) {
 
     vec3 ambient = color3 * kA;
 
-    vec3 viewDirection = normalize(v_cameraPosition - v_position);
+    vec3 viewDirection = normalize( - v_position);
 
 
     float diff = 0.0;
     float spec = 0.0;
 
+    vec3 normalizedNormal = normalize(v_normal);
 
     vec3 lightDirection1 = normalize(v_lightPosition1 - v_position);
-    vec3 reflectDirection1 = normalize(v_normal * (dot(v_normal, lightDirection1) * 2.0) - lightDirection1);
+    vec3 reflectDirection1 = normalize(normalizedNormal * (dot(normalizedNormal, lightDirection1) * 2.0) - lightDirection1);
+    // vec3 reflectDirection1 = reflect(-lightDirection1, normalizedNormal);
 
-    diff += max(0.0, dot(v_normal, lightDirection1));
-    if (max(0.0, dot(v_normal, lightDirection1)) > 0.0){
+    diff += max(0.0, dot(normalizedNormal, lightDirection1));
+    // https://stackoverflow.com/questions/20008089/specular-lighting-appears-on-both-eye-facing-and-rear-sides-of-object
+    if (max(0.0, dot(normalizedNormal, lightDirection1)) > 0.0){
         spec += pow(max(0.0, dot(reflectDirection1, viewDirection)), shininess);
     }
 
     vec3 lightDirection2 = normalize(v_lightPosition2 - v_position);
-    vec3 reflectDirection2 = normalize(v_normal * (dot(v_normal, lightDirection2) * 2.0) - lightDirection1);
+    vec3 reflectDirection2 = normalize(normalizedNormal * (dot(normalizedNormal, lightDirection2) * 2.0) - lightDirection2);
 
-    diff += max(0.0, dot(v_normal, lightDirection2));
-    if (max(0.0, dot(v_normal, lightDirection2)) > 0.0){
+    diff += max(0.0, dot(normalizedNormal, lightDirection2));
+    if (max(0.0, dot(normalizedNormal, lightDirection2)) > 0.0){
         spec += pow(max(0.0, dot(reflectDirection2, viewDirection)), shininess);
     }
 
     vec3 lightDirection3 = normalize(v_lightPosition3 - v_position);
-    vec3 reflectDirection3 = normalize(v_normal * (dot(v_normal, lightDirection3) * 2.0) - lightDirection1);
+    vec3 reflectDirection3 = normalize(normalizedNormal * (dot(normalizedNormal, lightDirection3) * 2.0) - lightDirection3);
 
-    diff += max(0.0, dot(v_normal, lightDirection3));
-    if (max(0.0, dot(v_normal, lightDirection3)) > 0.0){
+    diff += max(0.0, dot(normalizedNormal, lightDirection3));
+    if (max(0.0, dot(normalizedNormal, lightDirection3)) > 0.0){
         spec += pow(max(0.0, dot(reflectDirection3, viewDirection)), shininess);
     }
 

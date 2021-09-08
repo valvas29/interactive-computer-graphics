@@ -82,14 +82,17 @@ export class CycleNode extends AnimationNode {
     // group node to reflect a translation
     if (this.active) {
       let matrix = this.groupNode.transform.getMatrix();
+      let inverse = this.groupNode.transform.getInverseMatrix();
 
       let deltaTranslationVector = this.translation.mul(0.0001 * deltaT);
       let translation = new Translation(deltaTranslationVector);
       translation.matrix = matrix.mul(translation.getMatrix());
+      translation.inverse = translation.inverse.mul(inverse);
 
       let rotation = new Rotation(this.axisRotation, this.speed * 0.0001 * deltaT);
 
       translation.matrix = translation.matrix.mul(rotation.matrix);
+      translation.inverse = rotation.inverse.mul(translation.inverse);
 
       this.groupNode.transform = translation;
     }
@@ -151,6 +154,8 @@ export class JumperNode extends AnimationNode {
 
     if (this.active) {
       let matrix = this.groupNode.transform.getMatrix();
+      let inverse = this.groupNode.transform.getInverseMatrix();
+
       let difference = matrix.getVal(1, 3) - this.groupNodeYValue;
 
       if (difference )
@@ -176,6 +181,7 @@ export class JumperNode extends AnimationNode {
       let deltaVector = this.vector.mul(0.0001 * deltaT);
       let translation = new Translation(deltaVector);
       translation.matrix = matrix.mul(translation.getMatrix());
+      translation.inverse = translation.getInverseMatrix().mul(inverse);
       this.groupNode.transform = translation;
     }
   }
@@ -202,8 +208,8 @@ export class ScalingNode extends AnimationNode {
    */
   limit: number;
 
-  grow: boolean;//helper
-  shrink: boolean;//helper
+  grow: boolean; // helper
+  shrink: boolean; // helper
 
   /**
    * Creates a new ScalingNode, scales to triple/third size, scales back -> repeat
@@ -235,6 +241,7 @@ export class ScalingNode extends AnimationNode {
     // group node to reflect a translation
     if (this.active) {
       let matrix = this.groupNode.transform.getMatrix();
+      let inverse = this.groupNode.transform.getInverseMatrix();
 
       let difference = matrix.getVal(1, 1) / this.groupNodeSizeYDirection;
 
@@ -260,6 +267,7 @@ export class ScalingNode extends AnimationNode {
 
       let scaling = new Scaling(deltaVector);
       scaling.matrix = matrix.mul(scaling.getMatrix());
+      scaling.inverse = scaling.inverse.mul(inverse);
       this.groupNode.transform = scaling;
     }
   }
@@ -294,9 +302,12 @@ export class TranslationNode extends AnimationNode {
     // group node to reflect a translation
     if (this.active) {
       let matrix = this.groupNode.transform.getMatrix();
+      let inverse = this.groupNode.transform.getInverseMatrix();
+
       let deltaVector = this.vector.mul(0.0001 * deltaT);
       let translation = new Translation(deltaVector);
       translation.matrix = matrix.mul(translation.getMatrix());
+      translation.inverse = translation.getInverseMatrix().mul(inverse);
       this.groupNode.transform = translation;
     }
   }
@@ -337,8 +348,11 @@ export class RotationNode extends AnimationNode {
     // group node to reflect a rotation
     if (this.active) {
       let matrix = this.groupNode.transform.getMatrix();
+      let inverse = this.groupNode.transform.getInverseMatrix();
+
       let rotation = new Rotation(this.axis, 0.0001 * this.angle * deltaT);
       rotation.matrix = matrix.mul(rotation.getMatrix());
+      rotation.inverse = rotation.getInverseMatrix().mul(inverse);
       this.groupNode.transform = rotation;
     }
   }
@@ -381,5 +395,4 @@ export class SlerpNode extends AnimationNode {
       (this.groupNode.transform as SQT).rotation = rot;
     }
   }
-
 }

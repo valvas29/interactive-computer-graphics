@@ -5,6 +5,7 @@ attribute vec2 a_texCoord;
 attribute vec3 a_normal;
 varying vec2 v_texCoord;
 
+// TODO pass light position as uniform straight to fragment shader after multiplying it by lookat in visitor
 uniform vec3 lightPosition1;
 uniform vec3 lightPosition2;
 uniform vec3 lightPosition3;

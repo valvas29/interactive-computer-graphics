@@ -13,10 +13,11 @@ varying vec3 v_normal;
 attribute vec4 a_color;
 varying vec4 v_color;
 
+// TODO pass light position as uniform straight to fragment shader after multiplying it by lookat in visitor
 uniform vec3 lightPosition1;
 uniform vec3 lightPosition2;
 uniform vec3 lightPosition3;
-varying vec3 v_lightPosition1;
+varying vec3 v_lightPosition1; // arent actually varying
 varying vec3 v_lightPosition2;
 varying vec3 v_lightPosition3;
 
@@ -35,7 +36,7 @@ void main() {
   v_lightPosition2 = (V * vec4(lightPosition2, 1.0)).xyz;
   v_lightPosition3 = (V * vec4(lightPosition3, 1.0)).xyz;
 
-  v_cameraPosition = (V * vec4(cameraPosition, 1.0)).xyz;
+  v_cameraPosition = (V * vec4(cameraPosition, 1.0)).xyz; // not used
 
   // Pass the color and transformed vertex position through
   v_position = (V * M * vec4(a_position, 1.0)).xyz;

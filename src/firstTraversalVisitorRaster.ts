@@ -132,7 +132,7 @@ export class FirstTraversalVisitorRaster implements Visitor{
 				center: toWorld.mulVec(new Vector(0, 0, -1, 1)),
 				up: toWorld.mulVec(new Vector(0, 1, 0, 0)),
 				fovy: 60,
-				aspect: 600 / 500,
+				aspect: 350 / 350,
 				near: 0.1,
 				far: 100
 			};

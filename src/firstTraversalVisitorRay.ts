@@ -88,7 +88,6 @@ export class FirstTraversalVisitorRay implements Visitor {
 
 	visitLightNode(node: LightNode): void {
 		let toWorld = this.matrixStack[this.matrixStack.length - 1];
-
 		this.lightPositions.push(toWorld.mulVec(new Vector(0, 0, 0, 1)));
 	}
 
@@ -98,9 +97,9 @@ export class FirstTraversalVisitorRay implements Visitor {
 
 			let cameraRaytracer = {
 				origin: toWorld.mulVec(new Vector(0, 0, 0, 1)),
-				width: 600,
-				height: 500,
-				alpha: Math.PI / 2.6
+				width: 350,
+				height: 350,
+				alpha: Math.PI / 3
 			}
 			this.camera = cameraRaytracer;
 		}
