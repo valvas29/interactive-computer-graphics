@@ -172,10 +172,8 @@ export class JumperNode extends AnimationNode {
         if (this.down && difference <= 0) {
           this.turnOffActive();
         }
-        else {
-          this.down = false;
-          this.up = true;
-        }
+        this.down = false;
+        this.up = true;
       }
 
       if (this.up) this.vector.y = this.speed;
