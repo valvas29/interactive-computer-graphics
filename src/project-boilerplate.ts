@@ -170,14 +170,14 @@ window.addEventListener('load', () => {
 	const sphere1 = new SphereNode(new Vector(.5, .2, .2, 1));
 	gn3.add(gn5);
 	gn5.add(sphere1);
-	otherAnimationNodes.push(
+	controlledAnimationNodes.push(
 		new JumperNode(gn5, 7, 20));
 
 	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
 	const aaBox = new AABoxNode(new Vector(0, 0, 0, 0), true);
 	gn3.add(gn6);
 	gn6.add(aaBox);
-	controlledAnimationNodes.push(
+	otherAnimationNodes.push(
 		new CycleNode(gn6, new Vector(10, 0, 0, 0), new Vector (0, 1, 0, 0), 10));
 
 	const gn7 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
@@ -389,7 +389,7 @@ window.addEventListener('load', () => {
 			case "u":
 				animationNodes.controlledAnimationNodes[0].turnOnActive();
 				break;
-			//controlledAnimationNode[1]
+			//JumperNode
 			case "i":
 				animationNodes.controlledAnimationNodes[1].turnOnActive();
 				break;
@@ -441,10 +441,6 @@ window.addEventListener('load', () => {
 			//controlledAnimationNode[0]
 			case "u":
 				animationNodes.controlledAnimationNodes[0].turnOffActive();
-				break;
-			//controlledAnimationNode[1]
-			case "i":
-				animationNodes.controlledAnimationNodes[1].turnOffActive();
 				break;
 			//nach links fahren
 			case "a":

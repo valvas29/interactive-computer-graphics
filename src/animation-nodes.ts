@@ -158,8 +158,6 @@ export class JumperNode extends AnimationNode {
 
       let difference = matrix.getVal(1, 3) - this.groupNodeYValue;
 
-      if (difference )
-
       if (!this.down && difference < this.height) {
         this.up = true;
       }
@@ -171,8 +169,13 @@ export class JumperNode extends AnimationNode {
         this.down = true;
       }
       else {
-        this.down = false;
-        this.up = true;
+        if (this.down && difference <= 0) {
+          this.turnOffActive();
+        }
+        else {
+          this.down = false;
+          this.up = true;
+        }
       }
 
       if (this.up) this.vector.y = this.speed;
