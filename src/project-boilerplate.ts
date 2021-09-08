@@ -58,6 +58,12 @@ interface AnimationNodes {
 	otherAnimationNodes: any[]
 }
 
+interface Scene {
+	scenegraph: GroupNode;
+	animationNodes: AnimationNodes;
+	phongValues: PhongValues;
+}
+
 //Eigener Canvas für Rendertypen, da ein Canvas nur einen Context unterstützt
 let canvasRasteriser: HTMLCanvasElement;
 let canvasRaytracer: HTMLCanvasElement;
@@ -73,7 +79,7 @@ let visitorRaytracer: RayVisitor;
 let firstTraversalVisitorRaster: FirstTraversalVisitorRaster;
 let firstTraversalVisitorRay: FirstTraversalVisitorRay;
 
-let scenegraph: GroupNode;
+let rootNode: GroupNode;
 let animationNodes: AnimationNodes; //wenn Array vom Typ AnimationNode, kann die simulate-Methode nicht gefunden werden
 let freeFlightAnimationNodes: any[];
 let controlledAnimationNodes: any[];
@@ -82,6 +88,7 @@ let cameraNodes: any[];
 let activeCamera: CameraNode;
 let lightPositions: Array<Vector>;
 let phongValues: PhongValues;
+let scene: Scene;
 let rendertype = "rasteriser";
 
 window.addEventListener('load', () => {
@@ -148,19 +155,19 @@ window.addEventListener('load', () => {
 
 	 */
 
-	scenegraph = new GroupNode(new Translation(new Vector(0, 0, -10, 0)));
+	rootNode = new GroupNode(new Translation(new Vector(0, 0, -10, 0)));
 
 	const gn1 = new GroupNode(new Translation(new Vector(2, 0, 8, 0)));
 	const gn2 = new GroupNode(new Scaling(new Vector(15, 15, 15, 1)));
 	const desktop = new AABoxNode(new Vector(0, 0, 0, 0), false);
-	scenegraph.add(gn1);
+	rootNode.add(gn1);
 	gn1.add(gn2);
 	gn2.add(desktop);
 
 	const gn3 = new GroupNode(new Translation(new Vector(-3, 5, 3, 0)));
 	const gn4 = new GroupNode(new Rotation(new Vector(1, 0, 0, 0), 1.5708));
 	const pyramid = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1));
-	scenegraph.add(gn3);
+	rootNode.add(gn3);
 	gn3.add(gn4);
 	gn4.add(pyramid);
 	controlledAnimationNodes.push(
@@ -178,14 +185,14 @@ window.addEventListener('load', () => {
 	gn3.add(gn6);
 	gn6.add(aaBox);
 	otherAnimationNodes.push(
-		new CycleNode(gn6, new Vector(10, 0, 0, 0), new Vector (0, 1, 0, 0), 10));
+		new CycleNode(gn6, new Vector(10, 0, 0, 0), new Vector(0, 1, 0, 0), 10));
 
 	const gn7 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
 	const textureCube = new TextureBoxNode('hci-logo.png');
-	scenegraph.add(gn7);
+	rootNode.add(gn7);
 	gn7.add(textureCube);
 	otherAnimationNodes.push(
-		new RotationNode(gn7, new Vector (1, 0, 0, 0), 20));
+		new RotationNode(gn7, new Vector(1, 0, 0, 0), 20));
 
 	const gn8 = new GroupNode(new Translation(new Vector(-1, -3, -2, 0)));
 	const sphere2 = new SphereNode(new Vector(0, .7, .2, 1));
@@ -194,7 +201,7 @@ window.addEventListener('load', () => {
 
 	const lightNode1 = new GroupNode(new Translation(new Vector(-3, -3, 9, 0)));
 	const light1 = new LightNode();
-	scenegraph.add(lightNode1);
+	rootNode.add(lightNode1);
 	lightNode1.add(light1);
 
 	const lightNode2 = new GroupNode(new Translation(new Vector(1, -1, 4, 0)));
@@ -209,11 +216,11 @@ window.addEventListener('load', () => {
 
 	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 14, 0)));
 	const camera1 = new CameraNode(true);
-	scenegraph.add(cameraNode);
+	rootNode.add(cameraNode);
 	cameraNode.add(camera1);
 
 	const cameraNode2 = new GroupNode(new Translation(new Vector(0, 1.5, 2.5, 0)));
-	const camera2 = new CameraNode( false);
+	const camera2 = new CameraNode(false);
 	gn6.add(cameraNode2);
 	cameraNode2.add(camera2);
 
@@ -248,11 +255,12 @@ window.addEventListener('load', () => {
 
 	// setup for rendering
 	setupVisitor = new RasterSetupVisitor(gl);
-	setupVisitor.setup(scenegraph);
+	setupVisitor.setup(rootNode);
 	firstTraversalVisitorRaster = new FirstTraversalVisitorRaster();
 	firstTraversalVisitorRay = new FirstTraversalVisitorRay();
 	visitorRasteriser = new RasterVisitor(gl, phongShader, textureShader, setupVisitor.objects);
 	visitorRaytracer = new RayVisitor(ctx2d, canvasRaytracer.width, canvasRaytracer.height);
+
 
 	function simulate(deltaT: number) {
 		for (let animationNode of animationNodes.freeFlightNodes) {
@@ -270,8 +278,8 @@ window.addEventListener('load', () => {
 
 	function animate(timestamp: number) {
 		simulate(timestamp - lastTimestamp);
-		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, null, null, phongValues, firstTraversalVisitorRaster);
-		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, null, null, phongValues, firstTraversalVisitorRay);
+		if (rendertype === "rasteriser") visitorRasteriser.render(rootNode, null, null, phongValues, firstTraversalVisitorRaster);
+		else if (rendertype === "raytracer") visitorRaytracer.render(rootNode, null, null, phongValues, firstTraversalVisitorRay);
 
 		lastTimestamp = timestamp;
 		window.requestAnimationFrame(animate);
@@ -305,9 +313,9 @@ window.addEventListener('load', () => {
 	let rasterizer_b = document.getElementById("rasterizer_b");
 
 	rasterizer_b.addEventListener('click', function (event) {
-		if (rasterizer_b.className === "btn btn-info"){
+		if (rasterizer_b.className === "btn btn-info") {
 
-		}else{
+		} else {
 			rendertype = "rasteriser";
 
 			otherAnimationNodes.forEach(el => el.turnOnActive());
@@ -326,9 +334,9 @@ window.addEventListener('load', () => {
 	let raytracer_b = document.getElementById("raytracer_b");
 
 	raytracer_b.addEventListener('click', function (event) {
-		if (raytracer_b.className === "btn btn-info"){
+		if (raytracer_b.className === "btn btn-info") {
 
-		}else{
+		} else {
 			rendertype = "raytracer";
 
 			otherAnimationNodes.forEach(el => el.turnOffActive());
@@ -345,6 +353,38 @@ window.addEventListener('load', () => {
 			raytracer_b.className = "btn btn-info";
 		}
 	});
+
+	//DOWNLOAD-SCENEGRAPH
+	let downloadButton = document.getElementById('downloadSceneButton');
+	downloadButton.onclick = () => {
+		//save Scene-Information
+		scene = {
+			scenegraph: rootNode,
+			animationNodes: animationNodes,
+			phongValues: phongValues
+		}
+
+		//https://stackoverflow.com/questions/34156282/how-do-i-save-json-to-local-text-file
+		var a = document.createElement("a");
+		var file = new Blob([JSON.stringify(scene)], {type: 'text/plain'});
+		a.href = URL.createObjectURL(file);
+		a.download = 'scene';
+		a.click();
+		//TODO JSON.stringify nimmt nich die Objektnamen mit, deswegen toJSON in jeder Klasse implementieren
+	}
+
+	//IMPORT-SCENEGRAPH
+	let importButton = document.getElementById('importSceneButton');
+	importButton.addEventListener("change", handleFiles, false);
+	async function handleFiles() {
+		let file = await this.files[0].text();
+		let jsonFile = JSON.parse(file);
+
+		rootNode = jsonFile.scenegraph;
+		animationNodes = jsonFile.animationNodes;
+		phongValues = jsonFile.phongValues;
+	}
+
 
 	//EVENT-LISTENERS
 	window.addEventListener('keydown', function (event) {
