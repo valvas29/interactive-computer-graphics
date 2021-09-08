@@ -12,15 +12,13 @@ import {
 } from './rastervisitor';
 import Shader from './shader';
 import {
-	SlerpNode,
-	RotationNode, TranslationNode, AnimationNode, JumperNode, ScalingNode, CycleNode
+	RotationNode, TranslationNode, JumperNode, ScalingNode
 } from './animation-nodes';
 import phongVertexShader from './phong-vertex-perspective-shader.glsl';
 import phongFragmentShader from './phong-fragment-shader.glsl';
 import textureVertexShader from './texture-vertex-perspective-shader.glsl';
 import textureFragmentShader from './texture-fragment-shader.glsl';
 import {Rotation, Scaling, SQT, Translation} from './transformation';
-import Quaternion from './quaternion';
 import RayVisitor from "./rayvisitor";
 import Matrix from "./matrix";
 import phong from "./phong";
@@ -134,17 +132,15 @@ window.addEventListener('load', () => {
 	cameraNodes = [];
 
 	// construct scene graph
-	// für Quaterions const sg = new GroupNode(new SQT(new Vector(1, 1, 1, 0), { angle: 0.6, axis: new Vector(0, 1, 0, 0) }, new Vector(0, 0, 0, 0)));
+	//
+	// AnimationNodes stehen in den Klammern
 	/*
-	       T(SG)
-	         |
-	         +--------+-----+
-	         |
-		   T(gn1)
-			 |
-	       S(gn2)
-	         |
-	       Desktop
+	       scenegraph
+
+	       gn1			gn3	---------------+-------------------------+------------------+												gn7				gn9 (rotation)		camera1
+	       gn2			gn4 (scaling)	gn5 (jumper, rotation)		gn10 (rotation		gn6 (rotation)------+-----------+				textureCube		light1
+	       desktop		pyramid			sphere1			light2		light3				aabox				gn8			camera2
+	       																									sphere2
 
 	 */
 
@@ -171,14 +167,14 @@ window.addEventListener('load', () => {
 	gn3.add(gn5);
 	gn5.add(sphere1);
 	controlledAnimationNodes.push(
-		new JumperNode(gn5, 7, 20));
+		new JumperNode(gn5, 2, 20));
 
 	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
 	const aaBox = new AABoxNode(new Vector(0, 0, 0, 0), true);
 	gn3.add(gn6);
 	gn6.add(aaBox);
 	otherAnimationNodes.push(
-		new CycleNode(gn6, new Vector(10, 0, 0, 0), new Vector (0, 1, 0, 0), 10));
+		new RotationNode(gn6, new Vector (0, 1, 0, 0), 20));
 
 	const gn7 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
 	const textureCube = new TextureBoxNode('hci-logo.png');
@@ -187,27 +183,40 @@ window.addEventListener('load', () => {
 	otherAnimationNodes.push(
 		new RotationNode(gn7, new Vector (1, 0, 0, 0), 20));
 
-	const gn8 = new GroupNode(new Translation(new Vector(-1, -3, -2, 0)));
+	const gn8 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
 	const sphere2 = new SphereNode(new Vector(0, .7, .2, 1));
 	gn6.add(gn8);
 	gn8.add(sphere2);
 
+	const gn9 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
+	scenegraph.add(gn9);
+
+	const gn10 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
+	scenegraph.add(gn9);
+
 	const lightNode1 = new GroupNode(new Translation(new Vector(-3, -3, 9, 0)));
 	const light1 = new LightNode();
-	scenegraph.add(lightNode1);
+	gn9.add(lightNode1);
 	lightNode1.add(light1);
+	otherAnimationNodes.push(
+		new RotationNode(gn9, new Vector (0, 0, 1, 0), 20));
 
-	const lightNode2 = new GroupNode(new Translation(new Vector(1, -1, 4, 0)));
+	const lightNode2 = new GroupNode(new Translation(new Vector(1, -1, 2.5, 0)));
 	const light2 = new LightNode();
 	gn5.add(lightNode2);
 	lightNode2.add(light2);
+	otherAnimationNodes.push(
+		new RotationNode(gn5, new Vector (0, 1, 0, 0), 20));
 
 	const lightNode3 = new GroupNode(new Translation(new Vector(8, -1, 1, 0)));
 	const light3 = new LightNode();
-	gn3.add(lightNode3);
+	gn3.add(gn10);
+	gn10.add(lightNode3)
 	lightNode3.add(light3);
+	otherAnimationNodes.push(
+		new RotationNode(gn10, new Vector (1, 0, 0, 0), 20));
 
-	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 14, 0)));
+	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 15, 0)));
 	const camera1 = new CameraNode(true);
 	scenegraph.add(cameraNode);
 	cameraNode.add(camera1);
@@ -310,8 +319,6 @@ window.addEventListener('load', () => {
 		}else{
 			rendertype = "rasteriser";
 
-			otherAnimationNodes.forEach(el => el.turnOnActive());
-
 			canvasRasteriser.style.zIndex = "1";
 			canvasRasteriser.style.visibility = "visible";
 
@@ -330,10 +337,6 @@ window.addEventListener('load', () => {
 
 		}else{
 			rendertype = "raytracer";
-
-			otherAnimationNodes.forEach(el => el.turnOffActive());
-			//Nur gn5-Animation an
-			otherAnimationNodes[0].turnOnActive();
 
 			canvasRasteriser.style.zIndex = "0";
 			canvasRasteriser.style.visibility = "hidden";
@@ -364,10 +367,6 @@ window.addEventListener('load', () => {
 				if (rendertype === "rasteriser") {
 					rendertype = "raytracer";
 
-					otherAnimationNodes.forEach(el => el.turnOffActive());
-					//Nur gn5-Animation an
-					otherAnimationNodes[0].turnOnActive();
-
 					canvasRasteriser.style.zIndex = "0";
 					canvasRasteriser.style.visibility = "hidden";
 
@@ -375,8 +374,6 @@ window.addEventListener('load', () => {
 					canvasRaytracer.style.visibility = "visible";
 				} else {
 					rendertype = "rasteriser";
-
-					otherAnimationNodes.forEach(el => el.turnOnActive());
 
 					canvasRasteriser.style.zIndex = "1";
 					canvasRasteriser.style.visibility = "visible";
@@ -410,11 +407,11 @@ window.addEventListener('load', () => {
 				animationNodes.freeFlightNodes[3].turnOnActive();
 				break;
 			//nach oben fahren
-			case "q":
+			case "e":
 				animationNodes.freeFlightNodes[4].turnOnActive();
 				break;
 			//nach unten fahren
-			case "e":
+			case "q":
 				animationNodes.freeFlightNodes[5].turnOnActive();
 				break;
 			//nach links drehen
@@ -459,11 +456,11 @@ window.addEventListener('load', () => {
 				animationNodes.freeFlightNodes[3].turnOffActive();
 				break;
 			//nach oben fahren
-			case "q":
+			case "e":
 				animationNodes.freeFlightNodes[4].turnOffActive();
 				break;
 			//nach unten fahren
-			case "e":
+			case "q":
 				animationNodes.freeFlightNodes[5].turnOffActive();
 				break;
 			//nach links drehen

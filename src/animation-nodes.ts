@@ -39,67 +39,6 @@ export class AnimationNode {
 
 
 /**
- * Class representing a Cycle Animation
- * @extends AnimationNode
- */
-export class CycleNode extends AnimationNode {
-  /**
-   * the translation vector
-   */
-  translation: Vector;
-
-  /**
-   * which axis to rotate
-   */
-  axisRotation: Vector;
-
-  /**
-   * how fast to rotate
-   */
-  speed: number;
-
-
-  /**
-   * Creates a new CycleNode
-   * @param groupNode The group node to attach to
-   * @param translation which axis to translate
-   * @param axisRotation which axis to rotate
-   * @param rotationSpeed how fast to translate
-   */
-  constructor(groupNode: GroupNode, translation: Vector, axisRotation: Vector, rotationSpeed: number) {
-    super(groupNode);
-    this.translation = translation;
-    this.axisRotation = axisRotation;
-    this.speed = rotationSpeed;
-  }
-
-  /**
-   * Advances the animation by deltaT
-   * @param deltaT The time difference, the animation is advanced by
-   */
-  simulate(deltaT: number) {
-    // change the matrix of the attached
-    // group node to reflect a translation
-    if (this.active) {
-      let matrix = this.groupNode.transform.getMatrix();
-      let inverse = this.groupNode.transform.getInverseMatrix();
-
-      let deltaTranslationVector = this.translation.mul(0.0001 * deltaT);
-      let translation = new Translation(deltaTranslationVector);
-      translation.matrix = matrix.mul(translation.getMatrix());
-      translation.inverse = translation.inverse.mul(inverse);
-
-      let rotation = new Rotation(this.axisRotation, this.speed * 0.0001 * deltaT);
-
-      translation.matrix = translation.matrix.mul(rotation.matrix);
-      translation.inverse = rotation.inverse.mul(translation.inverse);
-
-      this.groupNode.transform = translation;
-    }
-  }
-}
-
-/**
  * Class representing a Jumping Animation
  * @extends AnimationNode
  */

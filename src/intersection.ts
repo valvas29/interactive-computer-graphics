@@ -25,7 +25,10 @@ export default class Intersection {
    * @return The result
    */
   closerThan(other: Intersection): boolean {
-    if (this.t < other.t) return true;
-    else return false;
+    if (this.t < other.t){
+      return true;
+    } else {
+      return false;
+    }
   }
 }
