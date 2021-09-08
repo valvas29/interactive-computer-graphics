@@ -366,11 +366,10 @@ window.addEventListener('load', () => {
 
 		//https://stackoverflow.com/questions/34156282/how-do-i-save-json-to-local-text-file
 		var a = document.createElement("a");
-		var file = new Blob([JSON.stringify(scene)], {type: 'text/plain'});
+		var file = new Blob([JSON.stringify(rootNode)], {type: 'text/plain'});
 		a.href = URL.createObjectURL(file);
 		a.download = 'scene';
 		a.click();
-		//TODO JSON.stringify nimmt nich die Objektnamen mit, deswegen toJSON in jeder Klasse implementieren
 	}
 
 	//IMPORT-SCENEGRAPH
@@ -379,9 +378,8 @@ window.addEventListener('load', () => {
 	async function handleFiles() {
 		let file = await this.files[0].text();
 		let jsonFile = JSON.parse(file);
+		console.log(jsonFile);
 
-		rootNode = jsonFile.scenegraph;
-		animationNodes = jsonFile.animationNodes;
 		phongValues = jsonFile.phongValues;
 	}
 

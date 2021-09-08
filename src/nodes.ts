@@ -47,6 +47,15 @@ export class GroupNode extends Node {
   add(childNode: Node) {
     this.childNodes.push(childNode);
   }
+
+  toJSON() {
+    return {
+		"GroupNode": {
+		    "transform": this.transform.toJSON(),
+
+	    }
+    }
+  }
 }
 
 /**
@@ -101,7 +110,7 @@ export class SphereNode extends Node {
 
   /**
    * Creates a new Sphere.
-   * The sphere is defined around the origin 
+   * The sphere is defined around the origin
    * with radius 1.
    * @param color The colour of the Sphere
    */

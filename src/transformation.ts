@@ -5,6 +5,7 @@ import Quaternion from './quaternion';
 export interface Transformation {
     getMatrix(): Matrix;
     getInverseMatrix(): Matrix;
+    toJSON(): { MatrixTransformation: { inverse: Matrix; matrix: Matrix } };
 }
 
 class MatrixTransformation implements Transformation {
@@ -22,6 +23,15 @@ class MatrixTransformation implements Transformation {
 
     getInverseMatrix(): Matrix {
         return this.inverse;
+    }
+
+    toJSON(): { MatrixTransformation: { inverse: Matrix; matrix: Matrix } } {
+        return {
+            "MatrixTransformation": {
+                "matrix": this.matrix,
+                "inverse": this.inverse
+            }
+        }
     }
 }
 
