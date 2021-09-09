@@ -249,6 +249,19 @@ export default class Matrix {
     return new Matrix(result);
   }
 
+  toJSON() {
+    let array = [];
+    //transposed array because constructor of Matrix will transpose it back later
+    for (let row = 0; row < 4; row++) {
+      for (let col = 0; col < 4; col++) {
+        array[col * 4 + row] = this.data[row * 4 + col];
+      }
+    }
+    return {
+      "data": array
+    }
+  }
+
   /**
    * Debug print to console
    */

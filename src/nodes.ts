@@ -1,6 +1,6 @@
 import Visitor from './visitor';
 import Vector from './vector';
-import { Transformation } from './transformation';
+import {Rotation, Scaling, Transformation, Translation} from './transformation';
 import Matrix from "./matrix";
 
 /**
@@ -52,7 +52,7 @@ export class GroupNode extends Node {
     return {
 		"GroupNode": {
 		    "transform": this.transform.toJSON(),
-
+            "childNodes": this.childNodes
 	    }
     }
   }
@@ -82,6 +82,14 @@ export class CameraNode extends Node {
   setActiveStatus(val: boolean) {
     this.active = val;
   }
+
+  toJSON() {
+    return {
+      "CameraNode": {
+        "active": this.active
+      }
+    }
+  }
 }
 
 export class LightNode extends Node {
@@ -99,6 +107,14 @@ export class LightNode extends Node {
    */
   accept(visitor: Visitor) {
     visitor.visitLightNode(this);
+  }
+
+  toJSON() {
+    return {
+      "LightNode": {
+
+      }
+    }
   }
 }
 
@@ -127,6 +143,14 @@ export class SphereNode extends Node {
   accept(visitor: Visitor) {
     visitor.visitSphereNode(this);
   }
+
+  toJSON() {
+    return {
+      "SphereNode": {
+        "color": this.color
+      }
+    }
+  }
 }
 
 /**
@@ -153,6 +177,15 @@ export class AABoxNode extends Node {
   accept(visitor: Visitor) {
     visitor.visitAABoxNode(this, this.outside);
   }
+
+  toJSON() {
+    return {
+      "AABoxNode": {
+        "color": this.color,
+        "outside": this.outside
+      }
+    }
+  }
 }
 
 /**
@@ -177,6 +210,14 @@ export class TextureBoxNode extends Node {
   accept(visitor: Visitor) {
     visitor.visitTextureBoxNode(this);
   }
+
+  toJSON() {
+    return {
+      "TextureBoxNode": {
+        "texture": this.texture
+      }
+    }
+  }
 }
 
 export class PyramidNode extends Node {
@@ -186,5 +227,15 @@ export class PyramidNode extends Node {
 
   accept(visitor: Visitor) {
     visitor.visitPyramidNode(this);
+  }
+
+  toJSON() {
+    return {
+      "PyramidNode": {
+        "area": this.area,
+        "color1": this.color1,
+        "color2": this.color2
+      }
+    }
   }
 }

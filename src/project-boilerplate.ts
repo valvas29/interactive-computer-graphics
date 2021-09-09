@@ -19,7 +19,7 @@ import phongVertexShader from './phong-vertex-perspective-shader.glsl';
 import phongFragmentShader from './phong-fragment-shader.glsl';
 import textureVertexShader from './texture-vertex-perspective-shader.glsl';
 import textureFragmentShader from './texture-fragment-shader.glsl';
-import {Rotation, Scaling, SQT, Translation} from './transformation';
+import {Rotation, Scaling, SQT, Transformation, Translation} from './transformation';
 import Quaternion from './quaternion';
 import RayVisitor from "./rayvisitor";
 import Matrix from "./matrix";
@@ -253,13 +253,16 @@ window.addEventListener('load', () => {
 		otherAnimationNodes: otherAnimationNodes
 	}
 
-	// setup for rendering
-	setupVisitor = new RasterSetupVisitor(gl);
-	setupVisitor.setup(rootNode);
-	firstTraversalVisitorRaster = new FirstTraversalVisitorRaster();
-	firstTraversalVisitorRay = new FirstTraversalVisitorRay();
-	visitorRasteriser = new RasterVisitor(gl, phongShader, textureShader, setupVisitor.objects);
-	visitorRaytracer = new RayVisitor(ctx2d, canvasRaytracer.width, canvasRaytracer.height);
+	setup(rootNode);
+	function setup(rootNode: GroupNode) {
+		// setup for rendering
+		setupVisitor = new RasterSetupVisitor(gl);
+		setupVisitor.setup(rootNode);
+		firstTraversalVisitorRaster = new FirstTraversalVisitorRaster();
+		firstTraversalVisitorRay = new FirstTraversalVisitorRay();
+		visitorRasteriser = new RasterVisitor(gl, phongShader, textureShader, setupVisitor.objects);
+		visitorRaytracer = new RayVisitor(ctx2d, canvasRaytracer.width, canvasRaytracer.height);
+	}
 
 
 	function simulate(deltaT: number) {
@@ -366,7 +369,7 @@ window.addEventListener('load', () => {
 
 		//https://stackoverflow.com/questions/34156282/how-do-i-save-json-to-local-text-file
 		var a = document.createElement("a");
-		var file = new Blob([JSON.stringify(rootNode)], {type: 'text/plain'});
+		var file = new Blob([JSON.stringify(scene)], {type: 'text/plain'});
 		a.href = URL.createObjectURL(file);
 		a.download = 'scene';
 		a.click();
@@ -375,13 +378,94 @@ window.addEventListener('load', () => {
 	//IMPORT-SCENEGRAPH
 	let importButton = document.getElementById('importSceneButton');
 	importButton.addEventListener("change", handleFiles, false);
+
 	async function handleFiles() {
 		let file = await this.files[0].text();
 		let jsonFile = JSON.parse(file);
-		console.log(jsonFile);
-
-		phongValues = jsonFile.phongValues;
+		parseData(jsonFile);
 	}
+
+	function parseData(file: any) {
+
+		//transform Matrix for rootNode
+		let transform = parseTransformation(file.scenegraph.GroupNode.transform);
+
+		//childNodes for rootNode
+		let childNodes = parseChildNodes(file.scenegraph.GroupNode.childNodes);
+
+		//initialize rootNode and push childNodes
+		rootNode = new GroupNode(transform);
+		childNodes.forEach(el => rootNode.add(el));
+
+		//one time setup before first render
+		setup(rootNode);
+
+		//import PhongValues
+		phongValues = file.phongValues;
+
+		function parseTransformation(transform: any): Transformation {
+			let result;
+
+			if (transform.hasOwnProperty("Translation")) {
+				let matrix = new Matrix(transform.Translation.matrix.data);
+				let inverse = new Matrix(transform.Translation.inverse.data);
+				result = new Translation(null, matrix, inverse);
+
+			} else if (transform.hasOwnProperty("Rotation")) {
+				let matrix = new Matrix(transform.Rotation.matrix.data);
+				let inverse = new Matrix(transform.Rotation.inverse.data);
+				result = new Rotation(null, null, matrix, inverse);
+
+			} else if (transform.hasOwnProperty("Scaling")) {
+				let matrix = new Matrix(transform.Scaling.matrix.data);
+				let inverse = new Matrix(transform.Scaling.inverse.data);
+				result = new Scaling(null, matrix, inverse);
+			}
+
+			return result;
+		}
+
+		function parseChildNodes(childNodes: any): any[] {
+			let result: any[] = [];
+
+			for (let i = 0; i < childNodes.length; i++) {
+				if (childNodes[i].hasOwnProperty("GroupNode")) {
+					let transform = parseTransformation(childNodes[i].GroupNode.transform);
+					let newChildNodes = parseChildNodes(childNodes[i].GroupNode.childNodes);
+					let groupNode = new GroupNode(transform);
+					newChildNodes.forEach(el => groupNode.add(el));
+					result.push(groupNode);
+
+				} else if (childNodes[i].hasOwnProperty("CameraNode")) {
+					result.push(new CameraNode(childNodes[i].CameraNode.active));
+
+				} else if (childNodes[i].hasOwnProperty("LightNode")) {
+					result.push(new LightNode());
+
+				} else if (childNodes[i].hasOwnProperty("SphereNode")) {
+					let vector = new Vector(childNodes[i].SphereNode.color.data[0], childNodes[i].SphereNode.color.data[1], childNodes[i].SphereNode.color.data[2], childNodes[i].SphereNode.color.data[3]);
+					result.push(new SphereNode(vector));
+
+				} else if (childNodes[i].hasOwnProperty("AABoxNode")) {
+					let vector = new Vector(childNodes[i].AABoxNode.color.data[0], childNodes[i].AABoxNode.color.data[1], childNodes[i].AABoxNode.color.data[2], childNodes[i].AABoxNode.color.data[3]);
+					result.push(new AABoxNode(vector, childNodes[i].outside));
+
+				} else if (childNodes[i].hasOwnProperty("TextureBoxNode")) {
+					result.push(new TextureBoxNode(childNodes[i].TextureBoxNode.texture));
+
+				} else if (childNodes[i].hasOwnProperty("PyramidNode")) {
+					let area = new Vector(childNodes[i].PyramidNode.area.data[0], childNodes[i].PyramidNode.area.data[1], childNodes[i].PyramidNode.area.data[2], childNodes[i].PyramidNode.area.data[3]);
+					let color1 = new Vector(childNodes[i].PyramidNode.color1.data[0], childNodes[i].PyramidNode.color1.data[1], childNodes[i].PyramidNode.color1.data[2], childNodes[i].PyramidNode.color1.data[3]);
+					let color2 = new Vector(childNodes[i].PyramidNode.color2.data[0], childNodes[i].PyramidNode.color2.data[1], childNodes[i].PyramidNode.color2.data[2], childNodes[i].PyramidNode.color2.data[3]);
+					result.push(new PyramidNode(area, color1, color2));
+				}
+			}
+			return result;
+		}
+	}
+
+
+
 
 
 	//EVENT-LISTENERS
