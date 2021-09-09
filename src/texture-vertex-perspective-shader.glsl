@@ -3,9 +3,11 @@ precision mediump float;
 attribute vec3 a_position;
 attribute vec2 a_texCoord;
 attribute vec3 a_normal;
+attribute vec3 a_tangent;
+attribute vec3 a_bitangent;
+
 varying vec2 v_texCoord;
 
-// TODO pass light position as uniform straight to fragment shader after multiplying it by lookat in visitor
 uniform vec3 lightPosition1;
 uniform vec3 lightPosition2;
 uniform vec3 lightPosition3;
@@ -22,6 +24,7 @@ uniform mat4 P;
 uniform mat4 N; // normal matrix
 
 varying vec3 v_normal;
+varying mat3 v_TBN;
 varying vec3 v_position;
 
 void main() {
@@ -37,4 +40,9 @@ void main() {
   v_position = (V * M * vec4(a_position, 1.0)).xyz;
 
   v_normal = normalize((V * N * vec4(a_normal, 0)).xyz);
+
+  vec3 T = normalize(vec3(M * vec4(a_tangent,   0.0)));
+  vec3 B = normalize(vec3(M * vec4(a_bitangent, 0.0)));
+  vec3 N = normalize(vec3(M * vec4(a_normal,    0.0)));
+  v_TBN = mat3(T, B, N);
 }

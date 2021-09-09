@@ -157,7 +157,7 @@ export class TextureBoxNode extends Node {
    * with all edges of length 1
    * @param texture The image filename for the texture
    */
-  constructor(public texture: string) {
+  constructor(public texture: string, public normalMap: string) {
     super();
   }
 

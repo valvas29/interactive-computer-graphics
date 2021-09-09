@@ -177,11 +177,11 @@ window.addEventListener('load', () => {
 		new RotationNode(gn6, new Vector (0, 1, 0, 0), 20));
 
 	const gn7 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
-	const textureCube = new TextureBoxNode('hci-logo.png');
+	const textureCube = new TextureBoxNode('hci-logo.png', 'brickwall_normal.jpg');
 	scenegraph.add(gn7);
 	gn7.add(textureCube);
-	otherAnimationNodes.push(
-		new RotationNode(gn7, new Vector (1, 0, 0, 0), 20));
+	//otherAnimationNodes.push(
+		//new RotationNode(gn7, new Vector (1, 0, 0, 0), 20));
 
 	const gn8 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
 	const sphere2 = new SphereNode(new Vector(0, .7, .2, 1));
@@ -194,10 +194,11 @@ window.addEventListener('load', () => {
 	const gn10 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
 	scenegraph.add(gn9);
 
-	const lightNode1 = new GroupNode(new Translation(new Vector(-3, -3, 9, 0)));
+	const lightNode1 = new GroupNode(new Translation(new Vector(-1, -2, 9, 0)));
 	const light1 = new LightNode();
 	gn9.add(lightNode1);
 	lightNode1.add(light1);
+
 	otherAnimationNodes.push(
 		new RotationNode(gn9, new Vector (0, 0, 1, 0), 20));
 
@@ -208,11 +209,12 @@ window.addEventListener('load', () => {
 	otherAnimationNodes.push(
 		new RotationNode(gn5, new Vector (0, 1, 0, 0), 20));
 
-	const lightNode3 = new GroupNode(new Translation(new Vector(8, -1, 1, 0)));
+	const lightNode3 = new GroupNode(new Translation(new Vector(6, -1, 1, 0)));
 	const light3 = new LightNode();
 	gn3.add(gn10);
 	gn10.add(lightNode3)
 	lightNode3.add(light3);
+
 	otherAnimationNodes.push(
 		new RotationNode(gn10, new Vector (1, 0, 0, 0), 20));
 
