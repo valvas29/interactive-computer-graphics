@@ -408,6 +408,10 @@ window.addEventListener('load', () => {
 		animationNodes.controlledAnimationNodes = parseAnimations(file.animationNodes.controlledAnimationNodes);
 		animationNodes.otherAnimationNodes = parseAnimations(file.animationNodes.otherAnimationNodes);
 
+		//Fahranimationen und ControlledAnimationNodes defaultmäßig aus, nur bei keydown-events
+		animationNodes.freeFlightNodes.forEach(el => el.turnOffActive());
+		animationNodes.controlledAnimationNodes.forEach(el => el.turnOffActive());
+
 		//import PhongValues
 		phongValues = file.phongValues;
 		const kA = document.getElementById("kA") as HTMLInputElement;
@@ -528,21 +532,6 @@ window.addEventListener('load', () => {
 			if (!result) console.log("NO GROUP NODE FOUND!")
 			return result;
 		}
-	}
-
-	//helper for switching active camera
-	function traverse(el: GroupNode) {
-		el.childNodes.forEach(function (el) {
-			if (el instanceof GroupNode) {
-				traverse(el);
-			}
-			else if (el instanceof CameraNode) {
-				if (el.active) el.setActiveStatus(false);
-				else {
-					el.setActiveStatus(true);
-				}
-			}
-		})
 	}
 
 	//EVENT-LISTENERS
