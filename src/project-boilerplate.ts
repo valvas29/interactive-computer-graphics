@@ -85,7 +85,6 @@ let freeFlightAnimationNodes: any[];
 let controlledAnimationNodes: any[];
 let otherAnimationNodes: any[];
 let cameraNodes: any[];
-let activeCamera: CameraNode;
 let lightPositions: Array<Vector>;
 let phongValues: PhongValues;
 let scene: Scene;
@@ -224,10 +223,9 @@ window.addEventListener('load', () => {
 	gn6.add(cameraNode2);
 	cameraNode2.add(camera2);
 
-	//alle cams in array sammeln und activeCamera speichern
+	//alle cams in array sammeln
 	cameraNodes.push(camera1)
 	cameraNodes.push(camera2);
-	activeCamera = camera1;
 
 	freeFlightAnimationNodes.push(
 		//FahrAnimationNodes
@@ -253,7 +251,9 @@ window.addEventListener('load', () => {
 		otherAnimationNodes: otherAnimationNodes
 	}
 
+
 	setup(rootNode);
+
 	function setup(rootNode: GroupNode) {
 		// setup for rendering
 		setupVisitor = new RasterSetupVisitor(gl);
@@ -386,6 +386,8 @@ window.addEventListener('load', () => {
 	}
 
 	function parseData(file: any) {
+		//reset cameraNodes
+		cameraNodes = [];
 
 		//transform Matrix for rootNode
 		let transform = parseTransformation(file.scenegraph.GroupNode.transform);
@@ -393,7 +395,7 @@ window.addEventListener('load', () => {
 		//save all GroupNodes to search for IDs for GroupNode related AnimationNodes
 		let allGroupNodes: GroupNode[] = [];
 
-			//childNodes for rootNode
+		//childNodes for rootNode
 		let childNodes = parseChildNodes(file.scenegraph.GroupNode.childNodes);
 
 		//initialize rootNode and push childNodes
@@ -416,6 +418,7 @@ window.addEventListener('load', () => {
 		kS.value = file.phongValues.kS;
 		const shininess = document.getElementById("shininess") as HTMLInputElement;
 		shininess.value = file.phongValues.shininess;
+
 
 		//one time setup before first render
 		setup(rootNode);
@@ -455,7 +458,9 @@ window.addEventListener('load', () => {
 					allGroupNodes.push(groupNode);
 
 				} else if (childNodes[i].hasOwnProperty("CameraNode")) {
-					result.push(new CameraNode(childNodes[i].CameraNode.active));
+					let camera = new CameraNode(childNodes[i].CameraNode.active);
+					result.push(camera);
+					cameraNodes.push(camera);
 
 				} else if (childNodes[i].hasOwnProperty("LightNode")) {
 					result.push(new LightNode());
@@ -499,17 +504,13 @@ window.addEventListener('load', () => {
 					let groupNode = findGroupNode(animationNodes[i].ScalingNode.guID);
 					result.push(new ScalingNode(groupNode, animationNodes[i].ScalingNode.scaleUp));
 
-				}
-
-				else if (animationNodes[i].hasOwnProperty("TranslationNode")) {
+				} else if (animationNodes[i].hasOwnProperty("TranslationNode")) {
 					let groupNode = findGroupNode(animationNodes[i].TranslationNode.guID);
 					let translation = new Vector(animationNodes[i].TranslationNode.translation.data[0], animationNodes[i].TranslationNode.translation.data[1], animationNodes[i].TranslationNode.translation.data[2], animationNodes[i].TranslationNode.translation.data[3]);
 					result.push(new TranslationNode(groupNode, translation));
-				}
-
-				else if (animationNodes[i].hasOwnProperty("RotationNode")) {
+				} else if (animationNodes[i].hasOwnProperty("RotationNode")) {
 					let groupNode = findGroupNode(animationNodes[i].RotationNode.guID);
-					let axis = new Vector (animationNodes[i].RotationNode.axis.data[0], animationNodes[i].RotationNode.axis.data[1], animationNodes[i].RotationNode.axis.data[2], animationNodes[i].RotationNode.axis.data[3]);
+					let axis = new Vector(animationNodes[i].RotationNode.axis.data[0], animationNodes[i].RotationNode.axis.data[1], animationNodes[i].RotationNode.axis.data[2], animationNodes[i].RotationNode.axis.data[3]);
 					result.push(new RotationNode(groupNode, axis, animationNodes[i].RotationNode.angle));
 				}
 			}
@@ -519,28 +520,40 @@ window.addEventListener('load', () => {
 
 		function findGroupNode(guID: string): GroupNode {
 			let result: GroupNode;
-			allGroupNodes.forEach(function(el) {
+			allGroupNodes.forEach(function (el) {
 				if (el.guID == guID) {
 					result = el;
 				}
-			})
+			});
 			if (!result) console.log("NO GROUP NODE FOUND!")
 			return result;
 		}
 	}
 
+	//helper for switching active camera
+	function traverse(el: GroupNode) {
+		el.childNodes.forEach(function (el) {
+			if (el instanceof GroupNode) {
+				traverse(el);
+			}
+			else if (el instanceof CameraNode) {
+				if (el.active) el.setActiveStatus(false);
+				else {
+					el.setActiveStatus(true);
+				}
+			}
+		})
+	}
+
 	//EVENT-LISTENERS
 	window.addEventListener('keydown', function (event) {
 		switch (event.key) {
+			//switch active camera
 			case "c":
-				activeCamera.setActiveStatus(false);
-				if (activeCamera === camera1) {
-					camera2.setActiveStatus(true);
-					activeCamera = camera2;
-				} else {
-					camera1.setActiveStatus(true);
-					activeCamera = camera1;
-				}
+				cameraNodes.forEach(function (el) {
+					if (el.active) el.setActiveStatus(false);
+					else el.setActiveStatus(true);
+				})
 				break;
 			//switch rendertype
 			case "k":
