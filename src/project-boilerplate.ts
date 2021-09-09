@@ -390,18 +390,35 @@ window.addEventListener('load', () => {
 		//transform Matrix for rootNode
 		let transform = parseTransformation(file.scenegraph.GroupNode.transform);
 
-		//childNodes for rootNode
+		//save all GroupNodes to search for IDs for GroupNode related AnimationNodes
+		let allGroupNodes: GroupNode[] = [];
+
+			//childNodes for rootNode
 		let childNodes = parseChildNodes(file.scenegraph.GroupNode.childNodes);
 
 		//initialize rootNode and push childNodes
-		rootNode = new GroupNode(transform);
+		rootNode = new GroupNode(transform, file.scenegraph.GroupNode.guID);
 		childNodes.forEach(el => rootNode.add(el));
+		allGroupNodes.push(rootNode);
 
-		//one time setup before first render
-		setup(rootNode);
+		//import Animation Nodes
+		animationNodes.freeFlightNodes = parseAnimations(file.animationNodes.freeFlightNodes);
+		animationNodes.controlledAnimationNodes = parseAnimations(file.animationNodes.controlledAnimationNodes);
+		animationNodes.otherAnimationNodes = parseAnimations(file.animationNodes.otherAnimationNodes);
 
 		//import PhongValues
 		phongValues = file.phongValues;
+		const kA = document.getElementById("kA") as HTMLInputElement;
+		kA.value = file.phongValues.kA;
+		const kD = document.getElementById("kD") as HTMLInputElement;
+		kD.value = file.phongValues.kD;
+		const kS = document.getElementById("kS") as HTMLInputElement;
+		kS.value = file.phongValues.kS;
+		const shininess = document.getElementById("shininess") as HTMLInputElement;
+		shininess.value = file.phongValues.shininess;
+
+		//one time setup before first render
+		setup(rootNode);
 
 		function parseTransformation(transform: any): Transformation {
 			let result;
@@ -432,9 +449,10 @@ window.addEventListener('load', () => {
 				if (childNodes[i].hasOwnProperty("GroupNode")) {
 					let transform = parseTransformation(childNodes[i].GroupNode.transform);
 					let newChildNodes = parseChildNodes(childNodes[i].GroupNode.childNodes);
-					let groupNode = new GroupNode(transform);
+					let groupNode = new GroupNode(transform, childNodes[i].GroupNode.guID);
 					newChildNodes.forEach(el => groupNode.add(el));
 					result.push(groupNode);
+					allGroupNodes.push(groupNode);
 
 				} else if (childNodes[i].hasOwnProperty("CameraNode")) {
 					result.push(new CameraNode(childNodes[i].CameraNode.active));
@@ -462,11 +480,54 @@ window.addEventListener('load', () => {
 			}
 			return result;
 		}
+
+		function parseAnimations(animationNodes: any): any[] {
+			let result: any[] = [];
+
+			for (let i = 0; i < animationNodes.length; i++) {
+				if (animationNodes[i].hasOwnProperty("CycleNode")) {
+					let groupNode = findGroupNode(animationNodes[i].CycleNode.guID);
+					let translation = new Vector(animationNodes[i].CycleNode.translation.data[0], animationNodes[i].CycleNode.translation.data[1], animationNodes[i].CycleNode.translation.data[2], animationNodes[i].CycleNode.translation.data[3]);
+					let axisRotation = new Vector(animationNodes[i].CycleNode.axisRotation.data[0], animationNodes[i].CycleNode.axisRotation.data[1], animationNodes[i].CycleNode.axisRotation.data[2], animationNodes[i].CycleNode.axisRotation.data[3]);
+					result.push(new CycleNode(groupNode, translation, axisRotation, animationNodes[i].CycleNode.speed));
+
+				} else if (animationNodes[i].hasOwnProperty("JumperNode")) {
+					let groupNode = findGroupNode(animationNodes[i].JumperNode.guID);
+					result.push(new JumperNode(groupNode, animationNodes[i].JumperNode.height, animationNodes[i].JumperNode.speed));
+
+				} else if (animationNodes[i].hasOwnProperty("ScalingNode")) {
+					let groupNode = findGroupNode(animationNodes[i].ScalingNode.guID);
+					result.push(new ScalingNode(groupNode, animationNodes[i].ScalingNode.scaleUp));
+
+				}
+
+				else if (animationNodes[i].hasOwnProperty("TranslationNode")) {
+					let groupNode = findGroupNode(animationNodes[i].TranslationNode.guID);
+					let translation = new Vector(animationNodes[i].TranslationNode.translation.data[0], animationNodes[i].TranslationNode.translation.data[1], animationNodes[i].TranslationNode.translation.data[2], animationNodes[i].TranslationNode.translation.data[3]);
+					result.push(new TranslationNode(groupNode, translation));
+				}
+
+				else if (animationNodes[i].hasOwnProperty("RotationNode")) {
+					let groupNode = findGroupNode(animationNodes[i].RotationNode.guID);
+					let axis = new Vector (animationNodes[i].RotationNode.axis.data[0], animationNodes[i].RotationNode.axis.data[1], animationNodes[i].RotationNode.axis.data[2], animationNodes[i].RotationNode.axis.data[3]);
+					result.push(new RotationNode(groupNode, axis, animationNodes[i].RotationNode.angle));
+				}
+			}
+
+			return result;
+		}
+
+		function findGroupNode(guID: string): GroupNode {
+			let result: GroupNode;
+			allGroupNodes.forEach(function(el) {
+				if (el.guID == guID) {
+					result = el;
+				}
+			})
+			if (!result) console.log("NO GROUP NODE FOUND!")
+			return result;
+		}
 	}
-
-
-
-
 
 	//EVENT-LISTENERS
 	window.addEventListener('keydown', function (event) {

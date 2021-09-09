@@ -58,6 +58,8 @@ export class CycleNode extends AnimationNode {
    */
   speed: number;
 
+  guID: string;
+
 
   /**
    * Creates a new CycleNode
@@ -71,6 +73,8 @@ export class CycleNode extends AnimationNode {
     this.translation = translation;
     this.axisRotation = axisRotation;
     this.speed = rotationSpeed;
+
+    this.guID = groupNode.guID;
   }
 
   /**
@@ -95,6 +99,17 @@ export class CycleNode extends AnimationNode {
       translation.inverse = rotation.inverse.mul(translation.inverse);
 
       this.groupNode.transform = translation;
+    }
+  }
+
+  toJSON() {
+    return {
+      "CycleNode": {
+        "translation": this.translation,
+        "axisRotation": this.axisRotation,
+        "speed": this.speed,
+        "guID": this.guID
+      }
     }
   }
 }
@@ -128,6 +143,8 @@ export class JumperNode extends AnimationNode {
    */
   groupNodeYValue: number;
 
+  guID: string;
+
   /**
    * Creates a new JumperNode
    * @param groupNode The group node to attach to
@@ -142,6 +159,8 @@ export class JumperNode extends AnimationNode {
     this.down = false;
     this.vector = new Vector(0,  speed, 0, 0);
     this.groupNodeYValue = groupNode.transform.getMatrix().getVal(1, 3);
+
+    this.guID = groupNode.guID;
   }
 
   /**
@@ -186,6 +205,16 @@ export class JumperNode extends AnimationNode {
       this.groupNode.transform = translation;
     }
   }
+
+  toJSON() {
+    return {
+      "JumperNode": {
+        "height": this.height,
+        "speed": this.speed,
+        "guID": this.guID
+      }
+    }
+  }
 }
 
 /**
@@ -212,6 +241,10 @@ export class ScalingNode extends AnimationNode {
   grow: boolean; // helper
   shrink: boolean; // helper
 
+  scaleUp: boolean;//only used for toJSON()
+
+  guID: string;
+
   /**
    * Creates a new ScalingNode, scales to triple/third size, scales back -> repeat
    * @param groupNode The group node to attach to
@@ -219,8 +252,12 @@ export class ScalingNode extends AnimationNode {
    */
   constructor(groupNode: GroupNode, scaleUp: boolean) {
     super(groupNode);
+    this.scaleUp = scaleUp;
     this.vector = new Vector(1, 1, 1, 1);
     this.groupNodeSizeYDirection = groupNode.transform.getMatrix().getVal(1,1);
+
+    this.guID = groupNode.guID;
+
     if (scaleUp) {
       this.grow = true;
       this.shrink = false;
@@ -272,6 +309,15 @@ export class ScalingNode extends AnimationNode {
       this.groupNode.transform = scaling;
     }
   }
+
+  toJSON() {
+    return {
+      "ScalingNode": {
+        "scaleUp": this.scaleUp,
+        "guID": this.guID
+      }
+    }
+  }
 }
 
 /**
@@ -284,6 +330,8 @@ export class TranslationNode extends AnimationNode {
    */
   vector: Vector
 
+  guID: string;
+
   /**
    * Creates a new TranslationNode
    * @param groupNode The group node to attach to
@@ -292,6 +340,7 @@ export class TranslationNode extends AnimationNode {
   constructor(groupNode: GroupNode, translation: Vector) {
     super(groupNode);
     this.vector = translation;
+    this.guID = groupNode.guID;
   }
 
   /**
@@ -312,6 +361,15 @@ export class TranslationNode extends AnimationNode {
       this.groupNode.transform = translation;
     }
   }
+
+  toJSON() {
+    return {
+      "TranslationNode": {
+        "translation": this.vector.toJSON(),
+        "guID": this.guID
+      }
+    }
+  }
 }
 
 /**
@@ -328,6 +386,8 @@ export class RotationNode extends AnimationNode {
    */
   axis: Vector;
 
+  guID: string;
+
   /**
    * Creates a new RotationNode
    * @param groupNode The group node to attach to
@@ -338,6 +398,8 @@ export class RotationNode extends AnimationNode {
     super(groupNode);
     this.angle = angle;
     this.axis = axis;
+
+    this.guID = groupNode.guID;
   }
 
   /**
@@ -355,6 +417,16 @@ export class RotationNode extends AnimationNode {
       rotation.matrix = matrix.mul(rotation.getMatrix());
       rotation.inverse = rotation.getInverseMatrix().mul(inverse);
       this.groupNode.transform = rotation;
+    }
+  }
+
+  toJSON() {
+    return {
+      "RotationNode": {
+        "axis": this.axis.toJSON(),
+        "angle": this.angle,
+        "guID": this.guID
+      }
     }
   }
 }
