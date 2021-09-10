@@ -143,21 +143,37 @@ export default class RasterTextureBox {
             1, 1, 0, 1, 0, 0,
         ];
 
-        /*
-        let tangents = [
+        this.tangents= [];
+        this.bitangents = [];
+        this.calculateTangentsAndBitangents(vertices, uv);
+
+        this.tangents = [
             // front
             1, 0, 0, 1, 0, 0, 1, 0, 0,
             1, 0, 0, 1, 0, 0, 1, 0, 0,
 
             // back
+            -1, 0, 0, -1, 0, 0, -1, 0, 0,
+            -1, 0, 0, -1, 0, 0, -1, 0, 0,
 
             // right
+            0, 0, -1, 0, 0, -1, 0, 0, -1,
+            0, 0, -1, 0, 0, -1, 0, 0, -1,
+
             // top
+            1, 0, 0, 1, 0, 0, 1, 0, 0,
+            1, 0, 0, 1, 0, 0, 1, 0, 0,
+
             // left
+            0, 0, 1, 0, 0, 1, 0, 0, 1,
+            0, 0, 1, 0, 0, 1, 0, 0, 1,
+
             // bottom
+            1, 0, 0, 1, 0, 0, 1, 0, 0,
+            1, 0, 0, 1, 0, 0, 1, 0, 0,
         ];
 
-        let bitangents = [
+        this.bitangents = [
             // front
             0, 1, 0, 0, 1, 0, 0, 1, 0,
             0, 1, 0, 0, 1, 0, 0, 1, 0,
@@ -171,20 +187,31 @@ export default class RasterTextureBox {
             0, 1, 0, 0, 1, 0, 0, 1, 0,
 
             // top
+            0, 0, -1, 0, 0, -1, 0, 0, -1,
+            0, 0, -1, 0, 0, -1, 0, 0, -1,
 
             // left
             0, 1, 0, 0, 1, 0, 0, 1, 0,
             0, 1, 0, 0, 1, 0, 0, 1, 0,
 
             // bottom
+            0, 0, 1, 0, 0, 1, 0, 0, 1,
+            0, 0, 1, 0, 0, 1, 0, 0, 1,
         ]
 
 
-         */
-        this.tangents= [];
-        this.bitangents = [];
 
-        this.calculateTangentsAndBitangents(vertices, uv);
+
+
+
+
+        // TODO remove
+        console.log("tangents: "+this.tangents.length);
+        console.log("vertices: "+vertices.length);
+        console.log("tangentsArray: "+this.tangents);
+        console.log("bitangentsArray: "+this.bitangents);
+        console.log("normalsArray: "+normals);
+
 
         let uvBuffer = this.gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
@@ -242,7 +269,7 @@ export default class RasterTextureBox {
         this.gl.vertexAttribPointer(bitangentLocation, 3, this.gl.FLOAT, false, 0, 0);
 
         // bind sampler to texture unit
-        shader.getUniformInt("normalSampler").set(0);
+        shader.getUniformInt("sampler").set(0);
         shader.getUniformInt("normalSampler").set(1);
 
         // set texture units
@@ -257,7 +284,8 @@ export default class RasterTextureBox {
 
         this.gl.disableVertexAttribArray(positionLocation);
         this.gl.disableVertexAttribArray(texCoordLocation);
-        // this.gl.disableVertexAttribArray(normalTexCoordLocation);
+        this.gl.disableVertexAttribArray(tangentLocation);
+        this.gl.disableVertexAttribArray(bitangentLocation);
         this.gl.disableVertexAttribArray(normalLocation);
     }
 
@@ -268,31 +296,33 @@ export default class RasterTextureBox {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            //gl.bindTexture(gl.TEXTURE_2D, null);
         }
     }
 
     calculateTangentsAndBitangents(vertices: Array<number>, uv: Array<number>){
-        // vertices.length == 108
-        for(let i=0; i < vertices.length/6; i++){
+        // runs 6 times because a cube has 6 sides (6 planes)
+        for(let i=0; i < 6; i++){
             let pos1 = new Vector(vertices[0+i*18], vertices[1+i*18], vertices[2+i*18], 1);
             let pos2 = new Vector(vertices[3+i*18], vertices[4+i*18], vertices[5+i*18], 1);
             let pos3 = new Vector(vertices[6+i*18], vertices[7+i*18], vertices[8+i*18], 1);
             let pos4 = new Vector(vertices[12+i*18], vertices[13+i*18], vertices[14+i*18], 1);
+            console.log(pos1);
 
             let uv1 = new Vector(uv[0+i*12], uv[1+i*12], 0, 1);
             let uv2 = new Vector(uv[2+i*12], uv[3+i*12], 0, 1);
             let uv3 = new Vector(uv[4+i*12], uv[5+i*12], 0, 1);
             let uv4 = new Vector(uv[8+i*12], uv[9+i*12], 0, 1);
 
-            let edge1 = pos1.sub(pos2);
-            let edge2 = pos3.sub(pos2); // TODO maybe change to pos3.sub(pos1)?
-            let edge3 = pos4.sub(pos3);
-            let edge4 = pos1.sub(pos4); // TODO maybe change to pos1.sub(pos3)
+            let edge1 = pos2.sub(pos1);
+            let edge2 = pos3.sub(pos2); // same as pos3.sub(pos2)?
+            let edge3 = pos1.sub(pos3);
+            let edge4 = pos1.sub(pos4); // same as pos1.sub(pos4)?
+            // let edge3 = pos4.sub(pos3);
+            // let edge4 = pos1.sub(pos4); // same as pos1.sub(pos4)?
             let deltaUV1 = uv2.sub(uv1);
-            let deltaUV2 = uv3.sub(uv2); // TODO maybe change to uv3.sub(uv1)?
-            let deltaUV3 = uv4.sub(uv3);
-            let deltaUV4 = uv1.sub(uv4); // TODO maybe change to uv1.sub(uv3)
+            let deltaUV2 = uv3.sub(uv2); // same as uv3.sub(uv2)?
+            let deltaUV3 = uv1.sub(uv4);
+            let deltaUV4 = uv1.sub(uv3); // same as uv1.sub(uv4)?
 
             let f = 1.0 / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 
@@ -312,7 +342,8 @@ export default class RasterTextureBox {
             let bitangent2y = f * (deltaUV4.y * edge3.y - deltaUV3.y * edge4.y);
             let bitangent2z = f * (deltaUV4.y * edge3.z - deltaUV3.y * edge4.z);
 
-            for(let j =0; j<6; j++){
+            for(let j =0; j<3; j++){
+                // write tangent1 and bitangent2 3 times for the 3 vertices of the triangle (same for tangent2 and the bitangent2)
                 this.tangents[0+i*18+j*3]= tangent1x;
                 this.tangents[1+i*18+j*3] = tangent1y;
                 this.tangents[2+i*18+j*3] = tangent1z;
