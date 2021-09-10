@@ -151,14 +151,18 @@ export class JumperNode extends AnimationNode {
    * @param height only positive integers
    * @param speed The speed for jumping
    */
-  constructor(groupNode: GroupNode, height: number, speed: number) {
+  constructor(groupNode: GroupNode, height: number, speed: number, groupNodeYValue?: number) {
     super(groupNode);
     this.height = height;
     this.speed = speed;
     this.up = true;
     this.down = false;
     this.vector = new Vector(0,  speed, 0, 0);
-    this.groupNodeYValue = groupNode.transform.getMatrix().getVal(1, 3);
+
+    if (!groupNodeYValue) {
+      this.groupNodeYValue = groupNode.transform.getMatrix().getVal(1, 3);
+    }
+    else this.groupNodeYValue = groupNodeYValue;
 
     this.guID = groupNode.guID;
   }
@@ -211,6 +215,7 @@ export class JumperNode extends AnimationNode {
       "JumperNode": {
         "height": this.height,
         "speed": this.speed,
+        "groupNodeYValue": this.groupNodeYValue,
         "guID": this.guID
       }
     }
@@ -250,11 +255,15 @@ export class ScalingNode extends AnimationNode {
    * @param groupNode The group node to attach to
    * @param scaleUp scaleUp or down
    */
-  constructor(groupNode: GroupNode, scaleUp: boolean) {
+  constructor(groupNode: GroupNode, scaleUp: boolean, groupNodeSizeYDirection?: number) {
     super(groupNode);
     this.scaleUp = scaleUp;
     this.vector = new Vector(1, 1, 1, 1);
-    this.groupNodeSizeYDirection = groupNode.transform.getMatrix().getVal(1,1);
+
+    if (!groupNodeSizeYDirection) {
+      this.groupNodeSizeYDirection = groupNode.transform.getMatrix().getVal(1, 1);
+    }
+    else this.groupNodeSizeYDirection = groupNodeSizeYDirection;
 
     this.guID = groupNode.guID;
 
@@ -314,6 +323,7 @@ export class ScalingNode extends AnimationNode {
     return {
       "ScalingNode": {
         "scaleUp": this.scaleUp,
+        "groupNodeSizeYDirection": this.groupNodeSizeYDirection,
         "guID": this.guID
       }
     }

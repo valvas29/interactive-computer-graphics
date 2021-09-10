@@ -502,11 +502,11 @@ window.addEventListener('load', () => {
 
 				} else if (animationNodes[i].hasOwnProperty("JumperNode")) {
 					let groupNode = findGroupNode(animationNodes[i].JumperNode.guID);
-					result.push(new JumperNode(groupNode, animationNodes[i].JumperNode.height, animationNodes[i].JumperNode.speed));
+					result.push(new JumperNode(groupNode, animationNodes[i].JumperNode.height, animationNodes[i].JumperNode.speed, animationNodes[i].JumperNode.groupNodeYValue));
 
 				} else if (animationNodes[i].hasOwnProperty("ScalingNode")) {
 					let groupNode = findGroupNode(animationNodes[i].ScalingNode.guID);
-					result.push(new ScalingNode(groupNode, animationNodes[i].ScalingNode.scaleUp));
+					result.push(new ScalingNode(groupNode, animationNodes[i].ScalingNode.scaleUp, animationNodes[i].ScalingNode.groupNodeSizeYDirection));
 
 				} else if (animationNodes[i].hasOwnProperty("TranslationNode")) {
 					let groupNode = findGroupNode(animationNodes[i].TranslationNode.guID);
