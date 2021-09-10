@@ -157,63 +157,65 @@ window.addEventListener('load', () => {
 	rootNode = new GroupNode(new Translation(new Vector(0, 0, -10, 0)));
 
 	const gn1 = new GroupNode(new Translation(new Vector(2, 0, 8, 0)));
-	const gn2 = new GroupNode(new Scaling(new Vector(15, 15, 15, 1)));
+	const gn2 = new GroupNode(new Scaling(new Vector(20, 20, 20, 1)));
 	const desktop = new AABoxNode(new Vector(0, 0, 0, 0), false);
 	rootNode.add(gn1);
 	gn1.add(gn2);
 	gn2.add(desktop);
 
-	const gn3 = new GroupNode(new Translation(new Vector(-3, 5, 3, 0)));
+	const gn3 = new GroupNode(new Translation(new Vector(-3, 2, 3, 0)));
 	const gn4 = new GroupNode(new Rotation(new Vector(1, 0, 0, 0), 1.5708));
-	const pyramid = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1));
+	const pyramid = new SphereNode(new Vector(.2, .4, .7, 1));
 	rootNode.add(gn3);
 	gn3.add(gn4);
 	gn4.add(pyramid);
 	controlledAnimationNodes.push(
 		new ScalingNode(gn4, true));
 
-	const gn5 = new GroupNode(new Translation(new Vector(4, -8, 2, 0)));
-	const sphere1 = new SphereNode(new Vector(.5, .2, .2, 1));
+	const gn5 = new GroupNode(new Translation(new Vector(8, -8, 2, 0)));
+	const sphere1 = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1));
 	gn3.add(gn5);
 	gn5.add(sphere1);
 	controlledAnimationNodes.push(
 		new JumperNode(gn5, 7, 20));
 
 	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
-	const aaBox = new AABoxNode(new Vector(0, 0, 0, 0), true);
+	const aaBox = new TextureBoxNode('checkerboard-finished.png');
 	gn3.add(gn6);
 	gn6.add(aaBox);
 	otherAnimationNodes.push(
-		new CycleNode(gn6, new Vector(10, 0, 0, 0), new Vector(0, 1, 0, 0), 10));
+		new RotationNode(gn6, new Vector(0, 0, 1, 0), 15));
+	otherAnimationNodes.push(
+		new RotationNode(gn6, new Vector(0, 1, 0, 0), 15));
 
-	const gn7 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
-	const textureCube = new TextureBoxNode('hci-logo.png');
-	rootNode.add(gn7);
+	const gn7 = new GroupNode(new Translation(new Vector(-2, 1, 0, 0)));
+	const textureCube = new AABoxNode(new Vector(0, 0, 0, 0), true);
+	gn6.add(gn7);
 	gn7.add(textureCube);
 	otherAnimationNodes.push(
 		new RotationNode(gn7, new Vector(1, 0, 0, 0), 20));
 
 	const gn8 = new GroupNode(new Translation(new Vector(-1, -3, -2, 0)));
-	const sphere2 = new SphereNode(new Vector(0, .7, .2, 1));
+	const sphere2 = new SphereNode(new Vector(.8, .8, .1, 1));
 	gn6.add(gn8);
 	gn8.add(sphere2);
 
-	const lightNode1 = new GroupNode(new Translation(new Vector(-3, -3, 9, 0)));
+	const lightNode1 = new GroupNode(new Translation(new Vector(2, 1, 1, 0)));
 	const light1 = new LightNode();
-	rootNode.add(lightNode1);
+	gn6.add(lightNode1);
 	lightNode1.add(light1);
 
-	const lightNode2 = new GroupNode(new Translation(new Vector(1, -1, 4, 0)));
+	const lightNode2 = new GroupNode(new Translation(new Vector(-10, -1, 4, 0)));
 	const light2 = new LightNode();
 	gn5.add(lightNode2);
 	lightNode2.add(light2);
 
-	const lightNode3 = new GroupNode(new Translation(new Vector(8, -1, 1, 0)));
+	const lightNode3 = new GroupNode(new Translation(new Vector(-3, -1, 1, 0)));
 	const light3 = new LightNode();
-	gn3.add(lightNode3);
+	gn8.add(lightNode3);
 	lightNode3.add(light3);
 
-	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 14, 0)));
+	const cameraNode = new GroupNode(new Translation(new Vector(2, -3, 17, 0)));
 	const camera1 = new CameraNode(true);
 	rootNode.add(cameraNode);
 	cameraNode.add(camera1);
@@ -253,7 +255,6 @@ window.addEventListener('load', () => {
 
 
 	setup(rootNode);
-
 	function setup(rootNode: GroupNode) {
 		// setup for rendering
 		setupVisitor = new RasterSetupVisitor(gl);
@@ -502,11 +503,11 @@ window.addEventListener('load', () => {
 
 				} else if (animationNodes[i].hasOwnProperty("JumperNode")) {
 					let groupNode = findGroupNode(animationNodes[i].JumperNode.guID);
-					result.push(new JumperNode(groupNode, animationNodes[i].JumperNode.height, animationNodes[i].JumperNode.speed));
+					result.push(new JumperNode(groupNode, animationNodes[i].JumperNode.height, animationNodes[i].JumperNode.speed, animationNodes[i].JumperNode.groupNodeYValue));
 
 				} else if (animationNodes[i].hasOwnProperty("ScalingNode")) {
 					let groupNode = findGroupNode(animationNodes[i].ScalingNode.guID);
-					result.push(new ScalingNode(groupNode, animationNodes[i].ScalingNode.scaleUp));
+					result.push(new ScalingNode(groupNode, animationNodes[i].ScalingNode.scaleUp, animationNodes[i].ScalingNode.groupNodeSizeYDirection));
 
 				} else if (animationNodes[i].hasOwnProperty("TranslationNode")) {
 					let groupNode = findGroupNode(animationNodes[i].TranslationNode.guID);
