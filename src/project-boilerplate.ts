@@ -379,6 +379,14 @@ window.addEventListener('load', () => {
 	let importButton = document.getElementById('importSceneButton');
 	importButton.addEventListener("change", handleFiles, false);
 
+	//SampleScene
+	let sampleSceneButton = document.getElementById('sampleSceneButton');
+	sampleSceneButton.onclick = () => {
+		fetch("./sample_scene.json"
+		).then(resp => resp.json()
+		).then(resp => parseData(resp));
+	}
+
 	async function handleFiles() {
 		let file = await this.files[0].text();
 		let jsonFile = JSON.parse(file);
