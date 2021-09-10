@@ -13,7 +13,7 @@ export default class RasterTextureBox {
      * The buffer containing the box's texture
      */
 
-    // https://webglfundamentals.org/webgl/lessons/webgl-2-textures.html
+        // https://webglfundamentals.org/webgl/lessons/webgl-2-textures.html
     tex: WebGLTexture;
     normalTex: WebGLTexture;
 
@@ -143,10 +143,7 @@ export default class RasterTextureBox {
             1, 1, 0, 1, 0, 0,
         ];
 
-        this.tangents= [];
-        this.bitangents = [];
-        this.calculateTangentsAndBitangents(vertices, uv);
-
+        /*
         this.tangents = [
             // front
             1, 0, 0, 1, 0, 0, 1, 0, 0,
@@ -197,20 +194,13 @@ export default class RasterTextureBox {
             // bottom
             0, 0, 1, 0, 0, 1, 0, 0, 1,
             0, 0, 1, 0, 0, 1, 0, 0, 1,
-        ]
+        ];
 
+         */
 
-
-
-
-
-
-        // TODO remove
-        console.log("tangents: "+this.tangents.length);
-        console.log("vertices: "+vertices.length);
-        console.log("tangentsArray: "+this.tangents);
-        console.log("bitangentsArray: "+this.bitangents);
-        console.log("normalsArray: "+normals);
+        this.tangents = [];
+        this.bitangents = [];
+        this.calculateTangentsAndBitangents(vertices, uv);
 
 
         let uvBuffer = this.gl.createBuffer();
@@ -289,7 +279,7 @@ export default class RasterTextureBox {
         this.gl.disableVertexAttribArray(normalLocation);
     }
 
-    bindTextureImage(gl: WebGL2RenderingContext, texture: WebGLTexture, image: HTMLImageElement){
+    bindTextureImage(gl: WebGL2RenderingContext, texture: WebGLTexture, image: HTMLImageElement) {
         image.onload = function () {
             gl.bindTexture(gl.TEXTURE_2D, texture);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
@@ -299,30 +289,29 @@ export default class RasterTextureBox {
         }
     }
 
-    calculateTangentsAndBitangents(vertices: Array<number>, uv: Array<number>){
+    calculateTangentsAndBitangents(vertices: Array<number>, uv: Array<number>) {
         // runs 6 times because a cube has 6 sides (6 planes)
-        for(let i=0; i < 6; i++){
-            let pos1 = new Vector(vertices[0+i*18], vertices[1+i*18], vertices[2+i*18], 1);
-            let pos2 = new Vector(vertices[3+i*18], vertices[4+i*18], vertices[5+i*18], 1);
-            let pos3 = new Vector(vertices[6+i*18], vertices[7+i*18], vertices[8+i*18], 1);
-            let pos4 = new Vector(vertices[12+i*18], vertices[13+i*18], vertices[14+i*18], 1);
-            console.log(pos1);
+        for (let i = 0; i < 6; i++) {
+            let pos1 = new Vector(vertices[0 + i * 18], vertices[1 + i * 18], vertices[2 + i * 18], 1);
+            let pos2 = new Vector(vertices[3 + i * 18], vertices[4 + i * 18], vertices[5 + i * 18], 1);
+            let pos3 = new Vector(vertices[6 + i * 18], vertices[7 + i * 18], vertices[8 + i * 18], 1);
+            let pos4 = new Vector(vertices[12 + i * 18], vertices[13 + i * 18], vertices[14 + i * 18], 1);
 
-            let uv1 = new Vector(uv[0+i*12], uv[1+i*12], 0, 1);
-            let uv2 = new Vector(uv[2+i*12], uv[3+i*12], 0, 1);
-            let uv3 = new Vector(uv[4+i*12], uv[5+i*12], 0, 1);
-            let uv4 = new Vector(uv[8+i*12], uv[9+i*12], 0, 1);
+            let uv1 = new Vector(uv[0 + i * 12], uv[1 + i * 12], 0, 1);
+            let uv2 = new Vector(uv[2 + i * 12], uv[3 + i * 12], 0, 1);
+            let uv3 = new Vector(uv[4 + i * 12], uv[5 + i * 12], 0, 1);
+            let uv4 = new Vector(uv[8 + i * 12], uv[9 + i * 12], 0, 1);
 
             let edge1 = pos2.sub(pos1);
-            let edge2 = pos3.sub(pos2); // same as pos3.sub(pos2)?
-            let edge3 = pos1.sub(pos3);
-            let edge4 = pos1.sub(pos4); // same as pos1.sub(pos4)?
+            let edge2 = pos3.sub(pos1); // same as pos3.sub(pos2)?
+            let edge3 = pos3.sub(pos1);
+            let edge4 = pos4.sub(pos3); // same as pos1.sub(pos4)?
             // let edge3 = pos4.sub(pos3);
             // let edge4 = pos1.sub(pos4); // same as pos1.sub(pos4)?
             let deltaUV1 = uv2.sub(uv1);
-            let deltaUV2 = uv3.sub(uv2); // same as uv3.sub(uv2)?
-            let deltaUV3 = uv1.sub(uv4);
-            let deltaUV4 = uv1.sub(uv3); // same as uv1.sub(uv4)?
+            let deltaUV2 = uv3.sub(uv1); // same as uv3.sub(uv2)?
+            let deltaUV3 = uv3.sub(uv1);
+            let deltaUV4 = uv4.sub(uv3); // same as uv1.sub(uv4)?
 
             let f = 1.0 / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 
@@ -338,27 +327,27 @@ export default class RasterTextureBox {
             let bitangent1y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
             let bitangent1z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
 
-            let bitangent2x = f * (deltaUV4.y * edge3.x - deltaUV3.y * edge4.x);
-            let bitangent2y = f * (deltaUV4.y * edge3.y - deltaUV3.y * edge4.y);
-            let bitangent2z = f * (deltaUV4.y * edge3.z - deltaUV3.y * edge4.z);
+            let bitangent2x = f * (-deltaUV4.x * edge3.x + deltaUV3.x * edge4.x);
+            let bitangent2y = f * (-deltaUV4.x * edge3.y + deltaUV3.x * edge4.y);
+            let bitangent2z = f * (-deltaUV4.x * edge3.z + deltaUV3.x * edge4.z);
 
-            for(let j =0; j<3; j++){
+            for (let j = 0; j < 3; j++) {
                 // write tangent1 and bitangent2 3 times for the 3 vertices of the triangle (same for tangent2 and the bitangent2)
-                this.tangents[0+i*18+j*3]= tangent1x;
-                this.tangents[1+i*18+j*3] = tangent1y;
-                this.tangents[2+i*18+j*3] = tangent1z;
+                this.tangents[0 + i * 18 + j * 3] = tangent1x;
+                this.tangents[1 + i * 18 + j * 3] = tangent1y;
+                this.tangents[2 + i * 18 + j * 3] = tangent1z;
 
-                this.bitangents[0+i*18+j*3]= bitangent1x;
-                this.bitangents[1+i*18+j*3] = bitangent1y;
-                this.bitangents[2+i*18+j*3] = bitangent1z;
+                this.bitangents[0 + i * 18 + j * 3] = bitangent1x;
+                this.bitangents[1 + i * 18 + j * 3] = bitangent1y;
+                this.bitangents[2 + i * 18 + j * 3] = bitangent1z;
 
-                this.tangents[9+i*18+j*3]= tangent2x;
-                this.tangents[10+i*18+j*3] = tangent2y;
-                this.tangents[11+i*18+j*3] = tangent2z;
+                this.tangents[9 + i * 18 + j * 3] = tangent2x;
+                this.tangents[10 + i * 18 + j * 3] = tangent2y;
+                this.tangents[11 + i * 18 + j * 3] = tangent2z;
 
-                this.bitangents[9+i*18+j*3]= bitangent2x;
-                this.bitangents[10+i*18+j*3] = bitangent2y;
-                this.bitangents[11+i*18+j*3] = bitangent2z;
+                this.bitangents[9 + i * 18 + j * 3] = bitangent2x;
+                this.bitangents[10 + i * 18 + j * 3] = bitangent2y;
+                this.bitangents[11 + i * 18 + j * 3] = bitangent2z;
             }
 
         }
