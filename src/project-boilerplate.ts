@@ -180,8 +180,8 @@ window.addEventListener('load', () => {
 	const textureCube = new TextureBoxNode('hci-logo.png', 'brickwall_normal.jpg');
 	scenegraph.add(gn7);
 	gn7.add(textureCube);
-	//otherAnimationNodes.push(
-		//new RotationNode(gn7, new Vector (1, 0, 0, 0), 20));
+	otherAnimationNodes.push(
+		new RotationNode(gn7, new Vector (1, 0, 0, 0), 20));
 
 	const gn8 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
 	const sphere2 = new SphereNode(new Vector(0, .7, .2, 1));
