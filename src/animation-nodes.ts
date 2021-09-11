@@ -76,7 +76,7 @@ export class JumperNode extends AnimationNode {
    * @param height only positive integers
    * @param speed The speed for jumping
    * @param groupNodeYValue
-   * @param forceActive
+   * @param forceActive to set the active state to true after importing if animation was still running
    */
   constructor(groupNode: GroupNode, height: number, speed: number, groupNodeYValue?: number, forceActive?: boolean) {
     super(groupNode);
