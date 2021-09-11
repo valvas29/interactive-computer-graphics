@@ -68,14 +68,17 @@ export class JumperNode extends AnimationNode {
   groupNodeYValue: number;
 
   guID: string;
+  forceActive: boolean;
 
   /**
    * Creates a new JumperNode
    * @param groupNode The group node to attach to
    * @param height only positive integers
    * @param speed The speed for jumping
+   * @param groupNodeYValue
+   * @param foreceActive
    */
-  constructor(groupNode: GroupNode, height: number, speed: number, groupNodeYValue?: number) {
+  constructor(groupNode: GroupNode, height: number, speed: number, groupNodeYValue?: number, forceActive?: boolean) {
     super(groupNode);
     this.height = height;
     this.speed = speed;
@@ -87,6 +90,8 @@ export class JumperNode extends AnimationNode {
       this.groupNodeYValue = groupNode.transform.getMatrix().getVal(1, 3);
     }
     else this.groupNodeYValue = groupNodeYValue;
+
+    if (forceActive) this.forceActive = forceActive;
 
     this.guID = groupNode.guID;
   }
@@ -140,6 +145,7 @@ export class JumperNode extends AnimationNode {
         "height": this.height,
         "speed": this.speed,
         "groupNodeYValue": this.groupNodeYValue,
+        "forceActive": this.forceActive,
         "guID": this.guID
       }
     }

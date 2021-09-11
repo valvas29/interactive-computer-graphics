@@ -423,7 +423,9 @@ window.addEventListener('load', () => {
 
 		//Fahranimationen und ControlledAnimationNodes defaultmäßig aus, nur bei keydown-events
 		animationNodes.freeFlightNodes.forEach(el => el.turnOffActive());
-		animationNodes.controlledAnimationNodes.forEach(el => el.turnOffActive());
+		animationNodes.controlledAnimationNodes.forEach(function(el) {
+			if (!el.forceActive) el.turnOffActive();
+		});
 
 		//import PhongValues
 		phongValues = file.phongValues;
@@ -509,7 +511,7 @@ window.addEventListener('load', () => {
 			for (let i = 0; i < animationNodes.length; i++) {
 				if (animationNodes[i].hasOwnProperty("JumperNode")) {
 					let groupNode = findGroupNode(animationNodes[i].JumperNode.guID);
-					result.push(new JumperNode(groupNode, animationNodes[i].JumperNode.height, animationNodes[i].JumperNode.speed, animationNodes[i].JumperNode.groupNodeYValue));
+					result.push(new JumperNode(groupNode, animationNodes[i].JumperNode.height, animationNodes[i].JumperNode.speed, animationNodes[i].JumperNode.groupNodeYValue, animationNodes[i].JumperNode.forceActive));
 
 				} else if (animationNodes[i].hasOwnProperty("ScalingNode")) {
 					let groupNode = findGroupNode(animationNodes[i].ScalingNode.guID);
