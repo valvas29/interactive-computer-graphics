@@ -90,9 +90,6 @@ let scene: Scene;
 let rendertype = "rasteriser";
 
 window.addEventListener('load', () => {
-	let objLoader = new ObjLoader();
-	objLoader.parse();
-
 	canvasRasteriser = document.getElementById("rasteriser") as HTMLCanvasElement;
 	canvasRaytracer = document.getElementById("raytracer") as HTMLCanvasElement;
 	gl = canvasRasteriser.getContext("webgl2");
@@ -155,6 +152,15 @@ window.addEventListener('load', () => {
 	 */
 
 	rootNode = new GroupNode(new Translation(new Vector(0, 0, -10, 0)));
+
+	/*
+	let objLoader = new ObjLoader();
+	const customShape1 = objLoader.parse("./cube.obj");
+	rootNode.add(customShape1);
+
+	 */
+
+
 
 	const gn1 = new GroupNode(new Translation(new Vector(2, 0, 8, 0)));
 	const gn2 = new GroupNode(new Scaling(new Vector(15, 15, 15, 1)));

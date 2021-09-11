@@ -1,4 +1,4 @@
-import {AABoxNode, CameraNode, GroupNode, Node, PyramidNode, SphereNode, TextureBoxNode, LightNode} from "./nodes";
+import {AABoxNode, CameraNode, GroupNode, Node, PyramidNode, SphereNode, TextureBoxNode, LightNode, CustomShapeNode} from "./nodes";
 import Vector from "./vector";
 import Matrix from "./matrix";
 import Visitor from "./visitor";
@@ -103,5 +103,9 @@ export class FirstTraversalVisitorRay implements Visitor {
 	}
 
 	visitPyramidNode(node: PyramidNode): void {
+	}
+
+	visitCustomShapeNode(node: CustomShapeNode): void {
+
 	}
 }
