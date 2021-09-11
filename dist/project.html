@@ -43,8 +43,8 @@
                     &nbsp;<kbd>↑</kbd>&nbsp;<kbd>←</kbd>&nbsp;<kbd>↓</kbd>&nbsp;<kbd>→</kbd> drücken, um den Blickwinkel der
                     Kamera zu verändern <br>
                     <br>
-                    &nbsp;<kbd>C</kbd>&nbsp;drücken, um die Kamera an den rotierenden Würfel zu hängen, beziehungsweise wieder
-                    in den Free-Flight-Modus zurückzukehren
+                    &nbsp;<kbd>C</kbd>&nbsp;drücken, um die Kamera an den untexturierten rotierenden Würfel zu hängen, beziehungsweise wieder
+                    zur Free-Flight-Kamera zurückzukehren
                 </div>
                 <div style="margin-left: 10px;margin-top: 40px">
                     Scaling-Node:
@@ -61,9 +61,9 @@
         <div class="col-sm">
             <figure class="figure col-sm-6">
                 <canvas id="rasteriser" class="figure-img mx-auto d-block rounded" width="350" height="350"
-                        style="position: relative; left: 100px; border:1px solid #000000"></canvas>
+                        style="position: absolute; left: 100px; border: 1px solid #000000"></canvas>
                 <canvas id="raytracer" class="figure-img mx-auto d-block rounded" width="350" height="350"
-                        style="position: absolute; left: 200px; border:1px solid #000000; visibility: hidden; z-index: 0"></canvas>
+                        style="position: absolute; left: 100px; border: 1px solid #000000; visibility: hidden; z-index: 0"></canvas>
             </figure>
         </div>
         <div class="col-sm">
