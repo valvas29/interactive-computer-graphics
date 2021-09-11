@@ -34,6 +34,8 @@ export default class RasterPyramid {
      * @param gl The canvas' context
      * @param minPoint The minimal x,y,z of the box
      * @param maxPoint The maximal x,y,z of the box
+     * @param color1
+     * @param color2
      */
     constructor(private gl: WebGL2RenderingContext, minPoint: Vector, maxPoint: Vector, color1?: Vector, color2?: Vector) {
         this.gl = gl;
