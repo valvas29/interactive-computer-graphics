@@ -145,7 +145,7 @@ export class JumperNode extends AnimationNode {
         "height": this.height,
         "speed": this.speed,
         "groupNodeYValue": this.groupNodeYValue,
-        "forceActive": this.forceActive,
+        "forceActive": this.active,
         "guID": this.guID
       }
     }
