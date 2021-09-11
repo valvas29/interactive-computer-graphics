@@ -12,7 +12,8 @@ import {
 } from './rastervisitor';
 import Shader from './shader';
 import {
-	RotationNode, TranslationNode, JumperNode, ScalingNode
+	SlerpNode,
+	RotationNode, TranslationNode, AnimationNode, JumperNode, ScalingNode, CycleNode
 } from './animation-nodes';
 import phongVertexShader from './phong-vertex-perspective-shader.glsl';
 import phongFragmentShader from './phong-fragment-shader.glsl';
@@ -56,6 +57,12 @@ interface AnimationNodes {
 	otherAnimationNodes: any[]
 }
 
+interface Scene {
+	scenegraph: GroupNode;
+	animationNodes: AnimationNodes;
+	phongValues: PhongValues;
+}
+
 //Eigener Canvas für Rendertypen, da ein Canvas nur einen Context unterstützt
 let canvasRasteriser: HTMLCanvasElement;
 let canvasRaytracer: HTMLCanvasElement;
@@ -71,15 +78,15 @@ let visitorRaytracer: RayVisitor;
 let firstTraversalVisitorRaster: FirstTraversalVisitorRaster;
 let firstTraversalVisitorRay: FirstTraversalVisitorRay;
 
-let scenegraph: GroupNode;
+let rootNode: GroupNode;
 let animationNodes: AnimationNodes; //wenn Array vom Typ AnimationNode, kann die simulate-Methode nicht gefunden werden
 let freeFlightAnimationNodes: any[];
 let controlledAnimationNodes: any[];
 let otherAnimationNodes: any[];
 let cameraNodes: any[];
-let activeCamera: CameraNode;
 let lightPositions: Array<Vector>;
 let phongValues: PhongValues;
+let scene: Scene;
 let rendertype = "rasteriser";
 
 window.addEventListener('load', () => {
@@ -144,19 +151,19 @@ window.addEventListener('load', () => {
 
 	 */
 
-	scenegraph = new GroupNode(new Translation(new Vector(0, 0, -10, 0)));
+	rootNode = new GroupNode(new Translation(new Vector(0, 0, -10, 0)));
 
 	const gn1 = new GroupNode(new Translation(new Vector(2, 0, 8, 0)));
 	const gn2 = new GroupNode(new Scaling(new Vector(15, 15, 15, 1)));
 	const desktop = new AABoxNode(new Vector(0, 0, 0, 0), false);
-	scenegraph.add(gn1);
+	rootNode.add(gn1);
 	gn1.add(gn2);
 	gn2.add(desktop);
 
 	const gn3 = new GroupNode(new Translation(new Vector(-3, 5, 3, 0)));
 	const gn4 = new GroupNode(new Rotation(new Vector(1, 0, 0, 0), 1.5708));
 	const pyramid = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1));
-	scenegraph.add(gn3);
+	rootNode.add(gn3);
 	gn3.add(gn4);
 	gn4.add(pyramid);
 	controlledAnimationNodes.push(
@@ -167,7 +174,7 @@ window.addEventListener('load', () => {
 	gn3.add(gn5);
 	gn5.add(sphere1);
 	controlledAnimationNodes.push(
-		new JumperNode(gn5, 2, 20));
+		new JumperNode(gn5, 7, 20));
 
 	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
 	const aaBox = new AABoxNode(new Vector(0, 0, 0, 0), true);
@@ -178,10 +185,10 @@ window.addEventListener('load', () => {
 
 	const gn7 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
 	const textureCube = new TextureBoxNode('hci-logo.png', 'brickwall_normal.jpg');
-	scenegraph.add(gn7);
+	rootNode.add(gn7);
 	gn7.add(textureCube);
 	otherAnimationNodes.push(
-		new RotationNode(gn7, new Vector (1, 0, 0, 0), 20));
+		new RotationNode(gn7, new Vector(1, 0, 0, 0), 20));
 
 	const gn8 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
 	const sphere2 = new SphereNode(new Vector(0, .7, .2, 1));
@@ -189,10 +196,10 @@ window.addEventListener('load', () => {
 	gn8.add(sphere2);
 
 	const gn9 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
-	scenegraph.add(gn9);
+	rootNode.add(gn9);
 
 	const gn10 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
-	scenegraph.add(gn9);
+	rootNode.add(gn9);
 
 	const lightNode1 = new GroupNode(new Translation(new Vector(-1, -2, 9, 0)));
 	const light1 = new LightNode();
@@ -220,18 +227,17 @@ window.addEventListener('load', () => {
 
 	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 15, 0)));
 	const camera1 = new CameraNode(true);
-	scenegraph.add(cameraNode);
+	rootNode.add(cameraNode);
 	cameraNode.add(camera1);
 
 	const cameraNode2 = new GroupNode(new Translation(new Vector(0, 1.5, 2.5, 0)));
-	const camera2 = new CameraNode( false);
+	const camera2 = new CameraNode(false);
 	gn6.add(cameraNode2);
 	cameraNode2.add(camera2);
 
-	//alle cams in array sammeln und activeCamera speichern
+	//alle cams in array sammeln
 	cameraNodes.push(camera1)
 	cameraNodes.push(camera2);
-	activeCamera = camera1;
 
 	freeFlightAnimationNodes.push(
 		//FahrAnimationNodes
@@ -257,13 +263,19 @@ window.addEventListener('load', () => {
 		otherAnimationNodes: otherAnimationNodes
 	}
 
-	// setup for rendering
-	setupVisitor = new RasterSetupVisitor(gl);
-	setupVisitor.setup(scenegraph);
-	firstTraversalVisitorRaster = new FirstTraversalVisitorRaster();
-	firstTraversalVisitorRay = new FirstTraversalVisitorRay();
-	visitorRasteriser = new RasterVisitor(gl, phongShader, textureShader, setupVisitor.objects);
-	visitorRaytracer = new RayVisitor(ctx2d, canvasRaytracer.width, canvasRaytracer.height);
+
+	setup(rootNode);
+
+	function setup(rootNode: GroupNode) {
+		// setup for rendering
+		setupVisitor = new RasterSetupVisitor(gl);
+		setupVisitor.setup(rootNode);
+		firstTraversalVisitorRaster = new FirstTraversalVisitorRaster();
+		firstTraversalVisitorRay = new FirstTraversalVisitorRay();
+		visitorRasteriser = new RasterVisitor(gl, phongShader, textureShader, setupVisitor.objects);
+		visitorRaytracer = new RayVisitor(ctx2d, canvasRaytracer.width, canvasRaytracer.height);
+	}
+
 
 	function simulate(deltaT: number) {
 		for (let animationNode of animationNodes.freeFlightNodes) {
@@ -281,8 +293,8 @@ window.addEventListener('load', () => {
 
 	function animate(timestamp: number) {
 		simulate(timestamp - lastTimestamp);
-		if (rendertype === "rasteriser") visitorRasteriser.render(scenegraph, null, null, phongValues, firstTraversalVisitorRaster);
-		else if (rendertype === "raytracer") visitorRaytracer.render(scenegraph, null, null, phongValues, firstTraversalVisitorRay);
+		if (rendertype === "rasteriser") visitorRasteriser.render(rootNode, null, null, phongValues, firstTraversalVisitorRaster);
+		else if (rendertype === "raytracer") visitorRaytracer.render(rootNode, null, null, phongValues, firstTraversalVisitorRay);
 
 		lastTimestamp = timestamp;
 		window.requestAnimationFrame(animate);
@@ -316,9 +328,9 @@ window.addEventListener('load', () => {
 	let rasterizer_b = document.getElementById("rasterizer_b");
 
 	rasterizer_b.addEventListener('click', function (event) {
-		if (rasterizer_b.className === "btn btn-info"){
+		if (rasterizer_b.className === "btn btn-info") {
 
-		}else{
+		} else {
 			rendertype = "rasteriser";
 
 			canvasRasteriser.style.zIndex = "1";
@@ -335,9 +347,9 @@ window.addEventListener('load', () => {
 	let raytracer_b = document.getElementById("raytracer_b");
 
 	raytracer_b.addEventListener('click', function (event) {
-		if (raytracer_b.className === "btn btn-info"){
+		if (raytracer_b.className === "btn btn-info") {
 
-		}else{
+		} else {
 			rendertype = "raytracer";
 
 			canvasRasteriser.style.zIndex = "0";
@@ -351,18 +363,200 @@ window.addEventListener('load', () => {
 		}
 	});
 
+	//DOWNLOAD-SCENEGRAPH
+	let downloadButton = document.getElementById('downloadSceneButton');
+	downloadButton.onclick = () => {
+		//save Scene-Information
+		scene = {
+			scenegraph: rootNode,
+			animationNodes: animationNodes,
+			phongValues: phongValues
+		}
+
+		//https://stackoverflow.com/questions/34156282/how-do-i-save-json-to-local-text-file
+		var a = document.createElement("a");
+		var file = new Blob([JSON.stringify(scene)], {type: 'text/plain'});
+		a.href = URL.createObjectURL(file);
+		a.download = 'scene';
+		a.click();
+	}
+
+	//IMPORT-SCENEGRAPH
+	let importButton = document.getElementById('importSceneButton');
+	importButton.addEventListener("change", handleFiles, false);
+
+	//SampleScene
+	let sampleSceneButton = document.getElementById('sampleSceneButton');
+	sampleSceneButton.onclick = () => {
+		fetch("./sample_scene.json"
+		).then(resp => resp.json()
+		).then(resp => parseData(resp));
+	}
+
+	async function handleFiles() {
+		let file = await this.files[0].text();
+		let jsonFile = JSON.parse(file);
+		parseData(jsonFile);
+	}
+
+	function parseData(file: any) {
+		//reset cameraNodes
+		cameraNodes = [];
+
+		//transform Matrix for rootNode
+		let transform = parseTransformation(file.scenegraph.GroupNode.transform);
+
+		//save all GroupNodes to search for IDs for GroupNode related AnimationNodes
+		let allGroupNodes: GroupNode[] = [];
+
+		//childNodes for rootNode
+		let childNodes = parseChildNodes(file.scenegraph.GroupNode.childNodes);
+
+		//initialize rootNode and push childNodes
+		rootNode = new GroupNode(transform, file.scenegraph.GroupNode.guID);
+		childNodes.forEach(el => rootNode.add(el));
+		allGroupNodes.push(rootNode);
+
+		//import Animation Nodes
+		animationNodes.freeFlightNodes = parseAnimations(file.animationNodes.freeFlightNodes);
+		animationNodes.controlledAnimationNodes = parseAnimations(file.animationNodes.controlledAnimationNodes);
+		animationNodes.otherAnimationNodes = parseAnimations(file.animationNodes.otherAnimationNodes);
+
+		//Fahranimationen und ControlledAnimationNodes defaultmäßig aus, nur bei keydown-events
+		animationNodes.freeFlightNodes.forEach(el => el.turnOffActive());
+		animationNodes.controlledAnimationNodes.forEach(el => el.turnOffActive());
+
+		//import PhongValues
+		phongValues = file.phongValues;
+		const kA = document.getElementById("kA") as HTMLInputElement;
+		kA.value = file.phongValues.kA;
+		const kD = document.getElementById("kD") as HTMLInputElement;
+		kD.value = file.phongValues.kD;
+		const kS = document.getElementById("kS") as HTMLInputElement;
+		kS.value = file.phongValues.kS;
+		const shininess = document.getElementById("shininess") as HTMLInputElement;
+		shininess.value = file.phongValues.shininess;
+
+
+		//one time setup before first render
+		setup(rootNode);
+
+		function parseTransformation(transform: any): Transformation {
+			let result;
+
+			if (transform.hasOwnProperty("Translation")) {
+				let matrix = new Matrix(transform.Translation.matrix.data);
+				let inverse = new Matrix(transform.Translation.inverse.data);
+				result = new Translation(null, matrix, inverse);
+
+			} else if (transform.hasOwnProperty("Rotation")) {
+				let matrix = new Matrix(transform.Rotation.matrix.data);
+				let inverse = new Matrix(transform.Rotation.inverse.data);
+				result = new Rotation(null, null, matrix, inverse);
+
+			} else if (transform.hasOwnProperty("Scaling")) {
+				let matrix = new Matrix(transform.Scaling.matrix.data);
+				let inverse = new Matrix(transform.Scaling.inverse.data);
+				result = new Scaling(null, matrix, inverse);
+			}
+
+			return result;
+		}
+
+		function parseChildNodes(childNodes: any): any[] {
+			let result: any[] = [];
+
+			for (let i = 0; i < childNodes.length; i++) {
+				if (childNodes[i].hasOwnProperty("GroupNode")) {
+					let transform = parseTransformation(childNodes[i].GroupNode.transform);
+					let newChildNodes = parseChildNodes(childNodes[i].GroupNode.childNodes);
+					let groupNode = new GroupNode(transform, childNodes[i].GroupNode.guID);
+					newChildNodes.forEach(el => groupNode.add(el));
+					result.push(groupNode);
+					allGroupNodes.push(groupNode);
+
+				} else if (childNodes[i].hasOwnProperty("CameraNode")) {
+					let camera = new CameraNode(childNodes[i].CameraNode.active);
+					result.push(camera);
+					cameraNodes.push(camera);
+
+				} else if (childNodes[i].hasOwnProperty("LightNode")) {
+					result.push(new LightNode());
+
+				} else if (childNodes[i].hasOwnProperty("SphereNode")) {
+					let vector = new Vector(childNodes[i].SphereNode.color.data[0], childNodes[i].SphereNode.color.data[1], childNodes[i].SphereNode.color.data[2], childNodes[i].SphereNode.color.data[3]);
+					result.push(new SphereNode(vector));
+
+				} else if (childNodes[i].hasOwnProperty("AABoxNode")) {
+					let vector = new Vector(childNodes[i].AABoxNode.color.data[0], childNodes[i].AABoxNode.color.data[1], childNodes[i].AABoxNode.color.data[2], childNodes[i].AABoxNode.color.data[3]);
+					result.push(new AABoxNode(vector, childNodes[i].outside));
+
+				} else if (childNodes[i].hasOwnProperty("TextureBoxNode")) {
+					result.push(new TextureBoxNode(childNodes[i].TextureBoxNode.texture));
+
+				} else if (childNodes[i].hasOwnProperty("PyramidNode")) {
+					let area = new Vector(childNodes[i].PyramidNode.area.data[0], childNodes[i].PyramidNode.area.data[1], childNodes[i].PyramidNode.area.data[2], childNodes[i].PyramidNode.area.data[3]);
+					let color1 = new Vector(childNodes[i].PyramidNode.color1.data[0], childNodes[i].PyramidNode.color1.data[1], childNodes[i].PyramidNode.color1.data[2], childNodes[i].PyramidNode.color1.data[3]);
+					let color2 = new Vector(childNodes[i].PyramidNode.color2.data[0], childNodes[i].PyramidNode.color2.data[1], childNodes[i].PyramidNode.color2.data[2], childNodes[i].PyramidNode.color2.data[3]);
+					result.push(new PyramidNode(area, color1, color2));
+				}
+			}
+			return result;
+		}
+
+		function parseAnimations(animationNodes: any): any[] {
+			let result: any[] = [];
+
+			for (let i = 0; i < animationNodes.length; i++) {
+				if (animationNodes[i].hasOwnProperty("CycleNode")) {
+					let groupNode = findGroupNode(animationNodes[i].CycleNode.guID);
+					let translation = new Vector(animationNodes[i].CycleNode.translation.data[0], animationNodes[i].CycleNode.translation.data[1], animationNodes[i].CycleNode.translation.data[2], animationNodes[i].CycleNode.translation.data[3]);
+					let axisRotation = new Vector(animationNodes[i].CycleNode.axisRotation.data[0], animationNodes[i].CycleNode.axisRotation.data[1], animationNodes[i].CycleNode.axisRotation.data[2], animationNodes[i].CycleNode.axisRotation.data[3]);
+					result.push(new CycleNode(groupNode, translation, axisRotation, animationNodes[i].CycleNode.speed));
+
+				} else if (animationNodes[i].hasOwnProperty("JumperNode")) {
+					let groupNode = findGroupNode(animationNodes[i].JumperNode.guID);
+					result.push(new JumperNode(groupNode, animationNodes[i].JumperNode.height, animationNodes[i].JumperNode.speed, animationNodes[i].JumperNode.groupNodeYValue));
+
+				} else if (animationNodes[i].hasOwnProperty("ScalingNode")) {
+					let groupNode = findGroupNode(animationNodes[i].ScalingNode.guID);
+					result.push(new ScalingNode(groupNode, animationNodes[i].ScalingNode.scaleUp, animationNodes[i].ScalingNode.groupNodeSizeYDirection));
+
+				} else if (animationNodes[i].hasOwnProperty("TranslationNode")) {
+					let groupNode = findGroupNode(animationNodes[i].TranslationNode.guID);
+					let translation = new Vector(animationNodes[i].TranslationNode.translation.data[0], animationNodes[i].TranslationNode.translation.data[1], animationNodes[i].TranslationNode.translation.data[2], animationNodes[i].TranslationNode.translation.data[3]);
+					result.push(new TranslationNode(groupNode, translation));
+				} else if (animationNodes[i].hasOwnProperty("RotationNode")) {
+					let groupNode = findGroupNode(animationNodes[i].RotationNode.guID);
+					let axis = new Vector(animationNodes[i].RotationNode.axis.data[0], animationNodes[i].RotationNode.axis.data[1], animationNodes[i].RotationNode.axis.data[2], animationNodes[i].RotationNode.axis.data[3]);
+					result.push(new RotationNode(groupNode, axis, animationNodes[i].RotationNode.angle));
+				}
+			}
+
+			return result;
+		}
+
+		function findGroupNode(guID: string): GroupNode {
+			let result: GroupNode;
+			allGroupNodes.forEach(function (el) {
+				if (el.guID == guID) {
+					result = el;
+				}
+			});
+			if (!result) console.log("NO GROUP NODE FOUND!")
+			return result;
+		}
+	}
+
 	//EVENT-LISTENERS
 	window.addEventListener('keydown', function (event) {
 		switch (event.key) {
+			//switch active camera
 			case "c":
-				activeCamera.setActiveStatus(false);
-				if (activeCamera === camera1) {
-					camera2.setActiveStatus(true);
-					activeCamera = camera2;
-				} else {
-					camera1.setActiveStatus(true);
-					activeCamera = camera1;
-				}
+				cameraNodes.forEach(function (el) {
+					if (el.active) el.setActiveStatus(false);
+					else el.setActiveStatus(true);
+				})
 				break;
 			//switch rendertype
 			case "k":
