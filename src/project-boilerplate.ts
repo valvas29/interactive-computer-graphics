@@ -666,4 +666,3 @@ window.addEventListener('load', () => {
 		}
 	});
 });
-
