@@ -25,6 +25,7 @@ import phong from "./phong";
 import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
 import {FirstTraversalVisitorRay} from "./firstTraversalVisitorRay";
 import AABox from "./aabox";
+import {ObjLoader} from "./obj-loader";
 
 export interface CameraRasteriser {
 	eye: Vector,
@@ -89,6 +90,9 @@ let scene: Scene;
 let rendertype = "rasteriser";
 
 window.addEventListener('load', () => {
+	let objLoader = new ObjLoader();
+	objLoader.parse();
+
 	canvasRasteriser = document.getElementById("rasteriser") as HTMLCanvasElement;
 	canvasRaytracer = document.getElementById("raytracer") as HTMLCanvasElement;
 	gl = canvasRasteriser.getContext("webgl2");
