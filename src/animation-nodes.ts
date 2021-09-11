@@ -76,7 +76,7 @@ export class JumperNode extends AnimationNode {
    * @param height only positive integers
    * @param speed The speed for jumping
    * @param groupNodeYValue
-   * @param foreceActive
+   * @param forceActive
    */
   constructor(groupNode: GroupNode, height: number, speed: number, groupNodeYValue?: number, forceActive?: boolean) {
     super(groupNode);
@@ -145,7 +145,7 @@ export class JumperNode extends AnimationNode {
         "height": this.height,
         "speed": this.speed,
         "groupNodeYValue": this.groupNodeYValue,
-        "forceActive": this.forceActive,
+        "forceActive": this.active,
         "guID": this.guID
       }
     }
