@@ -21,9 +21,9 @@
 </nav>
 <br>
 
-<div style="margin-left: 200px">
-    <div class="row" style="margin-bottom: 10px; width: 700px">
-        <div class="column">
+<div style="margin-left: 100px">
+    <div class="row" style="margin-bottom: 10px; width: 1900px">
+        <div class="col-sm">
             <div>
                 Renderer: &nbsp;<kbd>K</kbd>
             </div>
@@ -37,23 +37,38 @@
                 <div style="margin-left: 10px">
                     Kamera:
                     <br>
-                    &nbsp;<kbd>W</kbd>&nbsp;<kbd>A</kbd>&nbsp;<kbd>S</kbd>&nbsp;<kbd>D</kbd> , um die Kamera in x und z Richtung zu bewegen <br>
-                    &nbsp;<kbd>Q</kbd> <kbd>E</kbd> , um die Kamera in y Richtung zu bewegen <br>
-                    &nbsp;<kbd>↑</kbd>&nbsp;<kbd>←</kbd>&nbsp;<kbd>↓</kbd>&nbsp;<kbd>→</kbd> , um den Blickwinkel der Kamera zu verändern <br>
+                    &nbsp;<kbd>W</kbd>&nbsp;<kbd>A</kbd>&nbsp;<kbd>S</kbd>&nbsp;<kbd>D</kbd> drücken, um die Kamera in x und z
+                    Richtung zu bewegen <br>
+                    &nbsp;<kbd>Q</kbd> <kbd>E</kbd> drücken, um die Kamera in y Richtung zu bewegen <br>
+                    &nbsp;<kbd>↑</kbd>&nbsp;<kbd>←</kbd>&nbsp;<kbd>↓</kbd>&nbsp;<kbd>→</kbd> drücken, um den Blickwinkel der
+                    Kamera zu verändern <br>
                     <br>
-                    &nbsp;<kbd>C</kbd>&nbsp;, um die Kamera an den rotierenden Würfel zu <br> &nbsp;hängen, beziehungsweise wieder in den Free-Flight-Modus <br>&nbsp;zurückzukehren
+                    &nbsp;<kbd>C</kbd>&nbsp;drücken, um die Kamera an den rotierenden Würfel zu hängen, beziehungsweise wieder
+                    in den Free-Flight-Modus zurückzukehren
                 </div>
                 <div style="margin-left: 10px;margin-top: 40px">
-                    Skalierungs-Node:
+                    Scaling-Node:
                     <br>
-                    &nbsp;<kbd>U</kbd> drücken und halten , um die Pyramide bis zu einem Maximalwert <br> hochzuskalieren, beziehungsweise bis zu einem Maximalwert herunterzuskalieren
+                    &nbsp;<kbd>U</kbd> drücken und halten , um die Pyramide bis zu einem Maximalwert hochzuskalieren,
+                    beziehungsweise bis zu einem Minimalwert herunterzuskalieren
                     <br></br>
                     Jumper-Node:
                     <br>
-                    &nbsp;<kbd>I</kbd> drücken , um die rote Sphere einmal springen zu lassen oder halten, <br> um sie mehrmals springen zu lassen
+                    &nbsp;<kbd>I</kbd> drücken, um die rote Sphäre einmal bis zu einem Maximalwert springen zu lassen
                 </div>
-
-                <br><br>
+            </div>
+        </div>
+        <div class="col-sm">
+            <figure class="figure col-sm-6">
+                <canvas id="rasteriser" class="figure-img mx-auto d-block rounded" width="350" height="350"
+                        style="position: relative; left: 100px; border:1px solid #000000"></canvas>
+                <canvas id="raytracer" class="figure-img mx-auto d-block rounded" width="350" height="350"
+                        style="position: absolute; left: 200px; border:1px solid #000000; visibility: hidden; z-index: 0"></canvas>
+            </figure>
+        </div>
+        <div class="col-sm">
+            <b>Phong-Werte:</b>
+            <div class="form-group text-left" style="margin-left: 10px">
                 <div class="form-group text-left">
                     <label for="kA">kAmbient</label>
                     <input class="form-control-range" id="kA" type="range" min="0.0" max="1.0" step="0.05" value="0.2">
@@ -70,27 +85,21 @@
                     <label for="shininess">Shininess</label>
                     <input class="form-control-range" id="shininess" type="range" min="1" max="50" value="16">
                 </div>
-                <br>
-
-                <div>
-                    <label for="downloadSceneButton">Download Scene:</label>
-                    <input class="btn btn-primary" id="downloadSceneButton" type="button" value="Download Scene">
-                    <br>
-                    <br>
-                    <label for="importSceneButton">Import Scene:</label>
-                    <input class="btn btn-primary" id="importSceneButton" type="file">
-                    oder
-                    <input class="btn btn-primary" id="sampleSceneButton" type="button" value="Beispiel-Szene importieren" src="sample_scene.json">
-                </div>
             </div>
-        </div>
-        <div class="column">
-            <figure class="figure col-sm-6">
-                <canvas id="rasteriser" class="figure-img mx-auto d-block rounded" width="350" height="350"
-                        style="position: absolute; left: 200px; border:1px solid #000000"></canvas>
-                <canvas id="raytracer" class="figure-img mx-auto d-block rounded" width="350" height="350"
-                        style="position: absolute; left: 200px; border:1px solid #000000; visibility: hidden; z-index: 0"></canvas>
-            </figure>
+            <br>
+            <div>
+                <label for="downloadSceneButton">Aktuelle Szene herunterladen:</label>
+                <br>
+                <input class="btn btn-primary" id="downloadSceneButton" type="button" value="Szene herunterladen">
+                <br>
+                <br>
+                <label for="importSceneButton">Szene laden:</label>
+                <br>
+                <input class="btn btn-primary" id="importSceneButton" type="file">
+                oder
+                <input class="btn btn-primary" id="sampleSceneButton" type="button" value="Beispiel-Szene importieren"
+                       src="sample_scene.json">
+            </div>
         </div>
     </div>
 </div>
