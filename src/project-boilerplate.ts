@@ -178,9 +178,11 @@ window.addEventListener('load', () => {
 		new JumperNode(gn5, 7, 20));
 
 	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
-	const aaBox = new TextureBoxNode('checkerboard-finished.png');
+	const gn9 = new GroupNode(new Scaling(new Vector(1.5, 3, 4, 1)));
+	const aaBox = new TextureBoxNode('checkerboard-finished.png', 'brickwall_normal.jpg');
 	gn3.add(gn6);
-	gn6.add(aaBox);
+	gn6.add(gn9);
+	gn9.add(aaBox);
 	otherAnimationNodes.push(
 		new RotationNode(gn6, new Vector(0, 0, 1, 0), 15));
 	otherAnimationNodes.push(
@@ -213,15 +215,17 @@ window.addEventListener('load', () => {
 	gn8.add(lightNode3);
 	lightNode3.add(light3);
 
-	const cameraNode = new GroupNode(new Translation(new Vector(2, -3, 17, 0)));
+	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 17, 0)));
 	const camera1 = new CameraNode(true);
 	rootNode.add(cameraNode);
 	cameraNode.add(camera1);
 
-	const cameraNode2 = new GroupNode(new Translation(new Vector(0, 1.5, 2.5, 0)));
+	const cameraNode2 = new GroupNode(new Translation(new Vector(0, 2.5, -2.5, 0)));
+	const cameraRotate = new GroupNode(new Rotation(new Vector(0, 1, 0, 0), 2.8));
 	const camera2 = new CameraNode(false);
-	gn6.add(cameraNode2);
-	cameraNode2.add(camera2);
+	gn5.add(cameraNode2);
+	cameraNode2.add(cameraRotate);
+	cameraRotate.add(camera2);
 
 	//alle cams in array sammeln
 	cameraNodes.push(camera1)
