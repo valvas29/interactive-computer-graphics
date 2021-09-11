@@ -43,7 +43,7 @@ window.addEventListener('load', () => {
     sg.add(gn2);
     const gn3 = new GroupNode(new Translation(new Vector(0, 0, 0, 0)));
     gn2.add(gn3);
-    const cube = new TextureBoxNode('hci-logo.png');
+    const cube = new TextureBoxNode('hci-logo.png', 'brickwall_normal.jpg');
     gn3.add(cube);
 
     // setup for rendering

@@ -209,15 +209,15 @@ export class AABoxNode extends Node {
  * @extends Node
  */
 export class TextureBoxNode extends Node {
-	/**
-	 * Creates an axis aligned box textured box
-	 * The box's center is located at the origin
-	 * with all edges of length 1
-	 * @param texture The image filename for the texture
-	 */
-	constructor(public texture: string) {
-		super();
-	}
+  /**
+   * Creates an axis aligned box textured box
+   * The box's center is located at the origin
+   * with all edges of length 1
+   * @param texture The image filename for the texture
+   */
+  constructor(public texture: string, public normalMap: string) {
+    super();
+  }
 
 	/**
 	 * Accepts a visitor according to the visitor pattern
@@ -230,7 +230,8 @@ export class TextureBoxNode extends Node {
 	toJSON() {
 		return {
 			"TextureBoxNode": {
-				"texture": this.texture
+				"texture": this.texture,
+                "normalMap": this.normalMap
 			}
 		}
 	}

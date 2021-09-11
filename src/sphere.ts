@@ -41,7 +41,7 @@ export default class Sphere {
       }
     }
     const p = ray.origin.add(ray.direction.mul(t));
-    const test = p.sub(this.center).normalize()
-    return new Intersection(t, p, test);
+    const normal = p.sub(this.center).normalize();
+    return new Intersection(t, p, normal);
   }
 }

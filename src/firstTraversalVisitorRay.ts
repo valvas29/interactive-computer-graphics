@@ -1,11 +1,8 @@
 import {AABoxNode, CameraNode, GroupNode, Node, PyramidNode, SphereNode, TextureBoxNode, LightNode} from "./nodes";
-import RasterSphere from "./raster-sphere";
 import Vector from "./vector";
-import RasterBoxOutside from "./raster-boxOutside";
-import RasterTextureBox from "./raster-texture-box";
 import Matrix from "./matrix";
 import Visitor from "./visitor";
-import {CameraRasteriser, CameraRaytracer} from "./project-boilerplate";
+import {CameraRaytracer} from "./project-boilerplate";
 
 /**
  * Class traversing the Scene Graph before the actual traversal

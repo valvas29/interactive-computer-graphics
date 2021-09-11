@@ -12,15 +12,13 @@ import {
 } from './rastervisitor';
 import Shader from './shader';
 import {
-	SlerpNode,
-	RotationNode, TranslationNode, AnimationNode, JumperNode, ScalingNode, CycleNode
+	RotationNode, TranslationNode, JumperNode, ScalingNode
 } from './animation-nodes';
 import phongVertexShader from './phong-vertex-perspective-shader.glsl';
 import phongFragmentShader from './phong-fragment-shader.glsl';
 import textureVertexShader from './texture-vertex-perspective-shader.glsl';
 import textureFragmentShader from './texture-fragment-shader.glsl';
 import {Rotation, Scaling, SQT, Transformation, Translation} from './transformation';
-import Quaternion from './quaternion';
 import RayVisitor from "./rayvisitor";
 import Matrix from "./matrix";
 import phong from "./phong";
@@ -163,7 +161,7 @@ window.addEventListener('load', () => {
 	gn1.add(gn2);
 	gn2.add(desktop);
 
-	const gn3 = new GroupNode(new Translation(new Vector(-3, 2, 3, 0)));
+	const gn3 = new GroupNode(new Translation(new Vector(-3, 5, 3, 0)));
 	const gn4 = new GroupNode(new Rotation(new Vector(1, 0, 0, 0), 1.5708));
 	const pyramid = new SphereNode(new Vector(.2, .4, .7, 1));
 	rootNode.add(gn3);
@@ -322,8 +320,6 @@ window.addEventListener('load', () => {
 		} else {
 			rendertype = "rasteriser";
 
-			otherAnimationNodes.forEach(el => el.turnOnActive());
-
 			canvasRasteriser.style.zIndex = "1";
 			canvasRasteriser.style.visibility = "visible";
 
@@ -342,10 +338,6 @@ window.addEventListener('load', () => {
 
 		} else {
 			rendertype = "raytracer";
-
-			otherAnimationNodes.forEach(el => el.turnOffActive());
-			//Nur gn5-Animation an
-			otherAnimationNodes[0].turnOnActive();
 
 			canvasRasteriser.style.zIndex = "0";
 			canvasRasteriser.style.visibility = "hidden";
@@ -379,6 +371,14 @@ window.addEventListener('load', () => {
 	//IMPORT-SCENEGRAPH
 	let importButton = document.getElementById('importSceneButton');
 	importButton.addEventListener("change", handleFiles, false);
+
+	//SampleScene
+	let sampleSceneButton = document.getElementById('sampleSceneButton');
+	sampleSceneButton.onclick = () => {
+		fetch("./sample_scene.json"
+		).then(resp => resp.json()
+		).then(resp => parseData(resp));
+	}
 
 	async function handleFiles() {
 		let file = await this.files[0].text();
@@ -479,7 +479,7 @@ window.addEventListener('load', () => {
 					result.push(new AABoxNode(vector, childNodes[i].outside));
 
 				} else if (childNodes[i].hasOwnProperty("TextureBoxNode")) {
-					result.push(new TextureBoxNode(childNodes[i].TextureBoxNode.texture));
+					result.push(new TextureBoxNode(childNodes[i].TextureBoxNode.texture, childNodes[i].TextureBoxNode.normalMap));
 
 				} else if (childNodes[i].hasOwnProperty("PyramidNode")) {
 					let area = new Vector(childNodes[i].PyramidNode.area.data[0], childNodes[i].PyramidNode.area.data[1], childNodes[i].PyramidNode.area.data[2], childNodes[i].PyramidNode.area.data[3]);
@@ -495,13 +495,7 @@ window.addEventListener('load', () => {
 			let result: any[] = [];
 
 			for (let i = 0; i < animationNodes.length; i++) {
-				if (animationNodes[i].hasOwnProperty("CycleNode")) {
-					let groupNode = findGroupNode(animationNodes[i].CycleNode.guID);
-					let translation = new Vector(animationNodes[i].CycleNode.translation.data[0], animationNodes[i].CycleNode.translation.data[1], animationNodes[i].CycleNode.translation.data[2], animationNodes[i].CycleNode.translation.data[3]);
-					let axisRotation = new Vector(animationNodes[i].CycleNode.axisRotation.data[0], animationNodes[i].CycleNode.axisRotation.data[1], animationNodes[i].CycleNode.axisRotation.data[2], animationNodes[i].CycleNode.axisRotation.data[3]);
-					result.push(new CycleNode(groupNode, translation, axisRotation, animationNodes[i].CycleNode.speed));
-
-				} else if (animationNodes[i].hasOwnProperty("JumperNode")) {
+				if (animationNodes[i].hasOwnProperty("JumperNode")) {
 					let groupNode = findGroupNode(animationNodes[i].JumperNode.guID);
 					result.push(new JumperNode(groupNode, animationNodes[i].JumperNode.height, animationNodes[i].JumperNode.speed, animationNodes[i].JumperNode.groupNodeYValue));
 
@@ -513,6 +507,7 @@ window.addEventListener('load', () => {
 					let groupNode = findGroupNode(animationNodes[i].TranslationNode.guID);
 					let translation = new Vector(animationNodes[i].TranslationNode.translation.data[0], animationNodes[i].TranslationNode.translation.data[1], animationNodes[i].TranslationNode.translation.data[2], animationNodes[i].TranslationNode.translation.data[3]);
 					result.push(new TranslationNode(groupNode, translation));
+
 				} else if (animationNodes[i].hasOwnProperty("RotationNode")) {
 					let groupNode = findGroupNode(animationNodes[i].RotationNode.guID);
 					let axis = new Vector(animationNodes[i].RotationNode.axis.data[0], animationNodes[i].RotationNode.axis.data[1], animationNodes[i].RotationNode.axis.data[2], animationNodes[i].RotationNode.axis.data[3]);
@@ -550,10 +545,6 @@ window.addEventListener('load', () => {
 				if (rendertype === "rasteriser") {
 					rendertype = "raytracer";
 
-					otherAnimationNodes.forEach(el => el.turnOffActive());
-					//Nur gn5-Animation an
-					otherAnimationNodes[0].turnOnActive();
-
 					canvasRasteriser.style.zIndex = "0";
 					canvasRasteriser.style.visibility = "hidden";
 
@@ -561,8 +552,6 @@ window.addEventListener('load', () => {
 					canvasRaytracer.style.visibility = "visible";
 				} else {
 					rendertype = "rasteriser";
-
-					otherAnimationNodes.forEach(el => el.turnOnActive());
 
 					canvasRasteriser.style.zIndex = "1";
 					canvasRasteriser.style.visibility = "visible";
@@ -596,11 +585,11 @@ window.addEventListener('load', () => {
 				animationNodes.freeFlightNodes[3].turnOnActive();
 				break;
 			//nach oben fahren
-			case "q":
+			case "e":
 				animationNodes.freeFlightNodes[4].turnOnActive();
 				break;
 			//nach unten fahren
-			case "e":
+			case "q":
 				animationNodes.freeFlightNodes[5].turnOnActive();
 				break;
 			//nach links drehen
@@ -645,11 +634,11 @@ window.addEventListener('load', () => {
 				animationNodes.freeFlightNodes[3].turnOffActive();
 				break;
 			//nach oben fahren
-			case "q":
+			case "e":
 				animationNodes.freeFlightNodes[4].turnOffActive();
 				break;
 			//nach unten fahren
-			case "e":
+			case "q":
 				animationNodes.freeFlightNodes[5].turnOffActive();
 				break;
 			//nach links drehen
