@@ -40,7 +40,8 @@ export interface CameraRaytracer {
 	origin: Vector,
 	width: number,
 	height: number,
-	alpha: number
+	alpha: number,
+	toWorld: Matrix
 }
 
 export interface PhongValues {
@@ -673,5 +674,30 @@ window.addEventListener('load', () => {
 				break;
 		}
 	});
+
+	canvasRasteriser.addEventListener('mousedown', (event) => {
+		let mx = event.offsetX;
+		let my = event.offsetY;
+		castRayFromMouse(mx, my);
+
+	});
+
+	function castRayFromMouse(mx: number, my: number){
+		// https://antongerdelan.net/opengl/raycasting.html
+		// convert 2D to 3D NDC
+		/*
+		let x = (2.0 * mx) / canvasRasteriser.width - 1.0;
+		let y = 1.0 - (2.0 * my) / canvasRasteriser.height;
+
+		 */
+
+		let x = mx / canvasRasteriser.width * 2 - 1;
+		let y = 1 - my / canvasRasteriser.height * 2;
+		// we do not actually need a z yet
+		let z = -1;
+		let ray_nds = new Vector(x, y, z, 1);
+
+		// visitorRasteriser.
+	}
 });
 

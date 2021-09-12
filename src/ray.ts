@@ -1,4 +1,5 @@
 import Vector from './vector';
+import Matrix from "./matrix";
 
 /**
  * Class representing a ray
@@ -18,8 +19,10 @@ export default class Ray {
    * @param camera The Camera
    * @return The resulting Ray
    */
-  static makeRay(x: number, y: number, camera: {origin: Vector, width: number, height: number, alpha: number }): Ray {
+  static makeRay(x: number, y: number, camera: {origin: Vector, width: number, height: number, alpha: number, toWorld: Matrix }): Ray {
+    // the given origin is already in world space
     let direction = new Vector(x - (camera.width - 1) / 2, (camera.height - 1) / 2 - y, -((camera.width / 2) / Math.tan(camera.alpha / 2)), 0).normalize();
-    return new Ray(camera.origin, direction);
+    let worldDirection = camera.toWorld.mulVec(direction).normalize();
+    return new Ray(camera.origin, worldDirection);
   }
 }

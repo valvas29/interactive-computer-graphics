@@ -9,6 +9,7 @@ import RayVisitor from './rayvisitor';
 import { Rotation, Scaling, Translation } from './transformation';
 import {FirstTraversalVisitorRay} from "./firstTraversalVisitorRay";
 import phong from "./phong";
+import Matrix from "./matrix";
 
 window.addEventListener('load', () => {
     const canvas = document.getElementById("raytracer") as HTMLCanvasElement;
@@ -33,7 +34,8 @@ window.addEventListener('load', () => {
         origin: new Vector(0, 0, 0, 1),
         width: canvas.width,
         height: canvas.height,
-        alpha: Math.PI / 3
+        alpha: Math.PI / 3,
+        toWorld: Matrix.identity()
     }
     const phongValues = {
         shininess: 16.0,

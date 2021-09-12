@@ -18,7 +18,8 @@ window.addEventListener('load', () => {
         origin: new Vector(0, 0, 0, 1),
         width: canvas.width,
         height: canvas.height,
-        alpha: Math.PI / 3
+        alpha: Math.PI / 3,
+        toWorld: Matrix.identity()
     }
     const phongValues = {
         shininess: 32.0,

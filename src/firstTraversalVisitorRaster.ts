@@ -1,11 +1,9 @@
 import {AABoxNode, CameraNode, GroupNode, LightNode, Node, PyramidNode, SphereNode, TextureBoxNode} from "./nodes";
 import RasterSphere from "./raster-sphere";
 import Vector from "./vector";
-import RasterBoxOutside from "./raster-boxOutside";
-import RasterTextureBox from "./raster-texture-box";
 import Matrix from "./matrix";
 import Visitor from "./visitor";
-import {CameraRasteriser, CameraRaytracer} from "./project-boilerplate";
+import {CameraRasteriser} from "./project-boilerplate";
 
 /**
  * Class traversing the Scene Graph before the actual traversal
@@ -128,7 +126,7 @@ export class FirstTraversalVisitorRaster implements Visitor{
 			let toWorld = this.matrixStack[this.matrixStack.length - 1];
 
 			let cameraRasteriser = {
-				eye: toWorld.mulVec(new Vector(0, 0, 0, 1)),
+				eye: toWorld.mulVec(new Vector(0, 0, 0, 1)), // origin
 				center: toWorld.mulVec(new Vector(0, 0, -1, 1)),
 				up: toWorld.mulVec(new Vector(0, 1, 0, 0)),
 				fovy: 60,

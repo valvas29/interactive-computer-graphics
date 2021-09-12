@@ -14,7 +14,6 @@ import {CameraRaytracer, PhongValues} from "./project-boilerplate";
 import {FirstTraversalVisitorRay} from "./firstTraversalVisitorRay";
 
 const UNIT_SPHERE = new Sphere(new Vector(0, 0, 0, 1), 1, new Vector(0, 0, 0, 1));
-const UNIT_AABOX = new AABox(new Vector(-0.5, -0.5, -0.5, 1), new Vector(0.5, 0.5, 0.5, 1), new Vector(0, 0, 0, 1));
 
 /**
  * Class representing a Visitor that uses
@@ -54,7 +53,7 @@ export default class RayVisitor implements Visitor {
 	 */
 	render(
 		rootNode: Node,
-		camera: { origin: Vector, width: number, height: number, alpha: number } | null,
+		camera: { origin: Vector, width: number, height: number, alpha: number, toWorld: Matrix } | null,
 		lightPositions: Array<Vector> | null,
 		phongValues: PhongValues,
 		firstTraversalVisitorRay: FirstTraversalVisitorRay
@@ -158,27 +157,6 @@ export default class RayVisitor implements Visitor {
 	 * @param outside
 	 */
 	visitAABoxNode(node: AABoxNode, outside: boolean): void {
-		/*
-		let toWorld = this.matrixStack[this.matrixStack.length - 1];
-		let fromWorld = this.inverseStack[this.inverseStack.length - 1];
-
-		const ray = new Ray(fromWorld.mulVec(this.ray.origin), fromWorld.mulVec(this.ray.direction).normalize());
-		let intersection = UNIT_AABOX.intersect(ray);
-
-		if (intersection) {
-			const intersectionPointWorld = toWorld.mulVec(intersection.point);
-			const intersectionNormalWorld = toWorld.mulVec(intersection.normal).normalize();
-			intersection = new Intersection(
-				(intersectionPointWorld.x - ray.origin.x) / ray.direction.x,
-				intersectionPointWorld,
-				intersectionNormalWorld
-			);
-			if (this.intersection === null || intersection.closerThan(this.intersection)) {
-				this.intersection = intersection;
-				this.intersectionColor = node.color;
-			}
-		}
-		 */
 	}
 
 	/**

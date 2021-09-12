@@ -22,7 +22,7 @@ export default class AABox {
    * @param maxPoint The maximum Point
    * @param color The colour of the cube
    */
-  constructor(minPoint: Vector, maxPoint: Vector, public color: Vector) {
+  constructor(minPoint: Vector, maxPoint: Vector) {
     /*
       7----6
      /|   /|   2 = maxPoint

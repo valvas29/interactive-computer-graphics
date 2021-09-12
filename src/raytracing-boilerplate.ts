@@ -4,6 +4,7 @@ import Sphere from './sphere';
 import Vector from './vector';
 import Ray from './ray';
 import Intersection from "./intersection";
+import Matrix from "./matrix";
 
 window.addEventListener('load', evt => {
     const canvas = document.getElementById("raytracer") as HTMLCanvasElement;
@@ -20,7 +21,8 @@ window.addEventListener('load', evt => {
         origin: new Vector(0, 0, 0, 1),
         width: canvas.width,
         height: canvas.height,
-        alpha: Math.PI * 2 / 3 //evtl. Radian-Einheit
+        alpha: Math.PI * 2 / 3, //evtl. Radian-Einheit
+        toWorld: Matrix.identity()
     }
     for (let x = 0; x < canvas.width; x++) {
         for (let y = 0; y < canvas.height; y++) {
