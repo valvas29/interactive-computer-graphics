@@ -47,6 +47,7 @@ export default class RasterTextureBox {
      * @param minPoint The minimal x,y,z of the box
      * @param maxPoint The maximal x,y,z of the box
      * @param texture The URL to the image to be used as texture
+     * @param normalMap
      */
     constructor(
         private gl: WebGL2RenderingContext,

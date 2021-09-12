@@ -214,6 +214,7 @@ export class TextureBoxNode extends Node {
    * The box's center is located at the origin
    * with all edges of length 1
    * @param texture The image filename for the texture
+   * @param normalMap
    */
   constructor(public texture: string, public normalMap: string) {
     super();
@@ -252,6 +253,28 @@ export class PyramidNode extends Node {
 				"area": this.area,
 				"color1": this.color1,
 				"color2": this.color2
+			}
+		}
+	}
+}
+
+export class CustomShapeNode extends Node {
+	constructor(public vertices: number[], public normals: number[], public vertex_indices: number[], public normal_indices: number[], public color: Vector) {
+		super();
+	}
+
+	accept(visitor: Visitor) {
+		visitor.visitCustomShapeNode(this);
+	}
+
+	toJSON() {
+		return {
+			"CustomShapeNode": {
+				"vertices": this.vertices,
+				"normals": this.normals,
+				"vertex_indices": this.vertex_indices,
+				"normal_indices": this.normal_indices,
+				"color": this.color
 			}
 		}
 	}

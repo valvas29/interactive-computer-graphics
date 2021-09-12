@@ -4,7 +4,7 @@ import Vector from './vector';
 import {
 	AABoxNode,
 	GroupNode, PyramidNode, CameraNode, SphereNode,
-	TextureBoxNode, LightNode
+	TextureBoxNode, LightNode, CustomShapeNode
 } from './nodes';
 import {
 	RasterVisitor,
@@ -154,7 +154,7 @@ window.addEventListener('load', () => {
 	rootNode = new GroupNode(new Translation(new Vector(0, 0, -10, 0)));
 
 	const gn1 = new GroupNode(new Translation(new Vector(2, 0, 8, 0)));
-	const gn2 = new GroupNode(new Scaling(new Vector(15, 15, 15, 1)));
+	const gn2 = new GroupNode(new Scaling(new Vector(20, 20, 20, 1)));
 	const desktop = new AABoxNode(new Vector(0, 0, 0, 0), false);
 	rootNode.add(gn1);
 	gn1.add(gn2);
@@ -162,78 +162,69 @@ window.addEventListener('load', () => {
 
 	const gn3 = new GroupNode(new Translation(new Vector(-3, 5, 3, 0)));
 	const gn4 = new GroupNode(new Rotation(new Vector(1, 0, 0, 0), 1.5708));
-	const pyramid = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.9, .4, .1, 1));
+	const pyramid = new SphereNode(new Vector(.2, .4, .7, 1));
 	rootNode.add(gn3);
 	gn3.add(gn4);
 	gn4.add(pyramid);
 	controlledAnimationNodes.push(
 		new ScalingNode(gn4, true));
 
-	const gn5 = new GroupNode(new Translation(new Vector(4, -8, 2, 0)));
-	const sphere1 = new SphereNode(new Vector(.5, .2, .2, 1));
+	const gn5 = new GroupNode(new Translation(new Vector(8, -8, 2, 0)));
+	const sphere1 = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1));
 	gn3.add(gn5);
 	gn5.add(sphere1);
 	controlledAnimationNodes.push(
 		new JumperNode(gn5, 7, 20));
 
 	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
-	const aaBox = new AABoxNode(new Vector(0, 0, 0, 0), true);
+	const gn9 = new GroupNode(new Scaling(new Vector(1.5, 3, 4, 1)));
+	const aaBox = new TextureBoxNode('checkerboard-finished.png', 'brickwall_normal.jpg');
 	gn3.add(gn6);
-	gn6.add(aaBox);
+	gn6.add(gn9);
+	gn9.add(aaBox);
 	otherAnimationNodes.push(
-		new RotationNode(gn6, new Vector (0, 1, 0, 0), 20));
+		new RotationNode(gn6, new Vector(0, 0, 1, 0), 15));
+	otherAnimationNodes.push(
+		new RotationNode(gn6, new Vector(0, 1, 0, 0), -20));
 
-	const gn7 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
-	const textureCube = new TextureBoxNode('hci-logo.png', 'flowers_normal.jpg');
-	rootNode.add(gn7);
+	const gn7 = new GroupNode(new Translation(new Vector(-2, 1, 0, 0)));
+	const textureCube = new AABoxNode(new Vector(0, 0, 0, 0), true);
+	gn6.add(gn7);
 	gn7.add(textureCube);
 	otherAnimationNodes.push(
 		new RotationNode(gn7, new Vector(1, 0, 0, 0), 20));
 
-	const gn8 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
-	const sphere2 = new SphereNode(new Vector(0, .7, .2, 1));
+	const gn8 = new GroupNode(new Translation(new Vector(-1, -3, -2, 0)));
+	const sphere2 = new SphereNode(new Vector(.8, .8, .1, 1));
 	gn6.add(gn8);
 	gn8.add(sphere2);
 
-	const gn9 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
-	rootNode.add(gn9);
-
-	const gn10 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
-	rootNode.add(gn9);
-
-	const lightNode1 = new GroupNode(new Translation(new Vector(-1, -2, 9, 0)));
+	const lightNode1 = new GroupNode(new Translation(new Vector(2, 1, 1, 0)));
 	const light1 = new LightNode();
-	gn9.add(lightNode1);
+	gn6.add(lightNode1);
 	lightNode1.add(light1);
 
-	otherAnimationNodes.push(
-		new RotationNode(gn9, new Vector (0, 0, 1, 0), 20));
-
-	const lightNode2 = new GroupNode(new Translation(new Vector(1, -1, 2.5, 0)));
+	const lightNode2 = new GroupNode(new Translation(new Vector(-10, -1, 4, 0)));
 	const light2 = new LightNode();
 	gn5.add(lightNode2);
 	lightNode2.add(light2);
-	otherAnimationNodes.push(
-		new RotationNode(gn5, new Vector (0, 1, 0, 0), 20));
 
-	const lightNode3 = new GroupNode(new Translation(new Vector(6, -1, 1, 0)));
+	const lightNode3 = new GroupNode(new Translation(new Vector(-3, -1, 1, 0)));
 	const light3 = new LightNode();
-	gn3.add(gn10);
-	gn10.add(lightNode3)
+	gn8.add(lightNode3);
 	lightNode3.add(light3);
 
-	otherAnimationNodes.push(
-		new RotationNode(gn10, new Vector (1, 0, 0, 0), 20));
-
-	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 15, 0)));
+	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 17, 0)));
 	const camera1 = new CameraNode(true);
 	rootNode.add(cameraNode);
 	cameraNode.add(camera1);
 
-	const cameraNode2 = new GroupNode(new Translation(new Vector(0, 1.5, 2.5, 0)));
+	const cameraNode2 = new GroupNode(new Translation(new Vector(0, 2.5, -2.5, 0)));
+	const cameraRotate = new GroupNode(new Rotation(new Vector(0, 1, 0, 0), 2.8));
 	const camera2 = new CameraNode(false);
-	gn6.add(cameraNode2);
-	cameraNode2.add(camera2);
+	gn5.add(cameraNode2);
+	cameraNode2.add(cameraRotate);
+	cameraRotate.add(camera2);
 
 	//alle cams in array sammeln
 	cameraNodes.push(camera1)
@@ -265,7 +256,6 @@ window.addEventListener('load', () => {
 
 
 	setup(rootNode);
-
 	function setup(rootNode: GroupNode) {
 		// setup for rendering
 		setupVisitor = new RasterSetupVisitor(gl);
@@ -363,6 +353,87 @@ window.addEventListener('load', () => {
 		}
 	});
 
+	//IMPORT-OBJ-Files
+	let bunnyObjButton = document.getElementById('bunnyObjButton');
+	bunnyObjButton.onclick = () => {
+		fetch("./stanford_bunny.obj"
+		).then(resp => resp.text()
+		).then(resp => parseObjData(resp));
+	}
+
+	let armadilloObjButton = document.getElementById('armadilloObjButton');
+	armadilloObjButton.onclick = () => {
+		fetch("./armadillo.obj"
+		).then(resp => resp.text()
+		).then(resp => parseObjData(resp));
+	}
+
+	let tyraObjButton = document.getElementById('tyraObjButton');
+	tyraObjButton.onclick = () => {
+		fetch("./tyra.obj"
+		).then(resp => resp.text()
+		).then(resp => parseObjData(resp));
+	}
+
+	function parseObjData(string: any) {
+		let vertices = [];
+		let normals = [];
+		let vertex_indices = [];
+		let normal_indices = [];
+
+		let lines = string.split('\n');
+
+		let lineValues;
+		let identifier;
+		for (let i = 0; i < lines.length; i++) {
+			lineValues = lines[i].split(' ');
+			//remove whitespaces
+			lineValues = lineValues.filter((el: any) => el);
+			//e.g. v/f/vn
+			identifier = lineValues[0];
+
+			switch(identifier) {
+				case "v":
+					vertices.push(parseFloat(lineValues[1]), parseFloat(lineValues[2]), parseFloat(lineValues[3]));
+					break;
+				case "vn":
+					normals.push(parseFloat(lineValues[1]), parseFloat(lineValues[2]), parseFloat(lineValues[3]));
+					break;
+				case "f":
+					//vertex and normal indices
+					if (lineValues[1].includes('//')) {
+						vertex_indices.push(parseInt(lineValues[1].split('//')[0]) - 1, parseInt(lineValues[2].split('//')[0]) - 1, parseInt(lineValues[3].split('//')[0]) - 1);
+						normal_indices.push(parseInt(lineValues[1].split('//')[1]) - 1, parseInt(lineValues[2].split('//')[1]) - 1, parseInt(lineValues[3].split('//')[1]) - 1);
+					}
+					//only vertex indices
+					else {
+						vertex_indices.push(parseInt(lineValues[1]) - 1, parseInt(lineValues[2]) - 1, parseInt(lineValues[3]) - 1);
+					}
+					break;
+				default:
+			}
+		}
+		const customShapeNode =  new CustomShapeNode(vertices, normals, vertex_indices, normal_indices, new Vector(Math.random(), Math.random(), Math.random(), 1));
+
+		//check if already a customShape added, if true replace the old one
+		let alreadyAddedCustomShape = false;
+		if (rootNode.childNodes[rootNode.childNodes.length - 1] instanceof GroupNode) {
+			let groupNode = rootNode.childNodes[rootNode.childNodes.length - 1] as GroupNode;
+			if (groupNode.childNodes.length > 0) {
+				if (groupNode.childNodes[groupNode.childNodes.length - 1] instanceof CustomShapeNode) {
+					groupNode.childNodes[groupNode.childNodes.length - 1] = customShapeNode;
+					alreadyAddedCustomShape = true;
+				}
+			}
+		}
+		if (!alreadyAddedCustomShape) {
+			const gnCustomShape = new GroupNode(new Translation(new Vector(-2, 2, 9, 0)));
+			rootNode.add(gnCustomShape);
+			gnCustomShape.add(customShapeNode);
+		}
+		setupVisitor.setup(rootNode);
+	}
+
 	//DOWNLOAD-SCENEGRAPH
 	let downloadButton = document.getElementById('downloadSceneButton');
 	downloadButton.onclick = () => {
@@ -390,16 +461,16 @@ window.addEventListener('load', () => {
 	sampleSceneButton.onclick = () => {
 		fetch("./sample_scene.json"
 		).then(resp => resp.json()
-		).then(resp => parseData(resp));
+		).then(resp => parseSceneData(resp));
 	}
 
 	async function handleFiles() {
 		let file = await this.files[0].text();
 		let jsonFile = JSON.parse(file);
-		parseData(jsonFile);
+		parseSceneData(jsonFile);
 	}
 
-	function parseData(file: any) {
+	function parseSceneData(file: any) {
 		//reset cameraNodes
 		cameraNodes = [];
 
@@ -501,6 +572,10 @@ window.addEventListener('load', () => {
 					let color1 = new Vector(childNodes[i].PyramidNode.color1.data[0], childNodes[i].PyramidNode.color1.data[1], childNodes[i].PyramidNode.color1.data[2], childNodes[i].PyramidNode.color1.data[3]);
 					let color2 = new Vector(childNodes[i].PyramidNode.color2.data[0], childNodes[i].PyramidNode.color2.data[1], childNodes[i].PyramidNode.color2.data[2], childNodes[i].PyramidNode.color2.data[3]);
 					result.push(new PyramidNode(area, color1, color2));
+
+				} else if (childNodes[i].hasOwnProperty("CustomShapeNode")) {
+					let color = new Vector(childNodes[i].CustomShapeNode.color.data[0], childNodes[i].CustomShapeNode.color.data[1], childNodes[i].CustomShapeNode.color.data[2], childNodes[i].CustomShapeNode.color.data[3]);
+					result.push(new CustomShapeNode(childNodes[i].CustomShapeNode.vertices, childNodes[i].CustomShapeNode.normals, childNodes[i].CustomShapeNode.vertex_indices, childNodes[i].CustomShapeNode.normal_indices, color));
 				}
 			}
 			return result;
