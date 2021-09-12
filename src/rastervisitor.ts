@@ -10,6 +10,7 @@ import Shader from './shader';
 import {CameraRasteriser, PhongValues} from "./project-boilerplate";
 import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
 import RasterBoxInside from "./raster-boxInside";
+import Ray from "./ray";
 
 interface Renderable {
 	render(shader: Shader): void;
@@ -22,6 +23,10 @@ interface Renderable {
 export class RasterVisitor implements Visitor {
 	matrixStack: Matrix[];
 	inverseStack: Matrix[];
+
+	mouseRay: Ray;
+
+	firstTraversalVisitor: FirstTraversalVisitorRaster;
 
 	/**
 	 * Creates a new RasterVisitor
@@ -62,18 +67,30 @@ export class RasterVisitor implements Visitor {
 		this.inverseStack.push(Matrix.identity());
 
 		if (firstTraversalVisitor) {
+			this.firstTraversalVisitor = firstTraversalVisitor;
 			//first traversal
 			firstTraversalVisitor.setup(rootNode);
 			this.lookat = firstTraversalVisitor.lookat;
 			this.perspective = firstTraversalVisitor.perspective;
 			this.passCameraPosition(firstTraversalVisitor.eye);
 			this.passLightPositions(firstTraversalVisitor.lightPositions);
+
+			// if the canvas was clicked
+			if(firstTraversalVisitor.mouseRay){
+				this.mouseRay = firstTraversalVisitor.mouseRay;
+				// reset
+				firstTraversalVisitor.mouseRay = undefined;
+			}
 		} else {
+			// this only happens in other boilerplates that aren't relevant to the final project
 			this.setupCamera(camera);
 		}
 
 		// traverse and render
 		rootNode.accept(this);
+
+		// reset
+		this.mouseRay = undefined;
 	}
 
 	/**
@@ -211,6 +228,19 @@ export class RasterVisitor implements Visitor {
 			N.set(normal);
 		}
 
+		if(this.mouseRay){
+			let raster_sphere = this.renderables.get(node) as RasterSphere;
+			let mouseRayLocal = new Ray(fromWorld.mulVec(this.mouseRay.origin), fromWorld.mulVec(this.mouseRay.direction).normalize());
+			let intersection = raster_sphere.intersectBoundingSphere(mouseRayLocal);
+			if(intersection){
+				raster_sphere.updateColor(new Vector(Math.random(), Math.random(), Math.random(), 1));
+				console.log("intersected");
+			} else {
+				console.log("no intersection");
+			}
+
+		}
+
 		this.renderables.get(node).render(shader);
 	}
 
@@ -328,6 +358,20 @@ export class RasterVisitor implements Visitor {
 
 	visitLightNode(node: LightNode): void {
 
+	}
+
+	castRayFromMouse(mx: number, my: number){
+		let camera = {
+			origin: this.firstTraversalVisitor.cameraToWorld.mulVec(new Vector(0, 0, 0, 1)),
+			width: 350,
+			height: 350,
+			alpha: Math.PI / 3,
+			toWorld: this.firstTraversalVisitor.cameraToWorld
+		}
+		let mouseRay = Ray.makeRay(mx, my, camera);
+		// save the created ray into the firstTraversalVisitor to be able to later check for intersections at the start of
+		// the next render traversal
+		this.firstTraversalVisitor.mouseRay = mouseRay;
 	}
 }
 
