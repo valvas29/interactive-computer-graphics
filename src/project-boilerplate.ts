@@ -200,10 +200,6 @@ window.addEventListener('load', async () => {
 	const gn10 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
 	rootNode.add(gn9);
 
-	//for imports of Custom-obj
-	const gnCustomShape = new GroupNode(new Translation(new Vector(-2, 2, 2, 0)));
-	gn8.add(gnCustomShape);
-
 	const lightNode1 = new GroupNode(new Translation(new Vector(-1, -2, 9, 0)));
 	const light1 = new LightNode();
 	gn9.add(lightNode1);
@@ -428,8 +424,20 @@ window.addEventListener('load', async () => {
 		}
 		const customShapeNode =  new CustomShapeNode(vertices, normals, vertex_indices, normal_indices);
 
-		if (gnCustomShape.childNodes.length > 0) gnCustomShape.childNodes[0] = customShapeNode;
-		else {
+		//check if already a customShape added, if true replace the old one
+		let alreadyAddedCustomShape = false;
+		if (rootNode.childNodes[rootNode.childNodes.length - 1] instanceof GroupNode) {
+			let groupNode = rootNode.childNodes[rootNode.childNodes.length - 1] as GroupNode;
+			if (groupNode.childNodes.length > 0) {
+				if (groupNode.childNodes[groupNode.childNodes.length - 1] instanceof CustomShapeNode) {
+					groupNode.childNodes[groupNode.childNodes.length - 1] = customShapeNode;
+					alreadyAddedCustomShape = true;
+				}
+			}
+		}
+		if (!alreadyAddedCustomShape) {
+			const gnCustomShape = new GroupNode(new Translation(new Vector(-2, 2, 9, 0)));
+			rootNode.add(gnCustomShape);
 			gnCustomShape.add(customShapeNode);
 		}
 		setupVisitor.setup(rootNode);
@@ -573,6 +581,9 @@ window.addEventListener('load', async () => {
 					let color1 = new Vector(childNodes[i].PyramidNode.color1.data[0], childNodes[i].PyramidNode.color1.data[1], childNodes[i].PyramidNode.color1.data[2], childNodes[i].PyramidNode.color1.data[3]);
 					let color2 = new Vector(childNodes[i].PyramidNode.color2.data[0], childNodes[i].PyramidNode.color2.data[1], childNodes[i].PyramidNode.color2.data[2], childNodes[i].PyramidNode.color2.data[3]);
 					result.push(new PyramidNode(area, color1, color2));
+
+				} else if (childNodes[i].hasOwnProperty("CustomShapeNode")) {
+					result.push(new CustomShapeNode(childNodes[i].CustomShapeNode.vertices, childNodes[i].CustomShapeNode.normals, childNodes[i].CustomShapeNode.vertex_indices, childNodes[i].CustomShapeNode.normal_indices));
 				}
 			}
 			return result;
