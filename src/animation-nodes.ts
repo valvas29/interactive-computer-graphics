@@ -76,7 +76,7 @@ export class JumperNode extends AnimationNode {
    * @param height only positive integers
    * @param speed The speed for jumping
    * @param groupNodeYValue
-   * @param forceActive
+   * @param forceActive to set the active state to true after importing if animation was still running
    */
   constructor(groupNode: GroupNode, height: number, speed: number, groupNodeYValue?: number, forceActive?: boolean) {
     super(groupNode);
@@ -101,9 +101,6 @@ export class JumperNode extends AnimationNode {
    * @param deltaT The time difference, the animation is advanced by
    */
   simulate(deltaT: number) {
-    //TODO deltaT ist jetzt fix, dass die Kugel nicht mehr wegfliegt
-    if (deltaT > 1000) deltaT = 1000;
-
     if (this.active) {
       let matrix = this.groupNode.transform.getMatrix();
       let inverse = this.groupNode.transform.getInverseMatrix();

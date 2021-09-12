@@ -1,4 +1,14 @@
-import {AABoxNode, CameraNode, GroupNode, LightNode, Node, PyramidNode, SphereNode, TextureBoxNode} from "./nodes";
+import {
+	AABoxNode,
+	CameraNode,
+	CustomShapeNode,
+	GroupNode,
+	LightNode,
+	Node,
+	PyramidNode,
+	SphereNode,
+	TextureBoxNode
+} from "./nodes";
 import RasterSphere from "./raster-sphere";
 import Vector from "./vector";
 import RasterBoxOutside from "./raster-boxOutside";
@@ -141,5 +151,8 @@ export class FirstTraversalVisitorRaster implements Visitor{
 	}
 
 	visitPyramidNode(node: PyramidNode): void {
+	}
+
+	visitCustomShapeNode(node: CustomShapeNode): void {
 	}
 }

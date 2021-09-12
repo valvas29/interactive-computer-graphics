@@ -5,11 +5,22 @@ import RasterTextureBox from './raster-texture-box';
 import Vector from './vector';
 import Matrix from './matrix';
 import Visitor from './visitor';
-import {AABoxNode, GroupNode, Node, SphereNode, TextureBoxNode, PyramidNode, CameraNode, LightNode} from './nodes';
+import {
+	AABoxNode,
+	GroupNode,
+	Node,
+	SphereNode,
+	TextureBoxNode,
+	PyramidNode,
+	CameraNode,
+	LightNode,
+	CustomShapeNode
+} from './nodes';
 import Shader from './shader';
 import {CameraRasteriser, PhongValues} from "./project-boilerplate";
 import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
 import RasterBoxInside from "./raster-boxInside";
+import {RasterCustomShape} from "./raster-custom-shape";
 
 interface Renderable {
 	render(shader: Shader): void;
@@ -28,6 +39,7 @@ export class RasterVisitor implements Visitor {
 	 * @param gl The 3D context to render to
 	 * @param shader The default shader to use
 	 * @param textureshader The texture shader to use
+	 * @param renderables
 	 */
 	constructor(private gl: WebGL2RenderingContext, private shader: Shader, private textureshader: Shader, private renderables: WeakMap<Node, Renderable>) {
 	}
@@ -322,6 +334,40 @@ export class RasterVisitor implements Visitor {
 		this.renderables.get(node).render(shader);
 	}
 
+	visitCustomShapeNode(node: CustomShapeNode): void {
+		this.shader.use();
+		let shader = this.shader;
+
+		let toWorld = this.matrixStack[this.matrixStack.length - 1];
+		let fromWorld = this.inverseStack[this.inverseStack.length - 1];
+
+		shader.getUniformMatrix("M").set(toWorld);
+		let V = shader.getUniformMatrix("V");
+		if (V && this.lookat) {
+			V.set(this.lookat);
+		}
+		let P = shader.getUniformMatrix("P");
+		if (P && this.perspective) {
+			P.set(this.perspective);
+		}
+
+		let normal = fromWorld.transpose();
+		normal.setVal(0, 3, 0);
+		normal.setVal(1, 3, 0);
+		normal.setVal(2, 3, 0);
+		normal.setVal(3, 0, 0);
+		normal.setVal(3, 1, 0);
+		normal.setVal(3, 2, 0);
+		normal.setVal(3, 3, 1);
+
+		const N = shader.getUniformMatrix("N");
+		if (N) {
+			N.set(normal);
+		}
+
+		this.renderables.get(node).render(shader);
+	}
+
 	visitCameraNode(node: CameraNode): void {
 
 	}
@@ -444,6 +490,19 @@ export class RasterSetupVisitor {
 				node.color2
 			)
 		);
+	}
+
+	visitCustomShapeNode(node: CustomShapeNode) {
+		this.objects.set(
+			node,
+			new RasterCustomShape(
+				this.gl,
+				node.vertices,
+				node.normals,
+				node.vertex_indices,
+				node.normal_indices
+			)
+		)
 	}
 
 	visitCameraNode(node: CameraNode) {
