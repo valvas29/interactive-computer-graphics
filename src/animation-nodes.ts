@@ -347,6 +347,8 @@ export class RotationNode extends AnimationNode {
     // change the matrix of the attached
     // group node to reflect a rotation
     if (this.active) {
+      if (deltaT > 200) deltaT = 200;
+
       let matrix = this.groupNode.transform.getMatrix();
       let inverse = this.groupNode.transform.getInverseMatrix();
 
