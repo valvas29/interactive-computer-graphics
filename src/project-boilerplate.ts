@@ -4,7 +4,7 @@ import Vector from './vector';
 import {
 	AABoxNode,
 	GroupNode, PyramidNode, CameraNode, SphereNode,
-	TextureBoxNode, LightNode
+	TextureBoxNode, LightNode, CustomShapeNode
 } from './nodes';
 import {
 	RasterVisitor,
@@ -25,7 +25,6 @@ import phong from "./phong";
 import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
 import {FirstTraversalVisitorRay} from "./firstTraversalVisitorRay";
 import AABox from "./aabox";
-import {ObjLoader} from "./obj-loader";
 
 export interface CameraRasteriser {
 	eye: Vector,
@@ -89,7 +88,7 @@ let phongValues: PhongValues;
 let scene: Scene;
 let rendertype = "rasteriser";
 
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
 	canvasRasteriser = document.getElementById("rasteriser") as HTMLCanvasElement;
 	canvasRaytracer = document.getElementById("raytracer") as HTMLCanvasElement;
 	gl = canvasRasteriser.getContext("webgl2");
@@ -153,15 +152,6 @@ window.addEventListener('load', () => {
 
 	rootNode = new GroupNode(new Translation(new Vector(0, 0, -10, 0)));
 
-	/*
-	let objLoader = new ObjLoader();
-	const customShape1 = objLoader.parse("./cube.obj");
-	rootNode.add(customShape1);
-
-	 */
-
-
-
 	const gn1 = new GroupNode(new Translation(new Vector(2, 0, 8, 0)));
 	const gn2 = new GroupNode(new Scaling(new Vector(15, 15, 15, 1)));
 	const desktop = new AABoxNode(new Vector(0, 0, 0, 0), false);
@@ -190,7 +180,7 @@ window.addEventListener('load', () => {
 	gn3.add(gn6);
 	gn6.add(aaBox);
 	otherAnimationNodes.push(
-		new RotationNode(gn6, new Vector (0, 1, 0, 0), 20));
+		new RotationNode(gn6, new Vector(0, 1, 0, 0), -20));
 
 	const gn7 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
 	const textureCube = new TextureBoxNode('hci-logo.png', 'flowers_normal.jpg');
@@ -210,20 +200,24 @@ window.addEventListener('load', () => {
 	const gn10 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
 	rootNode.add(gn9);
 
+	//for imports of Custom-obj
+	const gnCustomShape = new GroupNode(new Translation(new Vector(-2, 2, 2, 0)));
+	gn8.add(gnCustomShape);
+
 	const lightNode1 = new GroupNode(new Translation(new Vector(-1, -2, 9, 0)));
 	const light1 = new LightNode();
 	gn9.add(lightNode1);
 	lightNode1.add(light1);
 
 	otherAnimationNodes.push(
-		new RotationNode(gn9, new Vector (0, 0, 1, 0), 20));
+		new RotationNode(gn9, new Vector(0, 0, 1, 0), 20));
 
 	const lightNode2 = new GroupNode(new Translation(new Vector(1, -1, 2.5, 0)));
 	const light2 = new LightNode();
 	gn5.add(lightNode2);
 	lightNode2.add(light2);
 	otherAnimationNodes.push(
-		new RotationNode(gn5, new Vector (0, 1, 0, 0), 20));
+		new RotationNode(gn5, new Vector(0, 1, 0, 0), 20));
 
 	const lightNode3 = new GroupNode(new Translation(new Vector(6, -1, 1, 0)));
 	const light3 = new LightNode();
@@ -232,7 +226,7 @@ window.addEventListener('load', () => {
 	lightNode3.add(light3);
 
 	otherAnimationNodes.push(
-		new RotationNode(gn10, new Vector (1, 0, 0, 0), 20));
+		new RotationNode(gn10, new Vector(1, 0, 0, 0), 20));
 
 	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 15, 0)));
 	const camera1 = new CameraNode(true);
@@ -372,6 +366,75 @@ window.addEventListener('load', () => {
 		}
 	});
 
+	//IMPORT-OBJ-Files
+	let bunnyObjButton = document.getElementById('bunnyObjButton');
+	bunnyObjButton.onclick = () => {
+		fetch("./stanford_bunny.obj"
+		).then(resp => resp.text()
+		).then(resp => parseObjData(resp));
+	}
+
+	let armadilloObjButton = document.getElementById('armadilloObjButton');
+	armadilloObjButton.onclick = () => {
+		fetch("./armadillo.obj"
+		).then(resp => resp.text()
+		).then(resp => parseObjData(resp));
+	}
+
+	let tyraObjButton = document.getElementById('tyraObjButton');
+	tyraObjButton.onclick = () => {
+		fetch("./tyra.obj"
+		).then(resp => resp.text()
+		).then(resp => parseObjData(resp));
+	}
+
+	function parseObjData(string: any) {
+		let vertices = [];
+		let normals = [];
+		let vertex_indices = [];
+		let normal_indices = [];
+
+		let lines = string.split('\n');
+
+		let lineValues;
+		let identifier;
+		for (let i = 0; i < lines.length; i++) {
+			lineValues = lines[i].split(' ');
+			//remove whitespaces
+			lineValues = lineValues.filter((el: any) => el);
+			//e.g. v/f/vn
+			identifier = lineValues[0];
+
+			switch(identifier) {
+				case "v":
+					vertices.push(parseFloat(lineValues[1]), parseFloat(lineValues[2]), parseFloat(lineValues[3]));
+					break;
+				case "vn":
+					normals.push(parseFloat(lineValues[1]), parseFloat(lineValues[2]), parseFloat(lineValues[3]));
+					break;
+				case "f":
+					//vertex and normal indices
+					if (lineValues[1].includes('//')) {
+						vertex_indices.push(parseInt(lineValues[1].split('//')[0]) - 1, parseInt(lineValues[2].split('//')[0]) - 1, parseInt(lineValues[3].split('//')[0]) - 1);
+						normal_indices.push(parseInt(lineValues[1].split('//')[1]) - 1, parseInt(lineValues[2].split('//')[1]) - 1, parseInt(lineValues[3].split('//')[1]) - 1);
+					}
+					//only vertex indices
+					else {
+						vertex_indices.push(parseInt(lineValues[1]) - 1, parseInt(lineValues[2]) - 1, parseInt(lineValues[3]) - 1);
+					}
+					break;
+				default:
+			}
+		}
+		const customShapeNode =  new CustomShapeNode(vertices, normals, vertex_indices, normal_indices);
+
+		if (gnCustomShape.childNodes.length > 0) gnCustomShape.childNodes[0] = customShapeNode;
+		else {
+			gnCustomShape.add(customShapeNode);
+		}
+		setupVisitor.setup(rootNode);
+	}
+
 	//DOWNLOAD-SCENEGRAPH
 	let downloadButton = document.getElementById('downloadSceneButton');
 	downloadButton.onclick = () => {
@@ -399,16 +462,16 @@ window.addEventListener('load', () => {
 	sampleSceneButton.onclick = () => {
 		fetch("./sample_scene.json"
 		).then(resp => resp.json()
-		).then(resp => parseData(resp));
+		).then(resp => parseSceneData(resp));
 	}
 
 	async function handleFiles() {
 		let file = await this.files[0].text();
 		let jsonFile = JSON.parse(file);
-		parseData(jsonFile);
+		parseSceneData(jsonFile);
 	}
 
-	function parseData(file: any) {
+	function parseSceneData(file: any) {
 		//reset cameraNodes
 		cameraNodes = [];
 
@@ -433,7 +496,7 @@ window.addEventListener('load', () => {
 
 		//Fahranimationen und ControlledAnimationNodes defaultmäßig aus, nur bei keydown-events
 		animationNodes.freeFlightNodes.forEach(el => el.turnOffActive());
-		animationNodes.controlledAnimationNodes.forEach(function(el) {
+		animationNodes.controlledAnimationNodes.forEach(function (el) {
 			if (!el.forceActive) el.turnOffActive();
 		});
 

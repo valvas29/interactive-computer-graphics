@@ -20,7 +20,7 @@ import Shader from './shader';
 import {CameraRasteriser, PhongValues} from "./project-boilerplate";
 import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
 import RasterBoxInside from "./raster-boxInside";
-import {CustomShape} from "./custom-shape";
+import {RasterCustomShape} from "./raster-custom-shape";
 
 interface Renderable {
 	render(shader: Shader): void;
@@ -495,11 +495,12 @@ export class RasterSetupVisitor {
 	visitCustomShapeNode(node: CustomShapeNode) {
 		this.objects.set(
 			node,
-			new CustomShape(
+			new RasterCustomShape(
 				this.gl,
 				node.vertices,
 				node.normals,
-				node.indices
+				node.vertex_indices,
+				node.normal_indices
 			)
 		)
 	}
