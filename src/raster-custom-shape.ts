@@ -36,8 +36,9 @@ export class RasterCustomShape {
 	 * @param normals
 	 * @param vertex_indices
 	 * @param normal_indices
+	 * @param color
 	 */
-	constructor(private gl: WebGL2RenderingContext, vertices: number[], normals: number[], vertex_indices: number[], normal_indices: number[]) {
+	constructor(private gl: WebGL2RenderingContext, vertices: number[], normals: number[], vertex_indices: number[], normal_indices: number[], color: Vector) {
 		this.gl = gl;
 
 		let newVertices: number[] = [];
@@ -55,10 +56,9 @@ export class RasterCustomShape {
 
 		this.elements = newVertices.length / 3;
 
-		let color1 = new Vector(Math.random(), Math.random(), Math.random(), 1);
 		let colors: number[] = [];
 		for (let i = 0; i < newVertices.length; i++) {
-			colors.push(color1.r, color1.g, color1.b, color1.a);
+			colors.push(color.r, color.g, color.b, color.a);
 		}
 
 		const vertexBuffer = gl.createBuffer();

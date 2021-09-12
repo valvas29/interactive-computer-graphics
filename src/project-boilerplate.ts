@@ -412,7 +412,7 @@ window.addEventListener('load', () => {
 				default:
 			}
 		}
-		const customShapeNode =  new CustomShapeNode(vertices, normals, vertex_indices, normal_indices);
+		const customShapeNode =  new CustomShapeNode(vertices, normals, vertex_indices, normal_indices, new Vector(Math.random(), Math.random(), Math.random(), 1));
 
 		//check if already a customShape added, if true replace the old one
 		let alreadyAddedCustomShape = false;
@@ -573,7 +573,8 @@ window.addEventListener('load', () => {
 					result.push(new PyramidNode(area, color1, color2));
 
 				} else if (childNodes[i].hasOwnProperty("CustomShapeNode")) {
-					result.push(new CustomShapeNode(childNodes[i].CustomShapeNode.vertices, childNodes[i].CustomShapeNode.normals, childNodes[i].CustomShapeNode.vertex_indices, childNodes[i].CustomShapeNode.normal_indices));
+					let color = new Vector(childNodes[i].CustomShapeNode.color.data[0], childNodes[i].CustomShapeNode.color.data[1], childNodes[i].CustomShapeNode.color.data[2], childNodes[i].CustomShapeNode.color.data[3]);
+					result.push(new CustomShapeNode(childNodes[i].CustomShapeNode.vertices, childNodes[i].CustomShapeNode.normals, childNodes[i].CustomShapeNode.vertex_indices, childNodes[i].CustomShapeNode.normal_indices, color));
 				}
 			}
 			return result;

@@ -259,7 +259,7 @@ export class PyramidNode extends Node {
 }
 
 export class CustomShapeNode extends Node {
-	constructor(public vertices: number[], public normals: number[], public vertex_indices: number[], public normal_indices: number[]) {
+	constructor(public vertices: number[], public normals: number[], public vertex_indices: number[], public normal_indices: number[], public color: Vector) {
 		super();
 	}
 
@@ -273,7 +273,8 @@ export class CustomShapeNode extends Node {
 				"vertices": this.vertices,
 				"normals": this.normals,
 				"vertex_indices": this.vertex_indices,
-				"normal_indices": this.normal_indices
+				"normal_indices": this.normal_indices,
+				"color": this.color
 			}
 		}
 	}

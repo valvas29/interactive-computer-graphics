@@ -500,7 +500,8 @@ export class RasterSetupVisitor {
 				node.vertices,
 				node.normals,
 				node.vertex_indices,
-				node.normal_indices
+				node.normal_indices,
+				node.color
 			)
 		)
 	}
