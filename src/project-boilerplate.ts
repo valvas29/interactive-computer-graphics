@@ -154,7 +154,7 @@ window.addEventListener('load', () => {
 	rootNode = new GroupNode(new Translation(new Vector(0, 0, -10, 0)));
 
 	const gn1 = new GroupNode(new Translation(new Vector(2, 0, 8, 0)));
-	const gn2 = new GroupNode(new Scaling(new Vector(20, 20, 20, 1)));
+	const gn2 = new GroupNode(new Scaling(new Vector(15, 15, 15, 1)));
 	const desktop = new AABoxNode(new Vector(0, 0, 0, 0), false);
 	rootNode.add(gn1);
 	gn1.add(gn2);
@@ -162,69 +162,79 @@ window.addEventListener('load', () => {
 
 	const gn3 = new GroupNode(new Translation(new Vector(-3, 5, 3, 0)));
 	const gn4 = new GroupNode(new Rotation(new Vector(1, 0, 0, 0), 1.5708));
-	const pyramid = new SphereNode(new Vector(.2, .4, .7, 1));
+	const pyramid = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.9, .4, .1, 1));
 	rootNode.add(gn3);
 	gn3.add(gn4);
 	gn4.add(pyramid);
 	controlledAnimationNodes.push(
 		new ScalingNode(gn4, true));
 
-	const gn5 = new GroupNode(new Translation(new Vector(8, -8, 2, 0)));
-	const sphere1 = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.3, .1, 1, 1));
+	const gn5 = new GroupNode(new Translation(new Vector(4, -8, 2, 0)));
+	const sphere1 = new SphereNode(new Vector(.5, .2, .2, 1));
 	gn3.add(gn5);
 	gn5.add(sphere1);
 	controlledAnimationNodes.push(
 		new JumperNode(gn5, 7, 20));
 
 	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
-	const gn9 = new GroupNode(new Scaling(new Vector(1.5, 3, 4, 1)));
-	const aaBox = new TextureBoxNode('checkerboard-finished.png', 'brickwall_normal.jpg');
+	const aaBox = new AABoxNode(new Vector(0, 0, 0, 0), true);
 	gn3.add(gn6);
-	gn6.add(gn9);
-	gn9.add(aaBox);
+	gn6.add(aaBox);
 	otherAnimationNodes.push(
-		new RotationNode(gn6, new Vector(0, 0, 1, 0), 15));
-	otherAnimationNodes.push(
-		new RotationNode(gn6, new Vector(0, 1, 0, 0), -20));
+		new RotationNode(gn6, new Vector (0, 1, 0, 0), 20));
 
-	const gn7 = new GroupNode(new Translation(new Vector(-2, 1, 0, 0)));
-	const textureCube = new AABoxNode(new Vector(0, 0, 0, 0), true);
-	gn6.add(gn7);
+	const gn7 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
+	const textureCube = new TextureBoxNode('hci-logo.png', 'flowers_normal.jpg');
+	rootNode.add(gn7);
 	gn7.add(textureCube);
 	otherAnimationNodes.push(
 		new RotationNode(gn7, new Vector(1, 0, 0, 0), 20));
 
-	const gn8 = new GroupNode(new Translation(new Vector(-1, -3, -2, 0)));
-	const sphere2 = new SphereNode(new Vector(.8, .8, .1, 1));
+	const gn8 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
+	const sphere2 = new SphereNode(new Vector(0, .7, .2, 1));
 	gn6.add(gn8);
 	gn8.add(sphere2);
 
-	const lightNode1 = new GroupNode(new Translation(new Vector(2, 1, 1, 0)));
+	const gn9 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
+	rootNode.add(gn9);
+
+	const gn10 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
+	rootNode.add(gn9);
+
+	const lightNode1 = new GroupNode(new Translation(new Vector(-1, -2, 9, 0)));
 	const light1 = new LightNode();
-	gn6.add(lightNode1);
+	gn9.add(lightNode1);
 	lightNode1.add(light1);
 
-	const lightNode2 = new GroupNode(new Translation(new Vector(-10, -1, 4, 0)));
+	otherAnimationNodes.push(
+		new RotationNode(gn9, new Vector (0, 0, 1, 0), 20));
+
+	const lightNode2 = new GroupNode(new Translation(new Vector(1, -1, 2.5, 0)));
 	const light2 = new LightNode();
 	gn5.add(lightNode2);
 	lightNode2.add(light2);
+	otherAnimationNodes.push(
+		new RotationNode(gn5, new Vector (0, 1, 0, 0), 20));
 
-	const lightNode3 = new GroupNode(new Translation(new Vector(-3, -1, 1, 0)));
+	const lightNode3 = new GroupNode(new Translation(new Vector(6, -1, 1, 0)));
 	const light3 = new LightNode();
-	gn8.add(lightNode3);
+	gn3.add(gn10);
+	gn10.add(lightNode3)
 	lightNode3.add(light3);
 
-	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 17, 0)));
+	otherAnimationNodes.push(
+		new RotationNode(gn10, new Vector (1, 0, 0, 0), 20));
+
+	const cameraNode = new GroupNode(new Translation(new Vector(2, 0, 15, 0)));
 	const camera1 = new CameraNode(true);
 	rootNode.add(cameraNode);
 	cameraNode.add(camera1);
 
-	const cameraNode2 = new GroupNode(new Translation(new Vector(0, 2.5, -2.5, 0)));
-	const cameraRotate = new GroupNode(new Rotation(new Vector(0, 1, 0, 0), 2.8));
+	const cameraNode2 = new GroupNode(new Translation(new Vector(0, 1.5, 2.5, 0)));
 	const camera2 = new CameraNode(false);
-	gn5.add(cameraNode2);
-	cameraNode2.add(cameraRotate);
-	cameraRotate.add(camera2);
+	gn6.add(cameraNode2);
+	cameraNode2.add(camera2);
+
 
 	//alle cams in array sammeln
 	cameraNodes.push(camera1)
