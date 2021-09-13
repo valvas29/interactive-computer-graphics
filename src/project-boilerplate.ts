@@ -169,10 +169,17 @@ window.addEventListener('load', () => {
 	otherAnimationNodes.push(
 		new RotationNode(gn7, new Vector(1, 0, 0, 0), 20));
 
-	const gn8 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
+	const gn8 = new GroupNode(new Translation(new Vector(-3, 0, 0, 0)));
 	const sphere2 = new SphereNode(new Vector(0, .7, .2, 1));
 	gn6.add(gn8);
 	gn8.add(sphere2);
+
+	const gn11 = new GroupNode(new Translation(new Vector(-2.2, 0, 0, 0)));
+	const pyramid2 = new PyramidNode(new Vector(1, 2, 1, 1), new Vector(1, 0, 0, 1), new Vector(0, 0, .8, 1));
+	gn8.add(gn11);
+	gn11.add(pyramid2);
+	otherAnimationNodes.push(
+		new RotationNode(gn8, new Vector(0, 1, 0, 0), 30));
 
 	const gn9 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
 	rootNode.add(gn9);
@@ -415,7 +422,7 @@ window.addEventListener('load', () => {
 			}
 		}
 		if (!alreadyAddedCustomShape) {
-			const gnCustomShape = new GroupNode(new Translation(new Vector(-2, 2, 9, 0)));
+			const gnCustomShape = new GroupNode(new Translation(new Vector(-2, 0, 6, 0)));
 			rootNode.add(gnCustomShape);
 			gnCustomShape.add(customShapeNode);
 		}
