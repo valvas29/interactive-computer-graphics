@@ -665,7 +665,7 @@ window.addEventListener('load', () => {
 		if(rendertype === "rasteriser"){
 			visitorRasteriser.castRayFromMouse(mx, my);
 		} else {
-
+			// TODO raytracer
 		}
 
 	});

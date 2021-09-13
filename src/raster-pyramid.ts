@@ -1,10 +1,15 @@
 import Vector from './vector';
 import Shader from './shader';
+import Sphere from "./sphere";
+import RitterAlgorithm from "./ritterAlgorithm";
+import Ray from "./ray";
+import {RasterObject} from "./rasterObject";
+
 
 /**
  * A class creating buffers for an axis aligned box to render it with WebGL
  */
-export default class RasterPyramid {
+export default class RasterPyramid implements RasterObject{
     /**
      * The buffer containing the box's vertices
      */
@@ -20,6 +25,7 @@ export default class RasterPyramid {
      * The amount of indices
      */
     elements: number;
+    boundingSphere: Sphere;
 
     /**
      * Creates all WebGL buffers for the box
@@ -38,6 +44,7 @@ export default class RasterPyramid {
      * @param color2
      */
     constructor(private gl: WebGL2RenderingContext, minPoint: Vector, maxPoint: Vector, color1?: Vector, color2?: Vector) {
+        //super();
         this.gl = gl;
         const mi = minPoint;
         const ma = maxPoint;
@@ -68,6 +75,7 @@ export default class RasterPyramid {
             (mi.x + ma.x)/2, ma.y, (mi.z + ma.z)/2, // 14 back up
             (mi.x + ma.x)/2, ma.y, (mi.z + ma.z)/2  // 15 left up
         ];
+        this.boundingSphere = RitterAlgorithm.createRitterBoundingSphere(vertices);
         let indices = [
             // front
             1, 4, 12,
@@ -225,5 +233,21 @@ export default class RasterPyramid {
         this.gl.disableVertexAttribArray(colorLocation);
 
         this.gl.disableVertexAttribArray(normalLocation);
+    }
+
+    intersectBoundingSphere(ray: Ray ){
+        let intersection = this.boundingSphere.intersect(ray);
+        return intersection;
+    }
+
+    updateColor(newColor: Vector){
+        let colors = [];
+        for (let i = 0; i < 16; i++) {
+            colors.push(newColor.r, newColor.g, newColor.b, newColor.a);
+        }
+        const colorBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, colorBuffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(colors), this.gl.STATIC_DRAW);
+        this.colorBuffer = colorBuffer;
     }
 }

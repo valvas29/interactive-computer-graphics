@@ -1,10 +1,14 @@
 import Vector from './vector';
 import Shader from './shader';
+import {RasterObject} from "./rasterObject";
+import Sphere from "./sphere";
+import Ray from "./ray";
+import RitterAlgorithm from "./ritterAlgorithm";
 
 /**
  * A class creating buffers for a textured box to render it with WebGL
  */
-export default class RasterTextureBox {
+export default class RasterTextureBox implements RasterObject{
     /**
      * The buffer containing the box's vertices
      */
@@ -22,11 +26,14 @@ export default class RasterTextureBox {
     /**
      * The buffer containing the box's texture coordinates
      */
+    uv: Array<number>;
     texCoords: WebGLBuffer;
     /**
      * The amount of faces
      */
     elements: number;
+
+    boundingSphere: Sphere;
 
     tangents: Array<number>;
     bitangents: Array<number>;
@@ -77,7 +84,7 @@ export default class RasterTextureBox {
             mi.x, mi.y, mi.z, ma.x, mi.y, mi.z, ma.x, mi.y, ma.z,
             ma.x, mi.y, ma.z, mi.x, mi.y, ma.z, mi.x, mi.y, mi.z
         ];
-
+        this.boundingSphere = RitterAlgorithm.createRitterBoundingSphere(vertices);
         let normals = [
             // front
             0, 0, 1, 0, 0, 1, 0, 0, 1,
@@ -142,6 +149,7 @@ export default class RasterTextureBox {
             0, 0, 1, 0, 1, 1,
             1, 1, 0, 1, 0, 0,
         ];
+        this.uv = uv;
 
         /*
         this.tangents = [
@@ -349,7 +357,26 @@ export default class RasterTextureBox {
                 this.bitangents[10 + i * 18 + j * 3] = bitangent2y;
                 this.bitangents[11 + i * 18 + j * 3] = bitangent2z;
             }
-
         }
+    }
+
+    intersectBoundingSphere(ray: Ray ){
+        let intersection = this.boundingSphere.intersect(ray);
+        return intersection;
+    }
+
+    updateColor(newColor: Vector){
+        // flip the texture instead of using a new color
+        for (let i = 0; i < this.uv.length; i++) {
+            if(this.uv[i] === 0){
+                this.uv[i] = 1;
+            }else{
+                this.uv[i] = 0;
+            }
+        }
+        const uvBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, uvBuffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.uv), this.gl.STATIC_DRAW);
+        this.texCoords = uvBuffer;
     }
 }

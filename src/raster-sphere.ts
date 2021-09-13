@@ -2,11 +2,12 @@ import Vector from './vector';
 import Shader from './shader';
 import Sphere from "./sphere";
 import Ray from "./ray";
+import {RasterObject} from "./rasterObject";
 
 /**
  * A class creating buffers for a sphere to render it with WebGL
  */
-export default class RasterSphere {
+export default class RasterSphere implements RasterObject{
     /**
      * The buffer containing the sphere's vertices
      */

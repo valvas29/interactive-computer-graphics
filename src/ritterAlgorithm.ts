@@ -2,7 +2,7 @@
 import Vector from "./vector";
 import Sphere from "./sphere";
 
-class ritterAlgorithm {
+export default class RitterAlgorithm {
     static createRitterBoundingSphere(vertices: Array<number>): Sphere {
         let max_x = new Vector(-Infinity, undefined, undefined, 1);
         let min_x = new Vector(Infinity, undefined, undefined, 1);

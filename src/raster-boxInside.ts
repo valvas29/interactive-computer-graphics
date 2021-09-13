@@ -1,236 +1,259 @@
 import Vector from './vector';
 import Shader from './shader';
+import {RasterObject} from "./rasterObject";
+import Sphere from "./sphere";
+import Ray from "./ray";
+import RitterAlgorithm from "./ritterAlgorithm";
+
 
 /**
  * A class creating buffers for an axis aligned box to render it with WebGL
  */
-export default class RasterBoxInside {
-	/**
-	 * The buffer containing the box's vertices
-	 */
-	vertexBuffer: WebGLBuffer;
-	/**
-	 * The indices describing which vertices form a triangle
-	 */
-	indexBuffer: WebGLBuffer;
-	// TODO private variable for color buffer
-	/**
-	 * The normals on the surface at each vertex location
-	 */
-	normalBuffer: WebGLBuffer;
+export default class RasterBoxInside implements RasterObject {
+    /**
+     * The buffer containing the box's vertices
+     */
+    vertexBuffer: WebGLBuffer;
+    /**
+     * The indices describing which vertices form a triangle
+     */
+    indexBuffer: WebGLBuffer;
+    /**
+     * The normals on the surface at each vertex location
+     */
+    normalBuffer: WebGLBuffer;
 
-	colorBuffer: WebGLBuffer;
-	/**
-	 * The amount of indices
-	 */
-	elements: number;
+    colorBuffer: WebGLBuffer;
+    /**
+     * The amount of indices
+     */
+    elements: number;
 
-	/**
-	 * Creates all WebGL buffers for the box
-	 *     6 ------- 7
-	 *    / |       / |
-	 *   3 ------- 2  |
-	 *   |  |      |  |
-	 *   |  5 -----|- 4
-	 *   | /       | /
-	 *   0 ------- 1
-	 *  looking in negative z axis direction
-	 * @param gl The canvas' context
-	 * @param minPoint The minimal x,y,z of the box
-	 * @param maxPoint The maximal x,y,z of the box
-	 */
-	constructor(private gl: WebGL2RenderingContext, minPoint: Vector, maxPoint: Vector) {
-		this.gl = gl;
-		const mi = minPoint;
-		const ma = maxPoint;
-		let vertices = [
-			// 3*8 = 24 vertices because every vertex has 3 different normals
+    boundingSphere: Sphere;
 
-			// 0
-			mi.x, mi.y, ma.z, // 0 facing bottom
-			mi.x, mi.y, ma.z, // 1 facing front
-			mi.x, mi.y, ma.z, // 2 facing left
+    /**
+     * Creates all WebGL buffers for the box
+     *     6 ------- 7
+     *    / |       / |
+     *   3 ------- 2  |
+     *   |  |      |  |
+     *   |  5 -----|- 4
+     *   | /       | /
+     *   0 ------- 1
+     *  looking in negative z axis direction
+     * @param gl The canvas' context
+     * @param minPoint The minimal x,y,z of the box
+     * @param maxPoint The maximal x,y,z of the box
+     */
+    constructor(private gl: WebGL2RenderingContext, minPoint: Vector, maxPoint: Vector) {
+        this.gl = gl;
+        const mi = minPoint;
+        const ma = maxPoint;
+        let vertices = [
+            // 3*8 = 24 vertices because every vertex has 3 different normals
 
-			// 1
-			ma.x, mi.y, ma.z, // 3 bottom
-			ma.x, mi.y, ma.z, // 4 front
-			ma.x, mi.y, ma.z, // 5 right
+            // 0
+            mi.x, mi.y, ma.z, // 0 facing bottom
+            mi.x, mi.y, ma.z, // 1 facing front
+            mi.x, mi.y, ma.z, // 2 facing left
 
-			// 2
-			ma.x, ma.y, ma.z, // 6 top
-			ma.x, ma.y, ma.z, // 7 front
-			ma.x, ma.y, ma.z, // 8 right
+            // 1
+            ma.x, mi.y, ma.z, // 3 bottom
+            ma.x, mi.y, ma.z, // 4 front
+            ma.x, mi.y, ma.z, // 5 right
 
-			// 3
-			mi.x, ma.y, ma.z, // 9 top
-			mi.x, ma.y, ma.z, // 10 front
-			mi.x, ma.y, ma.z, // 11 left
+            // 2
+            ma.x, ma.y, ma.z, // 6 top
+            ma.x, ma.y, ma.z, // 7 front
+            ma.x, ma.y, ma.z, // 8 right
 
-			// 4
-			ma.x, mi.y, mi.z, // 12 bottom
-			ma.x, mi.y, mi.z, // 13 back
-			ma.x, mi.y, mi.z, // 14 right
+            // 3
+            mi.x, ma.y, ma.z, // 9 top
+            mi.x, ma.y, ma.z, // 10 front
+            mi.x, ma.y, ma.z, // 11 left
 
-			// 5
-			mi.x, mi.y, mi.z, // 15 bottom
-			mi.x, mi.y, mi.z, // 16 back
-			mi.x, mi.y, mi.z, // 17 left
+            // 4
+            ma.x, mi.y, mi.z, // 12 bottom
+            ma.x, mi.y, mi.z, // 13 back
+            ma.x, mi.y, mi.z, // 14 right
 
-			// 6
-			mi.x, ma.y, mi.z, // 18 top
-			mi.x, ma.y, mi.z, // 19 back
-			mi.x, ma.y, mi.z, // 20 left
+            // 5
+            mi.x, mi.y, mi.z, // 15 bottom
+            mi.x, mi.y, mi.z, // 16 back
+            mi.x, mi.y, mi.z, // 17 left
 
-			// 7
-			ma.x, ma.y, mi.z, // 21 top
-			ma.x, ma.y, mi.z, // 22 back
-			ma.x, ma.y, mi.z  // 23 right
-		];
-		let indices = [
-			// front
-			1, 4, 7, 1, 7, 10,
-			// back
-			16, 13, 22, 16, 19, 22,
-			// right
-			5, 14, 23, 23, 8, 5,
-			// bottom
-			0, 3, 12, 0, 12, 15,
-			// top
-			9, 6, 21, 9, 18, 21,
-			// left
-			2, 20, 17, 11, 20, 2
-		];
-		let colors = [
-			0.7, 0.7, 0.2, 1.0,
-			0.7, 0.7, 0.2, 1.0,
-			0.7, 0.7, 0.2, 1.0,
+            // 6
+            mi.x, ma.y, mi.z, // 18 top
+            mi.x, ma.y, mi.z, // 19 back
+            mi.x, ma.y, mi.z, // 20 left
 
-			0.7, 0.7, 0.2, 1.0,
-			0.7, 0.7, 0.2, 1.0,
-			0.7, 0.7, 0.2, 1.0,
+            // 7
+            ma.x, ma.y, mi.z, // 21 top
+            ma.x, ma.y, mi.z, // 22 back
+            ma.x, ma.y, mi.z  // 23 right
+        ];
+        this.boundingSphere = RitterAlgorithm.createRitterBoundingSphere(vertices);
+        let indices = [
+            // front
+            1, 4, 7, 1, 7, 10,
+            // back
+            16, 13, 22, 16, 19, 22,
+            // right
+            5, 14, 23, 23, 8, 5,
+            // bottom
+            0, 3, 12, 0, 12, 15,
+            // top
+            9, 6, 21, 9, 18, 21,
+            // left
+            2, 20, 17, 11, 20, 2
+        ];
+        let colors = [
+            0.7, 0.7, 0.2, 1.0,
+            0.7, 0.7, 0.2, 1.0,
+            0.7, 0.7, 0.2, 1.0,
 
-			0.3, 0.0, 0.7, 1.0, // violet
-			0.3, 0.0, 0.7, 1.0, // violet
-			0.3, 0.0, 0.7, 1.0, // violet
+            0.7, 0.7, 0.2, 1.0,
+            0.7, 0.7, 0.2, 1.0,
+            0.7, 0.7, 0.2, 1.0,
 
-			0.3, 0.0, 0.7, 1.0, // violet
-			0.3, 0.0, 0.7, 1.0, // violet
-			0.3, 0.0, 0.7, 1.0, // violet
+            0.3, 0.0, 0.7, 1.0, // violet
+            0.3, 0.0, 0.7, 1.0, // violet
+            0.3, 0.0, 0.7, 1.0, // violet
 
-			0.7, 0.7, 0.2, 1.0,
-			0.7, 0.7, 0.2, 1.0,
-			0.7, 0.7, 0.2, 1.0,
+            0.3, 0.0, 0.7, 1.0, // violet
+            0.3, 0.0, 0.7, 1.0, // violet
+            0.3, 0.0, 0.7, 1.0, // violet
 
-			0.7, 0.7, 0.2, 1.0,
-			0.7, 0.7, 0.2, 1.0,
-			0.7, 0.7, 0.2, 1.0,
+            0.7, 0.7, 0.2, 1.0,
+            0.7, 0.7, 0.2, 1.0,
+            0.7, 0.7, 0.2, 1.0,
 
-			0.3, 0.0, 0.7, 1.0, // violet
-			0.3, 0.0, 0.7, 1.0, // violet
-			0.3, 0.0, 0.7, 1.0, // violet
+            0.7, 0.7, 0.2, 1.0,
+            0.7, 0.7, 0.2, 1.0,
+            0.7, 0.7, 0.2, 1.0,
 
-			0.3, 0.0, 0.7, 1.0, // violet
-			0.3, 0.0, 0.7, 1.0, // violet
-			0.3, 0.0, 0.7, 1.0, // violet
-		];
-		let normals = [
-			// 0
-			// facing bottom
-			0, 1, 0,
-			// facing front
-			0, 0, -1,
-			// facing left
-			1, 0, 0,
+            0.3, 0.0, 0.7, 1.0, // violet
+            0.3, 0.0, 0.7, 1.0, // violet
+            0.3, 0.0, 0.7, 1.0, // violet
 
-			// 1
-			0, 1, 0, // bottom
-			0, 0, -1, // front
-			-1, 0, 0, // right
+            0.3, 0.0, 0.7, 1.0, // violet
+            0.3, 0.0, 0.7, 1.0, // violet
+            0.3, 0.0, 0.7, 1.0, // violet
+        ];
+        let normals = [
+            // 0
+            // facing bottom
+            0, 1, 0,
+            // facing front
+            0, 0, -1,
+            // facing left
+            1, 0, 0,
 
-			// 2
-			0, -1, 0, //top
-			0, 0, -1, // front
-			-1, 0, 0, // right
+            // 1
+            0, 1, 0, // bottom
+            0, 0, -1, // front
+            -1, 0, 0, // right
 
-			// 3
-			0, -1, 0, // top
-			0, 0, -1, // front
-			1, 0, 0, // left
+            // 2
+            0, -1, 0, // top
+            0, 0, -1, // front
+            -1, 0, 0, // right
 
-			// 4
-			0, 1, 0, // bottom
-			0, 0, 1, // back
-			-1, 0, 0, // right
+            // 3
+            0, -1, 0, // top
+            0, 0, -1, // front
+            1, 0, 0, // left
 
-			// 5
-			0, 1, 0, // bottom
-			0, 0, 1, // back
-			1, 0, 0, // left
+            // 4
+            0, 1, 0, // bottom
+            0, 0, 1, // back
+            -1, 0, 0, // right
 
-			//6
-			0, -1, 0, // top
-			0, 0, 1, // back
-			1, 0, 0, // left
+            // 5
+            0, 1, 0, // bottom
+            0, 0, 1, // back
+            1, 0, 0, // left
 
-			// 7
-			0, -1, 0, // top
-			0, 0, 1, // back
-			-1, 0, 0// right
-		];
+            //6
+            0, -1, 0, // top
+            0, 0, 1, // back
+            1, 0, 0, // left
 
-		const vertexBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-		this.vertexBuffer = vertexBuffer;
+            // 7
+            0, -1, 0, // top
+            0, 0, 1, // back
+            -1, 0, 0 // right
+        ];
 
-		const indexBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-		this.indexBuffer = indexBuffer;
+        const vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        this.vertexBuffer = vertexBuffer;
 
-		const normalBuffer = this.gl.createBuffer();
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, normalBuffer);
-		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(normals), this.gl.STATIC_DRAW);
-		this.normalBuffer = normalBuffer;
-		this.elements = indices.length;
+        const indexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+        this.indexBuffer = indexBuffer;
 
-		const colorBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-		this.colorBuffer = colorBuffer;
-	}
+        const normalBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, normalBuffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(normals), this.gl.STATIC_DRAW);
+        this.normalBuffer = normalBuffer;
+        this.elements = indices.length;
 
-	/**
-	 * Renders the box
-	 * @param shader The shader used to render
-	 */
-	render(shader: Shader) {
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-		const positionLocation = shader.getAttributeLocation("a_position");
-		this.gl.enableVertexAttribArray(positionLocation);
-		this.gl.vertexAttribPointer(positionLocation,
-			3, this.gl.FLOAT, false, 0, 0);
+        const colorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+        this.colorBuffer = colorBuffer;
+    }
 
-		// TODO bind colour buffer
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
-		const colorLocation = shader.getAttributeLocation("a_color");
-		this.gl.enableVertexAttribArray(colorLocation);
-		this.gl.vertexAttribPointer(colorLocation, 4, this.gl.FLOAT, false, 0, 0);
+    /**
+     * Renders the box
+     * @param shader The shader used to render
+     */
+    render(shader: Shader) {
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
+        const positionLocation = shader.getAttributeLocation("a_position");
+        this.gl.enableVertexAttribArray(positionLocation);
+        this.gl.vertexAttribPointer(positionLocation,
+            3, this.gl.FLOAT, false, 0, 0);
 
-		// TODO bind normal buffer
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
-		const normalLocation = shader.getAttributeLocation("a_normal");
-		this.gl.enableVertexAttribArray(normalLocation);
-		this.gl.vertexAttribPointer(normalLocation, 3, this.gl.FLOAT, false, 0, 0);
+        // TODO bind colour buffer
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
+        const colorLocation = shader.getAttributeLocation("a_color");
+        this.gl.enableVertexAttribArray(colorLocation);
+        this.gl.vertexAttribPointer(colorLocation, 4, this.gl.FLOAT, false, 0, 0);
 
-		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-		this.gl.drawElements(this.gl.TRIANGLES, this.elements, this.gl.UNSIGNED_SHORT, 0);
+        // TODO bind normal buffer
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
+        const normalLocation = shader.getAttributeLocation("a_normal");
+        this.gl.enableVertexAttribArray(normalLocation);
+        this.gl.vertexAttribPointer(normalLocation, 3, this.gl.FLOAT, false, 0, 0);
 
-		this.gl.disableVertexAttribArray(positionLocation);
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+        this.gl.drawElements(this.gl.TRIANGLES, this.elements, this.gl.UNSIGNED_SHORT, 0);
 
-		// TODO disable color vertex attrib array
-		this.gl.disableVertexAttribArray(colorLocation);
+        this.gl.disableVertexAttribArray(positionLocation);
 
-		this.gl.disableVertexAttribArray(normalLocation);
-	}
+        // TODO disable color vertex attrib array
+        this.gl.disableVertexAttribArray(colorLocation);
+
+        this.gl.disableVertexAttribArray(normalLocation);
+    }
+
+    intersectBoundingSphere(ray: Ray) {
+        let intersection = this.boundingSphere.intersect(ray);
+        return intersection;
+    }
+
+    updateColor(newColor: Vector) {
+        let colors = [];
+        for (let i = 0; i < 24; i++) {
+            colors.push(newColor.r, newColor.g, newColor.b, newColor.a);
+        }
+        const colorBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, colorBuffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(colors), this.gl.STATIC_DRAW);
+        this.colorBuffer = colorBuffer;
+    }
 }

@@ -2,7 +2,6 @@ import Vector from './vector';
 import { GroupNode } from './nodes';
 import {Rotation, Scaling, SQT, Translation} from './transformation';
 import Quaternion from './quaternion';
-import Matrix from "./matrix";
 
 /**
  * Class representing an Animation
