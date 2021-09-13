@@ -4,7 +4,7 @@ import Vector from './vector';
 import {
 	AABoxNode,
 	GroupNode, PyramidNode, CameraNode, SphereNode,
-	TextureBoxNode, LightNode
+	TextureBoxNode, LightNode, CustomShapeNode
 } from './nodes';
 import {
 	RasterVisitor,
@@ -214,6 +214,7 @@ window.addEventListener('load', () => {
 	gn6.add(cameraNode2);
 	cameraNode2.add(camera2);
 
+
 	//alle cams in array sammeln
 	cameraNodes.push(camera1)
 	cameraNodes.push(camera2);
@@ -244,7 +245,6 @@ window.addEventListener('load', () => {
 
 
 	setup(rootNode);
-
 	function setup(rootNode: GroupNode) {
 		// setup for rendering
 		setupVisitor = new RasterSetupVisitor(gl);
@@ -341,6 +341,87 @@ window.addEventListener('load', () => {
 		}
 	});
 
+	//IMPORT-OBJ-Files
+	let bunnyObjButton = document.getElementById('bunnyObjButton');
+	bunnyObjButton.onclick = () => {
+		fetch("./stanford_bunny.obj"
+		).then(resp => resp.text()
+		).then(resp => parseObjData(resp));
+	}
+
+	let armadilloObjButton = document.getElementById('armadilloObjButton');
+	armadilloObjButton.onclick = () => {
+		fetch("./armadillo.obj"
+		).then(resp => resp.text()
+		).then(resp => parseObjData(resp));
+	}
+
+	let tyraObjButton = document.getElementById('tyraObjButton');
+	tyraObjButton.onclick = () => {
+		fetch("./tyra.obj"
+		).then(resp => resp.text()
+		).then(resp => parseObjData(resp));
+	}
+
+	function parseObjData(string: any) {
+		let vertices = [];
+		let normals = [];
+		let vertex_indices = [];
+		let normal_indices = [];
+
+		let lines = string.split('\n');
+
+		let lineValues;
+		let identifier;
+		for (let i = 0; i < lines.length; i++) {
+			lineValues = lines[i].split(' ');
+			//remove whitespaces
+			lineValues = lineValues.filter((el: any) => el);
+			//e.g. v/f/vn
+			identifier = lineValues[0];
+
+			switch(identifier) {
+				case "v":
+					vertices.push(parseFloat(lineValues[1]), parseFloat(lineValues[2]), parseFloat(lineValues[3]));
+					break;
+				case "vn":
+					normals.push(parseFloat(lineValues[1]), parseFloat(lineValues[2]), parseFloat(lineValues[3]));
+					break;
+				case "f":
+					//vertex and normal indices
+					if (lineValues[1].includes('//')) {
+						vertex_indices.push(parseInt(lineValues[1].split('//')[0]) - 1, parseInt(lineValues[2].split('//')[0]) - 1, parseInt(lineValues[3].split('//')[0]) - 1);
+						normal_indices.push(parseInt(lineValues[1].split('//')[1]) - 1, parseInt(lineValues[2].split('//')[1]) - 1, parseInt(lineValues[3].split('//')[1]) - 1);
+					}
+					//only vertex indices
+					else {
+						vertex_indices.push(parseInt(lineValues[1]) - 1, parseInt(lineValues[2]) - 1, parseInt(lineValues[3]) - 1);
+					}
+					break;
+				default:
+			}
+		}
+		const customShapeNode =  new CustomShapeNode(vertices, normals, vertex_indices, normal_indices, new Vector(Math.random(), Math.random(), Math.random(), 1));
+
+		//check if already a customShape added, if true replace the old one
+		let alreadyAddedCustomShape = false;
+		if (rootNode.childNodes[rootNode.childNodes.length - 1] instanceof GroupNode) {
+			let groupNode = rootNode.childNodes[rootNode.childNodes.length - 1] as GroupNode;
+			if (groupNode.childNodes.length > 0) {
+				if (groupNode.childNodes[groupNode.childNodes.length - 1] instanceof CustomShapeNode) {
+					groupNode.childNodes[groupNode.childNodes.length - 1] = customShapeNode;
+					alreadyAddedCustomShape = true;
+				}
+			}
+		}
+		if (!alreadyAddedCustomShape) {
+			const gnCustomShape = new GroupNode(new Translation(new Vector(-2, 2, 9, 0)));
+			rootNode.add(gnCustomShape);
+			gnCustomShape.add(customShapeNode);
+		}
+		setupVisitor.setup(rootNode);
+	}
+
 	//DOWNLOAD-SCENEGRAPH
 	let downloadButton = document.getElementById('downloadSceneButton');
 	downloadButton.onclick = () => {
@@ -368,16 +449,16 @@ window.addEventListener('load', () => {
 	sampleSceneButton.onclick = () => {
 		fetch("./sample_scene.json"
 		).then(resp => resp.json()
-		).then(resp => parseData(resp));
+		).then(resp => parseSceneData(resp));
 	}
 
 	async function handleFiles() {
 		let file = await this.files[0].text();
 		let jsonFile = JSON.parse(file);
-		parseData(jsonFile);
+		parseSceneData(jsonFile);
 	}
 
-	function parseData(file: any) {
+	function parseSceneData(file: any) {
 		//reset cameraNodes
 		cameraNodes = [];
 
@@ -479,6 +560,10 @@ window.addEventListener('load', () => {
 					let color1 = new Vector(childNodes[i].PyramidNode.color1.data[0], childNodes[i].PyramidNode.color1.data[1], childNodes[i].PyramidNode.color1.data[2], childNodes[i].PyramidNode.color1.data[3]);
 					let color2 = new Vector(childNodes[i].PyramidNode.color2.data[0], childNodes[i].PyramidNode.color2.data[1], childNodes[i].PyramidNode.color2.data[2], childNodes[i].PyramidNode.color2.data[3]);
 					result.push(new PyramidNode(area, color1, color2));
+
+				} else if (childNodes[i].hasOwnProperty("CustomShapeNode")) {
+					let color = new Vector(childNodes[i].CustomShapeNode.color.data[0], childNodes[i].CustomShapeNode.color.data[1], childNodes[i].CustomShapeNode.color.data[2], childNodes[i].CustomShapeNode.color.data[3]);
+					result.push(new CustomShapeNode(childNodes[i].CustomShapeNode.vertices, childNodes[i].CustomShapeNode.normals, childNodes[i].CustomShapeNode.vertex_indices, childNodes[i].CustomShapeNode.normal_indices, color));
 				}
 			}
 			return result;
