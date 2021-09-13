@@ -36,25 +36,30 @@
                 <b>Steuerung:</b>
                 <div style="margin-left: 10px">
                     Kamera:
-                    <br>
-                    &nbsp;<kbd>W</kbd>&nbsp;<kbd>A</kbd>&nbsp;<kbd>S</kbd>&nbsp;<kbd>D</kbd> drücken, um die Kamera in x und z
-                    Richtung zu bewegen <br>
-                    &nbsp;<kbd>Q</kbd> <kbd>E</kbd> drücken, um die Kamera in y Richtung zu bewegen <br>
-                    &nbsp;<kbd>↑</kbd>&nbsp;<kbd>←</kbd>&nbsp;<kbd>↓</kbd>&nbsp;<kbd>→</kbd> drücken, um den Blickwinkel der
-                    Kamera zu verändern <br>
-                    <br>
-                    &nbsp;<kbd>C</kbd>&nbsp;drücken, um die Kamera an den untexturierten rotierenden Würfel zu hängen, beziehungsweise wieder
-                    zur Free-Flight-Kamera zurückzukehren
+                    <div style="margin: 5px 10px">
+                        <kbd>W</kbd>&nbsp;<kbd>A</kbd>&nbsp;<kbd>S</kbd>&nbsp;<kbd>D</kbd> drücken, um die Kamera in x und z
+                        Richtung zu bewegen <br>
+                        <kbd>Q</kbd> <kbd>E</kbd> drücken, um die Kamera in y Richtung zu bewegen <br>
+                        <kbd>↑</kbd>&nbsp;<kbd>←</kbd>&nbsp;<kbd>↓</kbd>&nbsp;<kbd>→</kbd> drücken, um den Blickwinkel der
+                        Kamera zu verändern <br>
+                        <br>
+                        <kbd>C</kbd>&nbsp;drücken, um die Kamera an den untexturierten rotierenden Würfel zu hängen, beziehungsweise wieder
+                        zur Free-Flight-Kamera zurückzukehren
+                    </div>
                 </div>
                 <div style="margin-left: 10px;margin-top: 40px">
                     Scaling-Node:
-                    <br>
-                    &nbsp;<kbd>U</kbd> drücken und halten , um die Pyramide bis zu einem Maximalwert hochzuskalieren,
-                    beziehungsweise bis zu einem Minimalwert herunterzuskalieren
-                    <br></br>
+                    <div style="margin: 5px 10px">
+                        <kbd>U</kbd> drücken und halten , um die Pyramide bis zu einem Maximalwert hochzuskalieren,
+                        beziehungsweise bis zu einem Minimalwert herunterzuskalieren
+                    </div>
                     Jumper-Node:
-                    <br>
-                    &nbsp;<kbd>I</kbd> drücken, um die rote Sphäre einmal bis zu einem Maximalwert springen zu lassen
+                    <div style="margin: 5px 10px">
+                        <kbd>I</kbd> drücken, um die rote Sphäre einmal bis zu einem Maximalwert springen zu lassen
+                    </div>
+                </div>
+                <div>
+                    Mausinteraktion
                 </div>
             </div>
         </div>
@@ -111,25 +116,6 @@
         </div>
     </div>
 </div>
-<script>
-    let rasterizer_b = document.getElementById('rasterizer_b');
-    let raytracer_b = document.getElementById('raytracer_b');
-
-    window.addEventListener('keydown', (event) => {
-        switch (event.key) {
-            case "k":
-                if (rasterizer_b.className === "btn btn-info") {
-                    rasterizer_b.className = "btn btn-outline-info";
-                    raytracer_b.className = "btn btn-info";
-                } else {
-                    rasterizer_b.className = "btn btn-info";
-                    raytracer_b.className = "btn btn-outline-info";
-                }
-                break;
-        }
-    });
-
-</script>
 </body>
 
 </html>

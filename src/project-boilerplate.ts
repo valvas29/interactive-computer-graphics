@@ -21,10 +21,8 @@ import textureFragmentShader from './texture-fragment-shader.glsl';
 import {Rotation, Scaling, SQT, Transformation, Translation} from './transformation';
 import RayVisitor from "./rayvisitor";
 import Matrix from "./matrix";
-import phong from "./phong";
 import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
 import {FirstTraversalVisitorRay} from "./firstTraversalVisitorRay";
-import AABox from "./aabox";
 
 export interface CameraRasteriser {
 	eye: Vector,
@@ -103,25 +101,6 @@ window.addEventListener('load', () => {
 		textureVertexShader,
 		textureFragmentShader
 	);
-
-	//Kameras werden nicht benötigt, sind im Szenengraphen
-	/*
-	cameraRasteriser = {
-		eye: new Vector(0, 0, -30, 1),
-		center: new Vector(0, 0, 0, 1),
-		up: new Vector(0, 1, 0, 0),
-		fovy: 60,
-		aspect: canvasRasteriser.width / canvasRasteriser.height,
-		near: 0.1,
-		far: 100
-	};
-	cameraRaytracer = {
-		origin: new Vector(2, 0, 30, 1),
-		width: canvasRaytracer.width,
-		height: canvasRaytracer.height,
-		alpha: Math.PI / 3
-	}
-	 */
 
 	lightPositions = [
 		new Vector(1, 1, 1, 1)
@@ -325,7 +304,8 @@ window.addEventListener('load', () => {
 	}
 
 	//RENDERER-BUTTONS
-	let rasterizer_b = document.getElementById("rasterizer_b");
+	let rasterizer_b = document.getElementById('rasterizer_b');
+	let raytracer_b = document.getElementById('raytracer_b');
 
 	rasterizer_b.addEventListener('click', function (event) {
 		if (rasterizer_b.className === "btn btn-info") {
@@ -343,8 +323,6 @@ window.addEventListener('load', () => {
 			raytracer_b.className = "btn btn-outline-info";
 		}
 	});
-
-	let raytracer_b = document.getElementById("raytracer_b");
 
 	raytracer_b.addEventListener('click', function (event) {
 		if (raytracer_b.className === "btn btn-info") {
@@ -645,6 +623,9 @@ window.addEventListener('load', () => {
 				if (rendertype === "rasteriser") {
 					rendertype = "raytracer";
 
+					rasterizer_b.className = "btn btn-outline-info";
+					raytracer_b.className = "btn btn-info";
+
 					canvasRasteriser.style.zIndex = "0";
 					canvasRasteriser.style.visibility = "hidden";
 
@@ -652,6 +633,9 @@ window.addEventListener('load', () => {
 					canvasRaytracer.style.visibility = "visible";
 				} else {
 					rendertype = "rasteriser";
+
+					rasterizer_b.className = "btn btn-info";
+					raytracer_b.className = "btn btn-outline-info";
 
 					canvasRasteriser.style.zIndex = "1";
 					canvasRasteriser.style.visibility = "visible";
@@ -763,26 +747,12 @@ window.addEventListener('load', () => {
 	canvasRasteriser.addEventListener('mousedown', (event) => {
 		let mx = event.offsetX;
 		let my = event.offsetY;
-		castRayFromMouse(mx, my);
+		if(rendertype === "rasteriser"){
+			visitorRasteriser.castRayFromMouse(mx, my);
+		} else {
+			// TODO raytracer
+		}
 
 	});
-
-	function castRayFromMouse(mx: number, my: number){
-		// https://antongerdelan.net/opengl/raycasting.html
-		// convert 2D to 3D NDC
-		/*
-		let x = (2.0 * mx) / canvasRasteriser.width - 1.0;
-		let y = 1.0 - (2.0 * my) / canvasRasteriser.height;
-
-		 */
-
-		let x = mx / canvasRasteriser.width * 2 - 1;
-		let y = 1 - my / canvasRasteriser.height * 2;
-		// we do not actually need a z yet
-		let z = -1;
-		let ray_nds = new Vector(x, y, z, 1);
-
-		// visitorRasteriser.
-	}
 });
 

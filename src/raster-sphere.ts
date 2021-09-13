@@ -1,10 +1,13 @@
 import Vector from './vector';
 import Shader from './shader';
+import Sphere from "./sphere";
+import Ray from "./ray";
+import {RasterObject} from "./rasterObject";
 
 /**
  * A class creating buffers for a sphere to render it with WebGL
  */
-export default class RasterSphere {
+export default class RasterSphere implements RasterObject{
     /**
      * The buffer containing the sphere's vertices
      */
@@ -25,6 +28,8 @@ export default class RasterSphere {
      */
     elements: number;
 
+    boundingSphere: Sphere;
+
     /**
      * Creates all WebGL buffers for the sphere
      * @param gl The canvas' context
@@ -36,7 +41,7 @@ export default class RasterSphere {
         private gl: WebGL2RenderingContext,
         center: Vector,
         radius: number,
-        color: Vector
+        color: Vector,
     ) {
 
         let vertices = [];
@@ -45,6 +50,8 @@ export default class RasterSphere {
 
         //colorArray hinzugefügt
         let colors = [];
+
+        this.boundingSphere = new Sphere(center, radius, undefined);
 
         let ringsize = 30;
         for (let ring = 0; ring < ringsize; ring++) {
@@ -144,5 +151,24 @@ export default class RasterSphere {
 
         // TODO disable normal vertex attrib array
         this.gl.disableVertexAttribArray(normalLocation);
+    }
+
+    intersectBoundingSphere(ray: Ray ){
+        let intersection = this.boundingSphere.intersect(ray);
+        return intersection;
+    }
+
+    updateColor(newColor: Vector){
+        let colors = [];
+        let ringsize = 30;
+        for (let ring = 0; ring < ringsize; ring++) {
+            for (let ring2 = 0; ring2 < ringsize; ring2++) {
+                colors.push(newColor.r, newColor.g, newColor.b, newColor.a);
+            }
+        }
+        const colorBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, colorBuffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(colors), this.gl.STATIC_DRAW);
+        this.colorBuffer = colorBuffer;
     }
 }

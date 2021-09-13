@@ -1,10 +1,14 @@
 import Vector from './vector';
 import Shader from './shader';
+import {RasterObject} from "./rasterObject";
+import Sphere from "./sphere";
+import Ray from "./ray";
+import RitterAlgorithm from "./ritterAlgorithm";
 
 /**
  * A class creating buffers for an axis aligned box to render it with WebGL
  */
-export default class RasterBoxOutside {
+export default class RasterBoxOutside implements RasterObject{
     /**
      * The buffer containing the box's vertices
      */
@@ -24,6 +28,7 @@ export default class RasterBoxOutside {
      * The amount of indices
      */
     elements: number;
+    boundingSphere: Sphere;
 
     /**
      * Creates all WebGL buffers for the box
@@ -86,6 +91,7 @@ export default class RasterBoxOutside {
             ma.x, ma.y, mi.z, // 22 back
             ma.x, ma.y, mi.z  // 23 right
         ];
+        this.boundingSphere = RitterAlgorithm.createRitterBoundingSphere(vertices);
         let indices = [
             // front
             1, 4, 7, 1, 7, 10,
@@ -232,5 +238,21 @@ export default class RasterBoxOutside {
         this.gl.disableVertexAttribArray(colorLocation);
 
         this.gl.disableVertexAttribArray(normalLocation);
+    }
+
+    intersectBoundingSphere(ray: Ray ){
+        let intersection = this.boundingSphere.intersect(ray);
+        return intersection;
+    }
+
+    updateColor(newColor: Vector){
+        let colors = [];
+        for (let i = 0; i < 24; i++) {
+            colors.push(newColor.r, newColor.g, newColor.b, newColor.a);
+        }
+        const colorBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, colorBuffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(colors), this.gl.STATIC_DRAW);
+        this.colorBuffer = colorBuffer;
     }
 }
