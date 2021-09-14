@@ -754,12 +754,13 @@ window.addEventListener('load', () => {
 	canvasRasteriser.addEventListener('mousedown', (event) => {
 		let mx = event.offsetX;
 		let my = event.offsetY;
-		if(rendertype === "rasteriser"){
-			visitorRasteriser.castRayFromMouse(mx, my);
-		} else {
-			// TODO raytracer
-		}
+		visitorRasteriser.castRayFromMouse(mx, my);
+	});
 
+	canvasRaytracer.addEventListener('mousedown', (event) => {
+		let mx = event.offsetX;
+		let my = event.offsetY;
+		visitorRaytracer.castRayFromMouse(mx, my);
 	});
 });
 

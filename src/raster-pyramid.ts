@@ -14,10 +14,7 @@ export default class RasterPyramid implements RasterObject{
      * The buffer containing the box's vertices
      */
     vertexBuffer: WebGLBuffer;
-    /**
-     * The indices describing which vertices form a triangle
-     */
-    indexBuffer: WebGLBuffer;
+
     normalBuffer: WebGLBuffer;
 
     colorBuffer: WebGLBuffer;
@@ -25,6 +22,7 @@ export default class RasterPyramid implements RasterObject{
      * The amount of indices
      */
     elements: number;
+
     boundingSphere: Sphere;
 
     /**
@@ -44,50 +42,38 @@ export default class RasterPyramid implements RasterObject{
      * @param color2
      */
     constructor(private gl: WebGL2RenderingContext, minPoint: Vector, maxPoint: Vector, color1?: Vector, color2?: Vector) {
-        //super();
         this.gl = gl;
         const mi = minPoint;
         const ma = maxPoint;
+
+        // some vertices are duplicate to give a different normal to the same vertex
+        // and since duplicate vertices are actually needed, indexing would lose a lot of its value
         let vertices = [
-            // 0
-            mi.x, mi.y, ma.z, // 0 bottom
-            mi.x, mi.y, ma.z, // 1 front and up
-            mi.x, mi.y, ma.z, // 2 left and up
+            // front
+            mi.x, mi.y, ma.z, //0
+            ma.x, mi.y, ma.z, // 1
+            (mi.x + ma.x)/2, ma.y, (mi.z + ma.z)/2, //4
 
-            // 1
-            ma.x, mi.y, ma.z, // 3 bottom
-            ma.x, mi.y, ma.z, // 4 front up
-            ma.x, mi.y, ma.z, // 5 right up
+            ma.x, mi.y, mi.z, // 2
+            mi.x, mi.y, mi.z, // 3
+            (mi.x + ma.x)/2, ma.y, (mi.z + ma.z)/2,
 
-            // 2
-            ma.x, mi.y, mi.z, // 6 bottom
-            ma.x, mi.y, mi.z, // 7 back up
-            ma.x, mi.y, mi.z, // 8 right up
+            ma.x, mi.y, ma.z, // 1
+            ma.x, mi.y, mi.z, // 2
+            (mi.x + ma.x)/2, ma.y, (mi.z + ma.z)/2,
 
-            // 3
-            mi.x, mi.y, mi.z, // 9 bottom
-            mi.x, mi.y, mi.z, // 10 back up
-            mi.x, mi.y, mi.z, // 11 left up
+            mi.x, mi.y, mi.z,
+            mi.x, mi.y, ma.z,
+            (mi.x + ma.x)/2, ma.y, (mi.z + ma.z)/2,
 
-            // 4
-            (mi.x + ma.x)/2, ma.y, (mi.z + ma.z)/2, // 12 front up
-            (mi.x + ma.x)/2, ma.y, (mi.z + ma.z)/2, // 13 right up
-            (mi.x + ma.x)/2, ma.y, (mi.z + ma.z)/2, // 14 back up
-            (mi.x + ma.x)/2, ma.y, (mi.z + ma.z)/2  // 15 left up
+            mi.x, mi.y, ma.z,
+            ma.x, mi.y, ma.z,
+            ma.x, mi.y, mi.z,
+            ma.x, mi.y, mi.z,
+            mi.x, mi.y, mi.z,
+            mi.x, mi.y, ma.z,
         ];
         this.boundingSphere = RitterAlgorithm.createRitterBoundingSphere(vertices);
-        let indices = [
-            // front
-            1, 4, 12,
-            // back
-            7, 10, 14,
-            // right
-            5, 8, 13,
-            // left
-            11, 2, 15,
-            // bottom
-            0, 3, 6, 6, 9, 0
-        ];
 
         if(color1 === undefined){
             color1 = new Vector(Math.random(), Math.random(), Math.random(), 1);
@@ -98,31 +84,28 @@ export default class RasterPyramid implements RasterObject{
         }
 
         let colors = [
-            // 0
             color1.r, color1.g, color1.b, color1.a,
             color1.r, color1.g, color1.b, color1.a,
-            color1.r, color1.g, color1.b, color1.a,
-
-            // 1
-            color1.r, color1.g, color1.b, color1.a,
-            color1.r, color1.g, color1.b, color1.a,
-            color1.r, color1.g, color1.b, color1.a,
-
-            // 2
-            color1.r, color1.g, color1.b, color1.a,
-            color1.r, color1.g, color1.b, color1.a,
-            color1.r, color1.g, color1.b, color1.a,
-
-            // 3
-            color1.r, color1.g, color1.b, color1.a,
-            color1.r, color1.g, color1.b, color1.a,
-            color1.r, color1.g, color1.b, color1.a,
-
-            // 4
             color2.r, color2.g, color2.b, color2.a,
+
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
             color2.r, color2.g, color2.b, color2.a,
+
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
             color2.r, color2.g, color2.b, color2.a,
+
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
             color2.r, color2.g, color2.b, color2.a,
+
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
         ];
 
         let point0 = new Vector(mi.x, mi.y, ma.z, 1);
@@ -148,46 +131,37 @@ export default class RasterPyramid implements RasterObject{
         let rightUp = vec_1_2.cross(vec_1_4).normalize();
 
         let normals = [
-            // 0
-            // facing bottom
-            0, -1, 0,
             // facing front and up
             frontUp.x, frontUp.y, frontUp.z,
-            // facing left and up
+            frontUp.x, frontUp.y, frontUp.z,
+            frontUp.x, frontUp.y, frontUp.z,
+
+            // facing back and up
+            backUp.x, backUp.y, backUp.z,
+            backUp.x, backUp.y, backUp.z,
+            backUp.x, backUp.y, backUp.z,
+
+            rightUp.x, rightUp.y, rightUp.z, // right up
+            rightUp.x, rightUp.y, rightUp.z, // right up
+            rightUp.x, rightUp.y, rightUp.z, // right up
+
+            leftUp.x, leftUp.y, leftUp.z,
+            leftUp.x, leftUp.y, leftUp.z,
             leftUp.x, leftUp.y, leftUp.z,
 
-            // 1
-            0, -1, 0, // bottom
-            frontUp.x, frontUp.y, frontUp.z, // front up
-            rightUp.x, rightUp.y, rightUp.z, // right up
-
-            // 2
-            0, -1, 0, // bottom
-            backUp.x, backUp.y, backUp.z, // back up
-            rightUp.x, rightUp.y, rightUp.z, // right up
-
-            // 3
-            0, -1, 0, // bottom
-            backUp.x, backUp.y, backUp.z, // back up
-            leftUp.x, leftUp.y, leftUp.z, // left up
-
-            // 4
-            frontUp.x, frontUp.y, frontUp.z, // front up
-            rightUp.x, rightUp.y, rightUp.z, // right up
-            backUp.x, backUp.y, backUp.z, // back up
-            leftUp.x, leftUp.y, leftUp.z, // left up
+            0, -1, 0,
+            0, -1, 0,
+            0, -1, 0,
+            0, -1, 0,
+            0, -1, 0,
+            0, -1, 0,
         ];
 
         const vertexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
         this.vertexBuffer = vertexBuffer;
-
-        const indexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-        this.indexBuffer = indexBuffer;
-        this.elements = indices.length;
+        this.elements = vertices.length / 3;
 
         const normalBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, normalBuffer);
@@ -195,7 +169,6 @@ export default class RasterPyramid implements RasterObject{
         this.normalBuffer = normalBuffer;
 
 
-        // TODO create and fill a buffer for colours
         const colorBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
@@ -213,7 +186,6 @@ export default class RasterPyramid implements RasterObject{
         this.gl.vertexAttribPointer(positionLocation,
             3, this.gl.FLOAT, false, 0, 0);
 
-        // TODO bind colour buffer
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
         const colorLocation = shader.getAttributeLocation("a_color");
         this.gl.enableVertexAttribArray(colorLocation);
@@ -224,14 +196,10 @@ export default class RasterPyramid implements RasterObject{
         this.gl.enableVertexAttribArray(normalLocation);
         this.gl.vertexAttribPointer(normalLocation, 3, this.gl.FLOAT, false, 0, 0);
 
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-        this.gl.drawElements(this.gl.TRIANGLES, this.elements, this.gl.UNSIGNED_SHORT, 0);
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, this.elements);
 
         this.gl.disableVertexAttribArray(positionLocation);
-
-        // TODO disable color vertex attrib array
         this.gl.disableVertexAttribArray(colorLocation);
-
         this.gl.disableVertexAttribArray(normalLocation);
     }
 
@@ -240,11 +208,32 @@ export default class RasterPyramid implements RasterObject{
         return intersection;
     }
 
-    updateColor(newColor: Vector){
-        let colors = [];
-        for (let i = 0; i < 16; i++) {
-            colors.push(newColor.r, newColor.g, newColor.b, newColor.a);
-        }
+    updateColor(newColor: Vector, newSecondaryColor: Vector){
+        let colors = [
+            newColor.r, newColor.g, newColor.b, newColor.a,
+            newColor.r, newColor.g, newColor.b, newColor.a,
+            newSecondaryColor.r, newSecondaryColor.g, newSecondaryColor.b, newSecondaryColor.a,
+
+            newColor.r, newColor.g, newColor.b, newColor.a,
+            newColor.r, newColor.g, newColor.b, newColor.a,
+            newSecondaryColor.r, newSecondaryColor.g, newSecondaryColor.b, newSecondaryColor.a,
+
+            newColor.r, newColor.g, newColor.b, newColor.a,
+            newColor.r, newColor.g, newColor.b, newColor.a,
+            newSecondaryColor.r, newSecondaryColor.g, newSecondaryColor.b, newSecondaryColor.a,
+
+            newColor.r, newColor.g, newColor.b, newColor.a,
+            newColor.r, newColor.g, newColor.b, newColor.a,
+            newSecondaryColor.r, newSecondaryColor.g, newSecondaryColor.b, newSecondaryColor.a,
+
+            newColor.r, newColor.g, newColor.b, newColor.a,
+            newColor.r, newColor.g, newColor.b, newColor.a,
+            newColor.r, newColor.g, newColor.b, newColor.a,
+            newColor.r, newColor.g, newColor.b, newColor.a,
+            newColor.r, newColor.g, newColor.b, newColor.a,
+            newColor.r, newColor.g, newColor.b, newColor.a,
+        ];
+
         const colorBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, colorBuffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(colors), this.gl.STATIC_DRAW);

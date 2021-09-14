@@ -1,10 +1,14 @@
 import Vector from './vector';
 import Shader from './shader';
+import {RasterObject} from "./rasterObject";
+import Sphere from "./sphere";
+import Ray from "./ray";
+import RitterAlgorithm from "./ritterAlgorithm";
 
 /**
  * A class creating buffers for an axis aligned box to render it with WebGL
  */
-export class RasterCustomShape {
+export class RasterCustomShape implements RasterObject{
 	/**
 	 * The buffer containing the box's vertices
 	 */
@@ -20,6 +24,7 @@ export class RasterCustomShape {
 	 * The amount of indices
 	 */
 	elements: number;
+	boundingSphere: Sphere;
 
 	/**
 	 * Creates all WebGL buffers for the box
@@ -39,6 +44,7 @@ export class RasterCustomShape {
 	 * @param color
 	 */
 	constructor(private gl: WebGL2RenderingContext, vertices: number[], normals: number[], vertex_indices: number[], normal_indices: number[], color: Vector) {
+		this.boundingSphere= RitterAlgorithm.createRitterBoundingSphere(vertices);
 		this.gl = gl;
 
 		let newVertices: number[] = [];
@@ -48,6 +54,7 @@ export class RasterCustomShape {
 			makeVerticesNonIndexed();
 		}
 		else newVertices = vertices;
+
 
 		if (normal_indices.length > 0) {
 			makeNormalsNonIndexed();
@@ -103,7 +110,6 @@ export class RasterCustomShape {
 		this.gl.vertexAttribPointer(positionLocation,
 			3, this.gl.FLOAT, false, 0, 0);
 
-		// TODO bind colour buffer
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
 		const colorLocation = shader.getAttributeLocation("a_color");
 		this.gl.enableVertexAttribArray(colorLocation);
@@ -121,5 +127,22 @@ export class RasterCustomShape {
 		this.gl.disableVertexAttribArray(colorLocation);
 
 		this.gl.disableVertexAttribArray(normalLocation);
+	}
+
+	intersectBoundingSphere(ray: Ray ){
+		let intersection = this.boundingSphere.intersect(ray);
+		return intersection;
+	}
+
+	updateColor(newColor: Vector){
+		let colors = [];
+		for (let i = 0; i < this.elements*3; i++) {
+			colors.push(newColor.r, newColor.g, newColor.b, newColor.a);
+		}
+
+		const colorBuffer = this.gl.createBuffer();
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, colorBuffer);
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(colors), this.gl.STATIC_DRAW);
+		this.colorBuffer = colorBuffer;
 	}
 }

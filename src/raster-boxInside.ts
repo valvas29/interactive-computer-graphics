@@ -9,15 +9,12 @@ import RitterAlgorithm from "./ritterAlgorithm";
 /**
  * A class creating buffers for an axis aligned box to render it with WebGL
  */
+// has inverted normals compared to RasterBoxOutside
 export default class RasterBoxInside implements RasterObject {
     /**
      * The buffer containing the box's vertices
      */
     vertexBuffer: WebGLBuffer;
-    /**
-     * The indices describing which vertices form a triangle
-     */
-    indexBuffer: WebGLBuffer;
     /**
      * The normals on the surface at each vertex location
      */
@@ -28,7 +25,6 @@ export default class RasterBoxInside implements RasterObject {
      * The amount of indices
      */
     elements: number;
-
     boundingSphere: Sphere;
 
     /**
@@ -49,157 +45,127 @@ export default class RasterBoxInside implements RasterObject {
         this.gl = gl;
         const mi = minPoint;
         const ma = maxPoint;
+
+        // some vertices are duplicate to give a different normal to the same vertex
+        // and since duplicate vertices are actually needed, indexing would lose a lot of its value
         let vertices = [
-            // 3*8 = 24 vertices because every vertex has 3 different normals
+            // 6*6 = 36 vertices because every side needs 6 vertices (2 triangles)
 
-            // 0
-            mi.x, mi.y, ma.z, // 0 facing bottom
-            mi.x, mi.y, ma.z, // 1 facing front
-            mi.x, mi.y, ma.z, // 2 facing left
+            // front 012 023
+            mi.x, mi.y, ma.z, // 0
+            ma.x, mi.y, ma.z, // 1
+            ma.x, ma.y, ma.z, // 2
+            mi.x, mi.y, ma.z, // 0
+            ma.x, ma.y, ma.z, // 2
+            mi.x, ma.y, ma.z, // 3
 
-            // 1
-            ma.x, mi.y, ma.z, // 3 bottom
-            ma.x, mi.y, ma.z, // 4 front
-            ma.x, mi.y, ma.z, // 5 right
+            // back 456 467
+            ma.x, mi.y, mi.z,
+            mi.x, mi.y, mi.z,
+            mi.x, ma.y, mi.z,
+            ma.x, mi.y, mi.z,
+            mi.x, ma.y, mi.z,
+            ma.x, ma.y, mi.z,
 
-            // 2
-            ma.x, ma.y, ma.z, // 6 top
-            ma.x, ma.y, ma.z, // 7 front
-            ma.x, ma.y, ma.z, // 8 right
+            // right 147 172
+            ma.x, mi.y, ma.z,
+            ma.x, mi.y, mi.z,
+            ma.x, ma.y, mi.z,
+            ma.x, mi.y, ma.z,
+            ma.x, ma.y, mi.z,
+            ma.x, ma.y, ma.z,
 
-            // 3
-            mi.x, ma.y, ma.z, // 9 top
-            mi.x, ma.y, ma.z, // 10 front
-            mi.x, ma.y, ma.z, // 11 left
+            // bottom 541 510
+            mi.x, mi.y, mi.z,
+            ma.x, mi.y, mi.z,
+            ma.x, mi.y, ma.z,
+            mi.x, mi.y, mi.z,
+            ma.x, mi.y, ma.z,
+            mi.x, mi.y, ma.z,
 
-            // 4
-            ma.x, mi.y, mi.z, // 12 bottom
-            ma.x, mi.y, mi.z, // 13 back
-            ma.x, mi.y, mi.z, // 14 right
+            // top 327 376
+            mi.x, ma.y, ma.z,
+            ma.x, ma.y, ma.z,
+            ma.x, ma.y, mi.z,
+            mi.x, ma.y, ma.z,
+            ma.x, ma.y, mi.z,
+            mi.x, ma.y, mi.z,
 
-            // 5
-            mi.x, mi.y, mi.z, // 15 bottom
-            mi.x, mi.y, mi.z, // 16 back
-            mi.x, mi.y, mi.z, // 17 left
-
-            // 6
-            mi.x, ma.y, mi.z, // 18 top
-            mi.x, ma.y, mi.z, // 19 back
-            mi.x, ma.y, mi.z, // 20 left
-
-            // 7
-            ma.x, ma.y, mi.z, // 21 top
-            ma.x, ma.y, mi.z, // 22 back
-            ma.x, ma.y, mi.z  // 23 right
+            // left 503 536
+            mi.x, mi.y, mi.z,
+            mi.x, mi.y, ma.z,
+            mi.x, ma.y, ma.z,
+            mi.x, mi.y, mi.z,
+            mi.x, ma.y, ma.z,
+            mi.x, ma.y, mi.z,
         ];
         this.boundingSphere = RitterAlgorithm.createRitterBoundingSphere(vertices);
-        let indices = [
-            // front
-            1, 4, 7, 1, 7, 10,
-            // back
-            16, 13, 22, 16, 19, 22,
-            // right
-            5, 14, 23, 23, 8, 5,
-            // bottom
-            0, 3, 12, 0, 12, 15,
-            // top
-            9, 6, 21, 9, 18, 21,
-            // left
-            2, 20, 17, 11, 20, 2
-        ];
-        let colors = [
-            0.7, 0.7, 0.2, 1.0,
-            0.7, 0.7, 0.2, 1.0,
-            0.7, 0.7, 0.2, 1.0,
 
-            0.7, 0.7, 0.2, 1.0,
-            0.7, 0.7, 0.2, 1.0,
-            0.7, 0.7, 0.2, 1.0,
-
-            0.3, 0.0, 0.7, 1.0, // violet
-            0.3, 0.0, 0.7, 1.0, // violet
-            0.3, 0.0, 0.7, 1.0, // violet
-
-            0.3, 0.0, 0.7, 1.0, // violet
-            0.3, 0.0, 0.7, 1.0, // violet
-            0.3, 0.0, 0.7, 1.0, // violet
-
-            0.7, 0.7, 0.2, 1.0,
-            0.7, 0.7, 0.2, 1.0,
-            0.7, 0.7, 0.2, 1.0,
-
-            0.7, 0.7, 0.2, 1.0,
-            0.7, 0.7, 0.2, 1.0,
-            0.7, 0.7, 0.2, 1.0,
-
-            0.3, 0.0, 0.7, 1.0, // violet
-            0.3, 0.0, 0.7, 1.0, // violet
-            0.3, 0.0, 0.7, 1.0, // violet
-
-            0.3, 0.0, 0.7, 1.0, // violet
-            0.3, 0.0, 0.7, 1.0, // violet
-            0.3, 0.0, 0.7, 1.0, // violet
-        ];
+        let color1 = new Vector(0.7, 0.7, 0.2, 1.0); // violet
+        let color2 = new Vector(0.3, 0.0, 0.7, 1.0); // yellow
+        let colors = this.createColorArrayTopBottom(color1, color2);
+        // has inverted normals compared to RasterBoxOutside
         let normals = [
-            // 0
-            // facing bottom
-            0, 1, 0,
             // facing front
             0, 0, -1,
+            0, 0, -1,
+            0, 0, -1,
+            0, 0, -1,
+            0, 0, -1,
+            0, 0, -1,
+
+            // facing back
+            0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
+
+            // facing right
+            -1, 0, 0,
+            -1, 0, 0,
+            -1, 0, 0,
+            -1, 0, 0,
+            -1, 0, 0,
+            -1, 0, 0,
+
+            // facing bottom
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0,
+
+            // facing top
+            0, -1, 0,
+            0, -1, 0,
+            0, -1, 0,
+            0, -1, 0,
+            0, -1, 0,
+            0, -1, 0,
+
             // facing left
             1, 0, 0,
-
-            // 1
-            0, 1, 0, // bottom
-            0, 0, -1, // front
-            -1, 0, 0, // right
-
-            // 2
-            0, -1, 0, // top
-            0, 0, -1, // front
-            -1, 0, 0, // right
-
-            // 3
-            0, -1, 0, // top
-            0, 0, -1, // front
-            1, 0, 0, // left
-
-            // 4
-            0, 1, 0, // bottom
-            0, 0, 1, // back
-            -1, 0, 0, // right
-
-            // 5
-            0, 1, 0, // bottom
-            0, 0, 1, // back
-            1, 0, 0, // left
-
-            //6
-            0, -1, 0, // top
-            0, 0, 1, // back
-            1, 0, 0, // left
-
-            // 7
-            0, -1, 0, // top
-            0, 0, 1, // back
-            -1, 0, 0 // right
+            1, 0, 0,
+            1, 0, 0,
+            1, 0, 0,
+            1, 0, 0,
+            1, 0, 0,
         ];
 
         const vertexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
         this.vertexBuffer = vertexBuffer;
-
-        const indexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-        this.indexBuffer = indexBuffer;
+        this.elements = vertices.length / 3;
 
         const normalBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, normalBuffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(normals), this.gl.STATIC_DRAW);
         this.normalBuffer = normalBuffer;
-        this.elements = indices.length;
+
 
         const colorBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
@@ -215,30 +181,70 @@ export default class RasterBoxInside implements RasterObject {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
         const positionLocation = shader.getAttributeLocation("a_position");
         this.gl.enableVertexAttribArray(positionLocation);
-        this.gl.vertexAttribPointer(positionLocation,
-            3, this.gl.FLOAT, false, 0, 0);
+        this.gl.vertexAttribPointer(positionLocation, 3, this.gl.FLOAT, false, 0, 0);
 
-        // TODO bind colour buffer
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
         const colorLocation = shader.getAttributeLocation("a_color");
         this.gl.enableVertexAttribArray(colorLocation);
         this.gl.vertexAttribPointer(colorLocation, 4, this.gl.FLOAT, false, 0, 0);
 
-        // TODO bind normal buffer
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
         const normalLocation = shader.getAttributeLocation("a_normal");
         this.gl.enableVertexAttribArray(normalLocation);
         this.gl.vertexAttribPointer(normalLocation, 3, this.gl.FLOAT, false, 0, 0);
 
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-        this.gl.drawElements(this.gl.TRIANGLES, this.elements, this.gl.UNSIGNED_SHORT, 0);
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, this.elements);
 
         this.gl.disableVertexAttribArray(positionLocation);
-
-        // TODO disable color vertex attrib array
         this.gl.disableVertexAttribArray(colorLocation);
-
         this.gl.disableVertexAttribArray(normalLocation);
+    }
+
+    createColorArrayTopBottom(color1: Vector, color2: Vector){
+        // paints every vertex with ma.y in color1
+        return [
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
+            color2.r, color2.g, color2.b, color2.a,
+            color1.r, color1.g, color1.b, color1.a,
+            color2.r, color2.g, color2.b, color2.a,
+            color2.r, color2.g, color2.b, color2.a,
+
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
+            color2.r, color2.g, color2.b, color2.a,
+            color1.r, color1.g, color1.b, color1.a,
+            color2.r, color2.g, color2.b, color2.a,
+            color2.r, color2.g, color2.b, color2.a,
+
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
+            color2.r, color2.g, color2.b, color2.a,
+            color1.r, color1.g, color1.b, color1.a,
+            color2.r, color2.g, color2.b, color2.a,
+            color2.r, color2.g, color2.b, color2.a,
+
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
+
+            color2.r, color2.g, color2.b, color2.a,
+            color2.r, color2.g, color2.b, color2.a,
+            color2.r, color2.g, color2.b, color2.a,
+            color2.r, color2.g, color2.b, color2.a,
+            color2.r, color2.g, color2.b, color2.a,
+            color2.r, color2.g, color2.b, color2.a,
+
+            color1.r, color1.g, color1.b, color1.a,
+            color1.r, color1.g, color1.b, color1.a,
+            color2.r, color2.g, color2.b, color2.a,
+            color1.r, color1.g, color1.b, color1.a,
+            color2.r, color2.g, color2.b, color2.a,
+            color2.r, color2.g, color2.b, color2.a,
+        ];
     }
 
     intersectBoundingSphere(ray: Ray) {
@@ -246,11 +252,9 @@ export default class RasterBoxInside implements RasterObject {
         return intersection;
     }
 
-    updateColor(newColor: Vector) {
-        let colors = [];
-        for (let i = 0; i < 24; i++) {
-            colors.push(newColor.r, newColor.g, newColor.b, newColor.a);
-        }
+    updateColor(newColor: Vector, newSecondaryColor: Vector) {
+        let colors = this.createColorArrayTopBottom(newColor, newSecondaryColor);
+
         const colorBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, colorBuffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(colors), this.gl.STATIC_DRAW);

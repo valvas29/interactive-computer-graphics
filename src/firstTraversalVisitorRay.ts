@@ -3,6 +3,7 @@ import Vector from "./vector";
 import Matrix from "./matrix";
 import Visitor from "./visitor";
 import {CameraRaytracer} from "./project-boilerplate";
+import Ray from "./ray";
 
 /**
  * Class traversing the Scene Graph before the actual traversal
@@ -19,6 +20,7 @@ export class FirstTraversalVisitorRay implements Visitor {
 	 */
 	camera: CameraRaytracer;
 	lightPositions: Array<Vector>;
+	mouseRay: Ray;
 
 	/**
 	 * Creates a new FirstTraversalVisitorRay
