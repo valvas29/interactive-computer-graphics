@@ -123,11 +123,11 @@ window.addEventListener('load', () => {
 	/*
 		   scenegraph
 
-		   gn1			gn3	---------------+-------------------------+------------------+												gn7				gn9 (rotation)		camera1
-		   gn2			gn4 (scaling)	gn5 (jumper, rotation)		gn10 (rotation		gn6 (rotation)------+-----------+				textureCube		light1
-		   desktop		pyramid			sphere1			light2		light3				aabox				gn8			camera2
-																											sphere2
-
+		   gn1			gn3	---------------+-------------------------+------------------+															gn7				gn9 (rotation)		camera1
+		   gn2			gn4 (scaling)	gn5 (jumper, rotation)		gn10 (rotation)		gn6 (rotation)------+-----------+							textureCube		light1
+		   desktop		pyramid			sphere1			light2		light3				aabox				camera2		gn8 (rotation)--+
+																														sphere2			gn11
+																																		pyramid2
 	 */
 
 	rootNode = new GroupNode(new Translation(new Vector(0, 0, -10, 0)));
