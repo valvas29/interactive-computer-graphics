@@ -87,7 +87,7 @@ export default class RasterBoxOutside implements RasterObject{
             ma.x, ma.y, mi.z,
             mi.x, ma.y, ma.z,
             ma.x, ma.y, mi.z,
-            mi.x, mi.y, mi.z,
+            mi.x, ma.y, mi.z,
 
             // left 503 536
             mi.x, mi.y, mi.z,
