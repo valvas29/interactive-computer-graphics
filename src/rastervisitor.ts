@@ -457,6 +457,8 @@ export class RasterVisitor implements Visitor {
     }
 
     visitCustomShapeNode(node: CustomShapeNode): void {
+        let rasterCustomShape = this.renderables.get(node) as RasterCustomShape;
+
         this.shader.use();
         let shader = this.shader;
 
@@ -488,14 +490,15 @@ export class RasterVisitor implements Visitor {
         }
 
         if (this.mouseRay) {
-            let raster_custom_shape = this.renderables.get(node) as RasterCustomShape;
             let mouseRayLocal = new Ray(fromWorld.mulVec(this.mouseRay.origin), fromWorld.mulVec(this.mouseRay.direction).normalize());
-            let intersection = raster_custom_shape.intersectBoundingSphere(mouseRayLocal);
+            let intersection = rasterCustomShape.intersectBoundingSphere(mouseRayLocal);
             if (intersection) {
-                let objectIntersection: [RasterObject, Intersection, Ray, Node] = [raster_custom_shape, intersection, mouseRayLocal, node];
+                let objectIntersection: [RasterObject, Intersection, Ray, Node] = [rasterCustomShape, intersection, mouseRayLocal, node];
                 this.objectIntersections.push(objectIntersection);
             }
         }
+
+        rasterCustomShape.updateColor(node.color);
 
         this.renderables.get(node).render(shader);
     }
