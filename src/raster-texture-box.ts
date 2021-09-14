@@ -181,6 +181,7 @@ export default class RasterTextureBox implements RasterObject{
         cubeImage.src = texture;
         this.textureSource = texture;
         this.tex = cubeTexture;
+        this.textureSource = texture;
 
         let normalTexture = gl.createTexture();
         let normalImage = new Image();
@@ -366,31 +367,18 @@ export default class RasterTextureBox implements RasterObject{
         return intersection;
     }
 
-    updateColor(){
-        if(this.textureSource === "hci-logo.png"){
+    updateColor(texture: string){
+        if(this.textureSource !== texture){
             let cubeTexture = this.gl.createTexture();
             let cubeImage = new Image();
             this.bindTextureImage(this.gl, cubeTexture, cubeImage);
-            cubeImage.src = "checkerboard-finished.png";
-            this.textureSource = "checkerboard-finished.png";
+            cubeImage.src = texture;
             this.tex = cubeTexture;
 
             this.gl.activeTexture(this.gl.TEXTURE0);
             this.gl.bindTexture(this.gl.TEXTURE_2D, this.tex);
 
-            this.textureSource = "checkerboard-finished.png";
-        } else {
-            let cubeTexture = this.gl.createTexture();
-            let cubeImage = new Image();
-            this.bindTextureImage(this.gl, cubeTexture, cubeImage);
-            cubeImage.src = "hci-logo.png";
-            this.textureSource = "hci-logo.png";
-            this.tex = cubeTexture;
-
-            this.gl.activeTexture(this.gl.TEXTURE0);
-            this.gl.bindTexture(this.gl.TEXTURE_2D, this.tex);
-
-            this.textureSource = "hci-logo.png";
+            this.textureSource = texture;
         }
     }
 }

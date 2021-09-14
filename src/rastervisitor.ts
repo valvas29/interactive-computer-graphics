@@ -115,39 +115,45 @@ export class RasterVisitor implements Visitor {
             });
 
             for (let i = 0; i < this.objectIntersections.length; i++) {
-                // then check if the actual object (triangles) were hit: if no, keep going down the list
+                // then check if the actual object (triangles) were hit: if not, keep going down the list
+
+                // ideally you would only manipulate/update the node data and update each object in its visit-Function every traversal with the node data
+                // but this heavily impacts performance, especially for OBJs with high vertex counts
+                // so we update/manipulate the data of node AND object and only the visitSphereNode updates every traversal
+                // to ensure that the new node color of a manipulation in the raytracer gets updated on the raster object as well
+
                 let object = this.objectIntersections[i][0];
                 let localMouseRay = this.objectIntersections[i][2];
                 let node = this.objectIntersections[i][3];
 
+                /*
+                let triangleIntersection = object.intersectTriangles(localMouseRay);
+                if(triangleIntersection){
+                    copy code below here TODO
+                    break;
+                }
+                 */
+
                 if(node instanceof SphereNode || node instanceof CustomShapeNode){
                     let newColor = new Vector(Math.random(), Math.random(), Math.random(), 1);
                     node.color = newColor;
-                    object.updateColor(newColor);
+                    object.updateColor(node.color);
                 }else if(node instanceof PyramidNode || node instanceof AABoxNode){
                     let newColor = new Vector(Math.random(), Math.random(), Math.random(), 1);
                     let newSecondaryColor = new Vector(Math.random(), Math.random(), Math.random(), 1);
                     node.color1 = newColor;
                     node.color2 = newSecondaryColor;
-                    object.updateColor(newColor, newSecondaryColor);
+                    object.updateColor(node.color1, node.color2);
                 }else if(node instanceof TextureBoxNode){
-                    object.updateColor();
                     if(node.texture === "hci-logo.png"){
                         node.texture = "checkerboard-finished.png";
                     }else{
                         node.texture = "hci-logo.png";
                     }
+                    object.updateColor(node.texture);
                 }
 
                 break; // TODO delete
-
-                /*
-                let triangleIntersection = object.intersectTriangles(localMouseRay);
-                if(triangleIntersection){
-                    object.updateColor(new Vector(Math.random(), Math.random(), Math.random(), 1));
-                    break;
-                }
-                 */
             }
 
             // reset
@@ -252,6 +258,8 @@ export class RasterVisitor implements Visitor {
      * @param node The node to visit
      */
     visitSphereNode(node: SphereNode) {
+        let rasterSphere = this.renderables.get(node) as RasterSphere;
+
         const shader = this.shader;
         shader.use();
 
@@ -284,14 +292,16 @@ export class RasterVisitor implements Visitor {
         }
 
         if (this.mouseRay) {
-            let raster_sphere = this.renderables.get(node) as RasterSphere;
             let mouseRayLocal = new Ray(fromWorld.mulVec(this.mouseRay.origin), fromWorld.mulVec(this.mouseRay.direction).normalize());
-            let intersection = raster_sphere.intersectBoundingSphere(mouseRayLocal);
+            let intersection = rasterSphere.intersectBoundingSphere(mouseRayLocal);
             if (intersection) {
-                let objectIntersection: [RasterObject, Intersection, Ray, Node] = [raster_sphere, intersection, mouseRayLocal, node];
+                let objectIntersection: [RasterObject, Intersection, Ray, Node] = [rasterSphere, intersection, mouseRayLocal, node];
                 this.objectIntersections.push(objectIntersection);
             }
         }
+
+        // update the object color with the node color every traversal to correctly update changes of the node by clicks in the raytracer
+        rasterSphere.updateColor(node.color);
 
         this.renderables.get(node).render(shader);
     }
@@ -347,7 +357,6 @@ export class RasterVisitor implements Visitor {
             // if the aaBox that has Objects inside is clickable, none of the ones inside are since it checks boundingSphere first
         }
 
-
         this.renderables.get(node).render(shader);
     }
 
@@ -384,11 +393,11 @@ export class RasterVisitor implements Visitor {
         }
 
         if (this.mouseRay) {
-            let raster_texture_box = this.renderables.get(node) as RasterTextureBox;
+            let rasterTextureBox = this.renderables.get(node) as RasterTextureBox;
             let mouseRayLocal = new Ray(fromWorld.mulVec(this.mouseRay.origin), fromWorld.mulVec(this.mouseRay.direction).normalize());
-            let intersection = raster_texture_box.intersectBoundingSphere(mouseRayLocal);
+            let intersection = rasterTextureBox.intersectBoundingSphere(mouseRayLocal);
             if (intersection) {
-                let objectIntersection: [RasterObject, Intersection, Ray, Node] = [raster_texture_box, intersection, mouseRayLocal, node];
+                let objectIntersection: [RasterObject, Intersection, Ray, Node] = [rasterTextureBox, intersection, mouseRayLocal, node];
                 this.objectIntersections.push(objectIntersection);
             }
         }
@@ -428,14 +437,15 @@ export class RasterVisitor implements Visitor {
         }
 
         if (this.mouseRay) {
-            let raster_Pyramid = this.renderables.get(node) as RasterPyramid;
+            let rasterPyramid = this.renderables.get(node) as RasterPyramid;
             let mouseRayLocal = new Ray(fromWorld.mulVec(this.mouseRay.origin), fromWorld.mulVec(this.mouseRay.direction).normalize());
-            let intersection = raster_Pyramid.intersectBoundingSphere(mouseRayLocal);
+            let intersection = rasterPyramid.intersectBoundingSphere(mouseRayLocal);
             if (intersection) {
-                let objectIntersection: [RasterObject, Intersection, Ray, Node] = [raster_Pyramid, intersection, mouseRayLocal, node];
+                let objectIntersection: [RasterObject, Intersection, Ray, Node] = [rasterPyramid, intersection, mouseRayLocal, node];
                 this.objectIntersections.push(objectIntersection);
             }
         }
+
         this.renderables.get(node).render(shader);
     }
 
@@ -471,11 +481,11 @@ export class RasterVisitor implements Visitor {
         }
 
         if (this.mouseRay) {
-            let raster_custom_shape = this.renderables.get(node) as RasterCustomShape;
+            let rasterCustomShape = this.renderables.get(node) as RasterCustomShape;
             let mouseRayLocal = new Ray(fromWorld.mulVec(this.mouseRay.origin), fromWorld.mulVec(this.mouseRay.direction).normalize());
-            let intersection = raster_custom_shape.intersectBoundingSphere(mouseRayLocal);
+            let intersection = rasterCustomShape.intersectBoundingSphere(mouseRayLocal);
             if (intersection) {
-                let objectIntersection: [RasterObject, Intersection, Ray, Node] = [raster_custom_shape, intersection, mouseRayLocal, node];
+                let objectIntersection: [RasterObject, Intersection, Ray, Node] = [rasterCustomShape, intersection, mouseRayLocal, node];
                 this.objectIntersections.push(objectIntersection);
             }
         }
@@ -503,7 +513,7 @@ export class RasterVisitor implements Visitor {
 
         // save the created ray into the firstTraversalVisitor to be able to later check for intersections at the start of
         // the next render traversal
-        // it is saved into the firstTraversalVisitor instead of this visitor to ensure the intersection check
+        // it is saved into the firstTraversalVisitor instead of this visitor to ensure the intersection checks
         // happens once for the entire traversal and doesn't start halfway through
         this.firstTraversalVisitor.mouseRay = mouseRay;
     }
@@ -539,7 +549,6 @@ export class RasterSetupVisitor {
         // Enable depth testing
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.depthFunc(this.gl.LEQUAL);
-
         this.gl.disable(this.gl.CULL_FACE);
 
         rootNode.accept(this);
