@@ -119,7 +119,8 @@ export class RasterVisitor implements Visitor {
                 let object = this.objectIntersections[i][0];
                 let localMouseRay = this.objectIntersections[i][2];
                 let node = this.objectIntersections[i][3];
-                if(node instanceof SphereNode){
+
+                if(node instanceof SphereNode || node instanceof CustomShapeNode){
                     let newColor = new Vector(Math.random(), Math.random(), Math.random(), 1);
                     node.color = newColor;
                     object.updateColor(newColor);
@@ -146,7 +147,6 @@ export class RasterVisitor implements Visitor {
                     object.updateColor(new Vector(Math.random(), Math.random(), Math.random(), 1));
                     break;
                 }
-
                  */
             }
 

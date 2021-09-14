@@ -1,7 +1,6 @@
 import Visitor from './visitor';
 import Vector from './vector';
 import {Rotation, Scaling, Transformation, Translation} from './transformation';
-import Matrix from "./matrix";
 
 /**
  * Class representing a Node in a Scenegraph

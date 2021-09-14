@@ -1,7 +1,6 @@
 import Shader from "./shader";
 import Ray from "./ray";
 import Intersection from "./intersection";
-import Vector from "./vector";
 import Sphere from "./sphere";
 
 export interface RasterObject{
@@ -16,6 +15,6 @@ export interface RasterObject{
     updateColor(): void;
     updateColor(newTexture: string): void;
      */
+    // can't really overload the function so... takes either 2 colors, a texture or nothing depending on the RasterObject
     updateColor(a?: any, b?: any): void;
-
 }
