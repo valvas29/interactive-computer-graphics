@@ -150,7 +150,7 @@ export class RasterVisitor implements Visitor {
                     }else{
                         node.texture = "hci-logo.png";
                     }
-                    object.updateColor();
+                    object.updateColor(node.texture);
                 }
 
                 break; // TODO delete
