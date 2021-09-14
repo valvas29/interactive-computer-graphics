@@ -153,7 +153,7 @@ window.addEventListener('load', () => {
 	gn3.add(gn5);
 	gn5.add(sphere1);
 	controlledAnimationNodes.push(
-		new JumperNode(gn5, 7, 20));
+		new JumperNode(gn5, 3, 20));
 
 	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
 	const aaBox = new AABoxNode(new Vector(0.6, 0.4, 0.05, 1.0), new Vector(0.3, 1.0, 0.58, 1.0), true);
@@ -556,7 +556,7 @@ window.addEventListener('load', () => {
 				} else if (childNodes[i].hasOwnProperty("AABoxNode")) {
 					let color1 = new Vector(childNodes[i].AABoxNode.color1.data[0], childNodes[i].AABoxNode.color1.data[1], childNodes[i].AABoxNode.color1.data[2], childNodes[i].AABoxNode.color1.data[3]);
 					let color2 = new Vector(childNodes[i].AABoxNode.color2.data[0], childNodes[i].AABoxNode.color2.data[1], childNodes[i].AABoxNode.color2.data[2], childNodes[i].AABoxNode.color2.data[3]);
-					result.push(new AABoxNode(color1, color2, childNodes[i].outside));
+					result.push(new AABoxNode(color1, color2, childNodes[i].AABoxNode.outside));
 
 				} else if (childNodes[i].hasOwnProperty("TextureBoxNode")) {
 					result.push(new TextureBoxNode(childNodes[i].TextureBoxNode.texture, childNodes[i].TextureBoxNode.normalMap));
