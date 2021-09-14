@@ -141,7 +141,7 @@ window.addEventListener('load', () => {
 
 	const gn3 = new GroupNode(new Translation(new Vector(-3, 5, 3, 0)));
 	const gn4 = new GroupNode(new Rotation(new Vector(1, 0, 0, 0), 1.5708));
-	const pyramid = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.9, .4, .1, 1));
+	const pyramid = new SphereNode(new Vector(.5, .2, .2, 1));
 	rootNode.add(gn3);
 	gn3.add(gn4);
 	gn4.add(pyramid);
@@ -149,33 +149,33 @@ window.addEventListener('load', () => {
 		new ScalingNode(gn4, true));
 
 	const gn5 = new GroupNode(new Translation(new Vector(4, -8, 2, 0)));
-	const sphere1 = new SphereNode(new Vector(.5, .2, .2, 1));
+	const sphere1 = new PyramidNode(new Vector(1, 0.5, 1, 1), new Vector(.1, .4, .8, 1), new Vector(.9, .4, .1, 1));
 	gn3.add(gn5);
 	gn5.add(sphere1);
 	controlledAnimationNodes.push(
 		new JumperNode(gn5, 7, 20));
 
 	const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
-	const aaBox = new AABoxNode(new Vector(0.6, 0.4, 0.05, 1.0), new Vector(0.3, 1.0, 0.58, 1.0), true);
+	const aaBox = new TextureBoxNode('hci-logo.png', 'brickwall_normal.jpg');
 	gn3.add(gn6);
 	gn6.add(aaBox);
 	otherAnimationNodes.push(
 		new RotationNode(gn6, new Vector(0, 1, 0, 0), 20));
 
 	const gn7 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
-	const textureCube = new TextureBoxNode('hci-logo.png', 'flowers_normal.jpg');
+	const textureCube = new AABoxNode(new Vector(0.6, 0.4, 0.05, 1.0), new Vector(0.3, 1.0, 0.58, 1.0), true);
 	rootNode.add(gn7);
 	gn7.add(textureCube);
 	otherAnimationNodes.push(
 		new RotationNode(gn7, new Vector(1, 0, 0, 0), 20));
 
 	const gn8 = new GroupNode(new Translation(new Vector(-3, 0, 0, 0)));
-	const sphere2 = new SphereNode(new Vector(0, .7, .2, 1));
+	const sphere2 = new PyramidNode(new Vector(1, 4, 1, 1), new Vector(1, 0, 0, 1), new Vector(0, 0, .8, 1));
 	gn6.add(gn8);
 	gn8.add(sphere2);
 
-	const gn11 = new GroupNode(new Translation(new Vector(-2.2, 0, 0, 0)));
-	const pyramid2 = new PyramidNode(new Vector(1, 2, 1, 1), new Vector(1, 0, 0, 1), new Vector(0, 0, .8, 1));
+	const gn11 = new GroupNode(new Translation(new Vector(-1, 0, 0, 0)));
+	const pyramid2 = new SphereNode(new Vector(0, .7, .2, 1));
 	gn8.add(gn11);
 	gn11.add(pyramid2);
 	otherAnimationNodes.push(
@@ -217,7 +217,7 @@ window.addEventListener('load', () => {
 
 	const cameraNode2 = new GroupNode(new Translation(new Vector(0, 1.5, 2.5, 0)));
 	const camera2 = new CameraNode(false);
-	gn6.add(cameraNode2);
+	gn7.add(cameraNode2);
 	cameraNode2.add(camera2);
 
 	//alle cams in array sammeln
