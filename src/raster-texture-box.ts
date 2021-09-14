@@ -4,20 +4,23 @@ import {RasterObject} from "./rasterObject";
 import Sphere from "./sphere";
 import Ray from "./ray";
 import RitterAlgorithm from "./ritterAlgorithm";
+import Intersection from "./intersection";
+import RayTriangleIntersection from "./RayTriangleIntersection";
 
 /**
  * A class creating buffers for a textured box to render it with WebGL
  */
-export default class RasterTextureBox implements RasterObject{
+export default class RasterTextureBox implements RasterObject {
     /**
      * The buffer containing the box's vertices
      */
     vertexBuffer: WebGLBuffer;
+    vertices: number[];
     /**
      * The buffer containing the box's texture
      */
 
-    // https://webglfundamentals.org/webgl/lessons/webgl-2-textures.html
+        // https://webglfundamentals.org/webgl/lessons/webgl-2-textures.html
     tex: WebGLTexture;
     normalTex: WebGLTexture;
 
@@ -118,6 +121,7 @@ export default class RasterTextureBox implements RasterObject{
             mi.x, mi.y, ma.z,
             mi.x, mi.y, mi.z
         ];
+        this.vertices = vertices;
         this.boundingSphere = RitterAlgorithm.createRitterBoundingSphere(vertices);
         let normals = [
             // front
@@ -362,13 +366,17 @@ export default class RasterTextureBox implements RasterObject{
         }
     }
 
-    intersectBoundingSphere(ray: Ray ){
+    intersectBoundingSphere(ray: Ray) {
         let intersection = this.boundingSphere.intersect(ray);
         return intersection;
     }
 
-    updateColor(texture: string){
-        if(this.textureSource !== texture){
+    intersectTriangles(ray: Ray): Intersection {
+        return RayTriangleIntersection.intersectTriangles(this.vertices, ray);
+    }
+
+    updateColor(texture: string) {
+        if (this.textureSource !== texture) {
             let cubeTexture = this.gl.createTexture();
             let cubeImage = new Image();
             this.bindTextureImage(this.gl, cubeTexture, cubeImage);

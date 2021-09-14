@@ -4,15 +4,18 @@ import {RasterObject} from "./rasterObject";
 import Sphere from "./sphere";
 import Ray from "./ray";
 import RitterAlgorithm from "./ritterAlgorithm";
+import Intersection from "./intersection";
+import RayTriangleIntersection from "./RayTriangleIntersection";
 
 /**
  * A class creating buffers for an axis aligned box to render it with WebGL
  */
-export default class RasterBoxOutside implements RasterObject{
+export default class RasterBoxOutside implements RasterObject {
     /**
      * The buffer containing the box's vertices
      */
     vertexBuffer: WebGLBuffer;
+    vertices: number[];
     /**
      * The normals on the surface at each vertex location
      */
@@ -39,7 +42,7 @@ export default class RasterBoxOutside implements RasterObject{
      * @param minPoint The minimal x,y,z of the box
      * @param maxPoint The maximal x,y,z of the box
      */
-    constructor(private gl: WebGL2RenderingContext, minPoint: Vector, maxPoint: Vector, color1: Vector, color2:Vector) {
+    constructor(private gl: WebGL2RenderingContext, minPoint: Vector, maxPoint: Vector, color1: Vector, color2: Vector) {
         this.gl = gl;
         const mi = minPoint;
         const ma = maxPoint;
@@ -97,6 +100,7 @@ export default class RasterBoxOutside implements RasterObject{
             mi.x, ma.y, ma.z,
             mi.x, ma.y, mi.z,
         ];
+        this.vertices = vertices;
         this.boundingSphere = RitterAlgorithm.createRitterBoundingSphere(vertices);
 
         let colors = this.createColorArrayTopBottom(color1, color2);
@@ -194,7 +198,7 @@ export default class RasterBoxOutside implements RasterObject{
         this.gl.disableVertexAttribArray(normalLocation);
     }
 
-    createColorArrayTopBottom(color1: Vector, color2: Vector){
+    createColorArrayTopBottom(color1: Vector, color2: Vector) {
         // paints every vertex with ma.y in color1
         return [
             color1.r, color1.g, color1.b, color1.a,
@@ -241,12 +245,16 @@ export default class RasterBoxOutside implements RasterObject{
         ];
     }
 
-    intersectBoundingSphere(ray: Ray ){
+    intersectBoundingSphere(ray: Ray) {
         let intersection = this.boundingSphere.intersect(ray);
         return intersection;
     }
 
-    updateColor(newColor: Vector, newSecondaryColor: Vector){
+    intersectTriangles(ray: Ray): Intersection {
+        return RayTriangleIntersection.intersectTriangles(this.vertices, ray);
+    }
+
+    updateColor(newColor: Vector, newSecondaryColor: Vector) {
         let colors = this.createColorArrayTopBottom(newColor, newSecondaryColor);
 
         const colorBuffer = this.gl.createBuffer();

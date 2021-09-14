@@ -12,6 +12,7 @@ export default class RasterSphere implements RasterObject{
      * The buffer containing the sphere's vertices
      */
     vertexBuffer: WebGLBuffer;
+    vertices: number[];
     /**
      * The indices describing which vertices form a triangle
      */
@@ -29,6 +30,7 @@ export default class RasterSphere implements RasterObject{
     elements: number;
 
     boundingSphere: Sphere;
+
 
     /**
      * Creates all WebGL buffers for the sphere
@@ -84,6 +86,7 @@ export default class RasterSphere implements RasterObject{
                 normals.push(normal.z);
             }
         }
+        this.vertices = vertices;
 
         for (let ring = 0; ring < ringsize - 1; ring++) {
             for (let ring2 = 0; ring2 < ringsize; ring2++) {
@@ -150,6 +153,10 @@ export default class RasterSphere implements RasterObject{
     intersectBoundingSphere(ray: Ray ){
         let intersection = this.boundingSphere.intersect(ray);
         return intersection;
+    }
+
+    intersectTriangles(ray: Ray ){
+        return this.intersectBoundingSphere(ray);
     }
 
     updateColor(newColor: Vector){

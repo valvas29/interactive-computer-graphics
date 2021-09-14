@@ -4,18 +4,22 @@ import Sphere from "./sphere";
 import RitterAlgorithm from "./ritterAlgorithm";
 import Ray from "./ray";
 import {RasterObject} from "./rasterObject";
+import Intersection from "./intersection";
+import RayTriangleIntersection from "./RayTriangleIntersection";
 
 
 /**
  * A class creating buffers for an axis aligned box to render it with WebGL
  */
-export default class RasterPyramid implements RasterObject{
+export default class RasterPyramid implements RasterObject {
     /**
      * The buffer containing the box's vertices
      */
     vertexBuffer: WebGLBuffer;
+    vertices: number[];
 
     indexBuffer: WebGLBuffer;
+    indices: number[];
 
     normalBuffer: WebGLBuffer;
 
@@ -55,25 +59,26 @@ export default class RasterPyramid implements RasterObject{
             // front
             mi.x, mi.y, ma.z, //0
             ma.x, mi.y, ma.z, // 1
-            (mi.x + ma.x)/2, ma.y, (mi.z + ma.z)/2, //4
+            (mi.x + ma.x) / 2, ma.y, (mi.z + ma.z) / 2, //4
 
             ma.x, mi.y, mi.z, // 2
             mi.x, mi.y, mi.z, // 3
-            (mi.x + ma.x)/2, ma.y, (mi.z + ma.z)/2,
+            (mi.x + ma.x) / 2, ma.y, (mi.z + ma.z) / 2,
 
             ma.x, mi.y, ma.z, // 1
             ma.x, mi.y, mi.z, // 2
-            (mi.x + ma.x)/2, ma.y, (mi.z + ma.z)/2,
+            (mi.x + ma.x) / 2, ma.y, (mi.z + ma.z) / 2,
 
             mi.x, mi.y, mi.z,
             mi.x, mi.y, ma.z,
-            (mi.x + ma.x)/2, ma.y, (mi.z + ma.z)/2,
+            (mi.x + ma.x) / 2, ma.y, (mi.z + ma.z) / 2,
 
             mi.x, mi.y, ma.z,
             ma.x, mi.y, ma.z,
             ma.x, mi.y, mi.z,
             mi.x, mi.y, mi.z,
         ];
+        this.vertices = vertices;
         let indices = [
             0, 1, 2,
             3, 4, 5,
@@ -81,14 +86,15 @@ export default class RasterPyramid implements RasterObject{
             9, 10, 11,
             12, 13, 14,
             14, 15, 12
-        ]
+        ];
+        this.indices = indices;
         this.boundingSphere = RitterAlgorithm.createRitterBoundingSphere(vertices);
 
-        if(color1 === undefined){
+        if (color1 === undefined) {
             color1 = new Vector(Math.random(), Math.random(), Math.random(), 1);
         }
 
-        if(color2 === undefined){
+        if (color2 === undefined) {
             color2 = new Vector(Math.random(), Math.random(), Math.random(), 1);
         }
 
@@ -122,7 +128,7 @@ export default class RasterPyramid implements RasterObject{
         let point1 = new Vector(ma.x, mi.y, ma.z, 1);
         let point2 = new Vector(ma.x, mi.y, mi.z, 1);
         let point3 = new Vector(mi.x, mi.y, mi.z, 1);
-        let point4 = new Vector((mi.x + ma.x)/2, ma.y, (mi.z + ma.z)/2, 1);
+        let point4 = new Vector((mi.x + ma.x) / 2, ma.y, (mi.z + ma.z) / 2, 1);
 
         let vec_0_1 = point1.sub(point0);
         let vec_0_4 = point4.sub(point0);
@@ -217,12 +223,16 @@ export default class RasterPyramid implements RasterObject{
         this.gl.disableVertexAttribArray(normalLocation);
     }
 
-    intersectBoundingSphere(ray: Ray ){
+    intersectBoundingSphere(ray: Ray) {
         let intersection = this.boundingSphere.intersect(ray);
         return intersection;
     }
 
-    updateColor(newColor: Vector, newSecondaryColor: Vector){
+    intersectTriangles(ray: Ray): Intersection {
+        return RayTriangleIntersection.intersectTriangles(this.vertices, ray, this.indices);
+    }
+
+    updateColor(newColor: Vector, newSecondaryColor: Vector) {
         let colors = [
             newColor.r, newColor.g, newColor.b, newColor.a,
             newColor.r, newColor.g, newColor.b, newColor.a,

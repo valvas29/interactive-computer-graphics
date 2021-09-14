@@ -6,10 +6,11 @@ import Sphere from "./sphere";
 export interface RasterObject{
     boundingSphere: Sphere;
     vertexBuffer: WebGLBuffer;
+    vertices: number[];
 
     render(shader: Shader): void;
     intersectBoundingSphere(ray: Ray): Intersection;
-    //intersectTriangles(ray: Ray);
+    intersectTriangles(ray: Ray): Intersection;
     /*
     updateColor(newColor: Vector, newSecondaryColor?: Vector): void;
     updateColor(): void;
