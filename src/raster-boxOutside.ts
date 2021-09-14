@@ -39,7 +39,7 @@ export default class RasterBoxOutside implements RasterObject{
      * @param minPoint The minimal x,y,z of the box
      * @param maxPoint The maximal x,y,z of the box
      */
-    constructor(private gl: WebGL2RenderingContext, minPoint: Vector, maxPoint: Vector) {
+    constructor(private gl: WebGL2RenderingContext, minPoint: Vector, maxPoint: Vector, color1: Vector, color2:Vector) {
         this.gl = gl;
         const mi = minPoint;
         const ma = maxPoint;
@@ -99,8 +99,6 @@ export default class RasterBoxOutside implements RasterObject{
         ];
         this.boundingSphere = RitterAlgorithm.createRitterBoundingSphere(vertices);
 
-        let color1 = new Vector(0.6, 0.4, 0.05, 1.0);
-        let color2 = new Vector(0.3, 1.0, 0.58, 1.0);
         let colors = this.createColorArrayTopBottom(color1, color2);
         let normals = [
             // facing front

@@ -118,6 +118,7 @@ export default class RayVisitor implements Visitor {
                 }
             }
         }
+
         if (this.mouseRay) {
             // sort the boundingSphere intersections by distance to look at the closest hit first
             this.objectIntersections.sort((a, b) => {
@@ -195,11 +196,8 @@ export default class RayVisitor implements Visitor {
             let mouseRayLocal = new Ray(fromWorld.mulVec(this.mouseRay.origin), fromWorld.mulVec(this.mouseRay.direction).normalize());
             let intersection = sphere.intersect(mouseRayLocal);
             if (intersection) {
-                console.log("ray sphere intersected");
                 let objectIntersection: [Sphere, Intersection, Ray, SphereNode] = [sphere, intersection, mouseRayLocal, node];
                 this.objectIntersections.push(objectIntersection);
-            }else{
-                console.log("ray sphere missed");
             }
         }
     }

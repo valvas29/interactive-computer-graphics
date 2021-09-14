@@ -41,8 +41,8 @@ export class RasterVisitor implements Visitor {
 
     firstTraversalVisitor: FirstTraversalVisitorRaster;
 
-    // saves the intersected Object, the according intersection and the mouseRay in local space of the according object:
-    objectIntersections: [RasterObject, Intersection, Ray][]; // equivalent to Array<[RasterObject, Intersection, Ray]>
+    // saves the intersected Object, the according intersection, the mouseRay in local space of the according object and the objectNode:
+    objectIntersections: [RasterObject, Intersection, Ray, Node][]; // equivalent to Array<[RasterObject, Intersection, Ray, Node]>
 
     /**
      * Creates a new RasterVisitor
@@ -118,10 +118,26 @@ export class RasterVisitor implements Visitor {
                 // then check if the actual object (triangles) were hit: if no, keep going down the list
                 let object = this.objectIntersections[i][0];
                 let localMouseRay = this.objectIntersections[i][2];
-                // node
+                let node = this.objectIntersections[i][3];
+                if(node instanceof SphereNode){
+                    let newColor = new Vector(Math.random(), Math.random(), Math.random(), 1);
+                    node.color = newColor;
+                    object.updateColor(newColor);
+                }else if(node instanceof PyramidNode || node instanceof AABoxNode){
+                    let newColor = new Vector(Math.random(), Math.random(), Math.random(), 1);
+                    let newSecondaryColor = new Vector(Math.random(), Math.random(), Math.random(), 1);
+                    node.color1 = newColor;
+                    node.color2 = newSecondaryColor;
+                    object.updateColor(newColor, newSecondaryColor);
+                }else if(node instanceof TextureBoxNode){
+                    object.updateColor();
+                    if(node.texture === "hci-logo.png"){
+                        node.texture = "checkerboard-finished.png";
+                    }else{
+                        node.texture = "hci-logo.png";
+                    }
+                }
 
-
-                object.updateColor(new Vector(Math.random(), Math.random(), Math.random(), 1), new Vector(Math.random(), Math.random(), Math.random(), 1)); // TODO delete
                 break; // TODO delete
 
                 /*
@@ -272,7 +288,7 @@ export class RasterVisitor implements Visitor {
             let mouseRayLocal = new Ray(fromWorld.mulVec(this.mouseRay.origin), fromWorld.mulVec(this.mouseRay.direction).normalize());
             let intersection = raster_sphere.intersectBoundingSphere(mouseRayLocal);
             if (intersection) {
-                let objectIntersection: [RasterObject, Intersection, Ray] = [raster_sphere, intersection, mouseRayLocal];
+                let objectIntersection: [RasterObject, Intersection, Ray, Node] = [raster_sphere, intersection, mouseRayLocal, node];
                 this.objectIntersections.push(objectIntersection);
             }
         }
@@ -323,7 +339,7 @@ export class RasterVisitor implements Visitor {
                 let mouseRayLocal = new Ray(fromWorld.mulVec(this.mouseRay.origin), fromWorld.mulVec(this.mouseRay.direction).normalize());
                 let intersection = raster_boxOutside.intersectBoundingSphere(mouseRayLocal);
                 if (intersection) {
-                    let objectIntersection: [RasterObject, Intersection, Ray] = [raster_boxOutside, intersection, mouseRayLocal];
+                    let objectIntersection: [RasterObject, Intersection, Ray, Node] = [raster_boxOutside, intersection, mouseRayLocal, node];
                     this.objectIntersections.push(objectIntersection);
                 }
             }
@@ -372,7 +388,7 @@ export class RasterVisitor implements Visitor {
             let mouseRayLocal = new Ray(fromWorld.mulVec(this.mouseRay.origin), fromWorld.mulVec(this.mouseRay.direction).normalize());
             let intersection = raster_texture_box.intersectBoundingSphere(mouseRayLocal);
             if (intersection) {
-                let objectIntersection: [RasterObject, Intersection, Ray] = [raster_texture_box, intersection, mouseRayLocal];
+                let objectIntersection: [RasterObject, Intersection, Ray, Node] = [raster_texture_box, intersection, mouseRayLocal, node];
                 this.objectIntersections.push(objectIntersection);
             }
         }
@@ -416,7 +432,7 @@ export class RasterVisitor implements Visitor {
             let mouseRayLocal = new Ray(fromWorld.mulVec(this.mouseRay.origin), fromWorld.mulVec(this.mouseRay.direction).normalize());
             let intersection = raster_Pyramid.intersectBoundingSphere(mouseRayLocal);
             if (intersection) {
-                let objectIntersection: [RasterObject, Intersection, Ray] = [raster_Pyramid, intersection, mouseRayLocal];
+                let objectIntersection: [RasterObject, Intersection, Ray, Node] = [raster_Pyramid, intersection, mouseRayLocal, node];
                 this.objectIntersections.push(objectIntersection);
             }
         }
@@ -459,7 +475,7 @@ export class RasterVisitor implements Visitor {
             let mouseRayLocal = new Ray(fromWorld.mulVec(this.mouseRay.origin), fromWorld.mulVec(this.mouseRay.direction).normalize());
             let intersection = raster_custom_shape.intersectBoundingSphere(mouseRayLocal);
             if (intersection) {
-                let objectIntersection: [RasterObject, Intersection, Ray] = [raster_custom_shape, intersection, mouseRayLocal];
+                let objectIntersection: [RasterObject, Intersection, Ray, Node] = [raster_custom_shape, intersection, mouseRayLocal, node];
                 this.objectIntersections.push(objectIntersection);
             }
         }
@@ -562,7 +578,9 @@ export class RasterSetupVisitor {
                 new RasterBoxOutside(
                     this.gl,
                     new Vector(-0.5, -0.5, -0.5, 1),
-                    new Vector(0.5, 0.5, 0.5, 1)
+                    new Vector(0.5, 0.5, 0.5, 1),
+                    node.color1,
+                    node.color2
                 )
             );
         } else {
@@ -571,7 +589,9 @@ export class RasterSetupVisitor {
                 new RasterBoxInside(
                     this.gl,
                     new Vector(-0.5, -0.5, -0.5, 1),
-                    new Vector(0.5, 0.5, 0.5, 1)
+                    new Vector(0.5, 0.5, 0.5, 1),
+                    node.color1,
+                    node.color2
                 )
             );
         }

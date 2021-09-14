@@ -126,7 +126,7 @@ window.addEventListener('load', () => {
            gn1			gn3	---------------+-------------------------+------------------+												gn7				gn9 (rotation)		camera1
            gn2			gn4 (scaling)	gn5 (jumper, rotation)		gn10 (rotation		gn6 (rotation)------+-----------+				textureCube		light1
            desktop		pyramid			sphere1			light2		light3				aabox				gn8			camera2
-                                                                                                               sphere2
+                                                                                                            sphere2
 
      */
 
@@ -134,7 +134,7 @@ window.addEventListener('load', () => {
 
     const gn1 = new GroupNode(new Translation(new Vector(2, 0, 8, 0)));
     const gn2 = new GroupNode(new Scaling(new Vector(15, 15, 15, 1)));
-    const desktop = new AABoxNode(new Vector(0, 0, 0, 0), false);
+    const desktop = new AABoxNode(new Vector(0.7, 0.7, 0.2, 1.0), new Vector(0.3, 0.0, 0.7, 1.0), false);
     rootNode.add(gn1);
     gn1.add(gn2);
     gn2.add(desktop);
@@ -156,7 +156,7 @@ window.addEventListener('load', () => {
         new JumperNode(gn5, 7, 20));
 
     const gn6 = new GroupNode(new Translation(new Vector(7, -3, 5, 0)));
-    const aaBox = new AABoxNode(new Vector(0, 0, 0, 0), true);
+    const aaBox = new AABoxNode(new Vector(0.6, 0.4, 0.05, 1.0), new Vector(0.3, 1.0, 0.58, 1.0), true);
     gn3.add(gn6);
     gn6.add(aaBox);
     otherAnimationNodes.push(
@@ -554,8 +554,8 @@ window.addEventListener('load', () => {
                     result.push(new SphereNode(vector));
 
                 } else if (childNodes[i].hasOwnProperty("AABoxNode")) {
-                    let vector = new Vector(childNodes[i].AABoxNode.color.data[0], childNodes[i].AABoxNode.color.data[1], childNodes[i].AABoxNode.color.data[2], childNodes[i].AABoxNode.color.data[3]);
-                    result.push(new AABoxNode(vector, childNodes[i].outside));
+                    // let vector = new Vector(childNodes[i].AABoxNode.color.data[0], childNodes[i].AABoxNode.color.data[1], childNodes[i].AABoxNode.color.data[2], childNodes[i].AABoxNode.color.data[3]);
+                    // result.push(new AABoxNode(vector, childNodes[i].outside)); TODO
 
                 } else if (childNodes[i].hasOwnProperty("TextureBoxNode")) {
                     result.push(new TextureBoxNode(childNodes[i].TextureBoxNode.texture, childNodes[i].TextureBoxNode.normalMap));

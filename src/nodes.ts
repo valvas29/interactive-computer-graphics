@@ -182,7 +182,7 @@ export class AABoxNode extends Node {
 	 * @param color The colour of the cube
 	 * @param outside if not outside then normals of the box are inversed for lighting in desktop
 	 */
-	constructor(public color: Vector, public outside: boolean) {
+	constructor(public color1: Vector, public color2: Vector, public outside: boolean) {
 		super();
 	}
 
@@ -197,7 +197,7 @@ export class AABoxNode extends Node {
 	toJSON() {
 		return {
 			"AABoxNode": {
-				"color": this.color,
+				"color": this.color1, // TODO also color2
 				"outside": this.outside
 			}
 		}

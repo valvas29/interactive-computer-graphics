@@ -17,7 +17,7 @@ export default class RasterTextureBox implements RasterObject{
      * The buffer containing the box's texture
      */
 
-        // https://webglfundamentals.org/webgl/lessons/webgl-2-textures.html
+    // https://webglfundamentals.org/webgl/lessons/webgl-2-textures.html
     tex: WebGLTexture;
     normalTex: WebGLTexture;
 
@@ -28,6 +28,7 @@ export default class RasterTextureBox implements RasterObject{
      */
     uv: Array<number>;
     texCoords: WebGLBuffer;
+    textureSource: string;
     /**
      * The amount of faces
      */
@@ -178,6 +179,7 @@ export default class RasterTextureBox implements RasterObject{
         let cubeImage = new Image();
         this.bindTextureImage(gl, cubeTexture, cubeImage);
         cubeImage.src = texture;
+        this.textureSource = texture;
         this.tex = cubeTexture;
 
         let normalTexture = gl.createTexture();
@@ -270,9 +272,11 @@ export default class RasterTextureBox implements RasterObject{
         shader.getUniformInt("normalSampler").set(1);
 
         // set texture units
+        // image texture
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.tex);
 
+        // normal texture
         this.gl.activeTexture(this.gl.TEXTURE1);
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.normalTex);
 
@@ -363,17 +367,30 @@ export default class RasterTextureBox implements RasterObject{
     }
 
     updateColor(){
-        // flip the texture instead of using a new color
-        for (let i = 0; i < this.uv.length; i++) {
-            if(this.uv[i] === 0){
-                this.uv[i] = 1;
-            }else{
-                this.uv[i] = 0;
-            }
+        if(this.textureSource === "hci-logo.png"){
+            let cubeTexture = this.gl.createTexture();
+            let cubeImage = new Image();
+            this.bindTextureImage(this.gl, cubeTexture, cubeImage);
+            cubeImage.src = "checkerboard-finished.png";
+            this.textureSource = "checkerboard-finished.png";
+            this.tex = cubeTexture;
+
+            this.gl.activeTexture(this.gl.TEXTURE0);
+            this.gl.bindTexture(this.gl.TEXTURE_2D, this.tex);
+
+            this.textureSource = "checkerboard-finished.png";
+        } else {
+            let cubeTexture = this.gl.createTexture();
+            let cubeImage = new Image();
+            this.bindTextureImage(this.gl, cubeTexture, cubeImage);
+            cubeImage.src = "hci-logo.png";
+            this.textureSource = "hci-logo.png";
+            this.tex = cubeTexture;
+
+            this.gl.activeTexture(this.gl.TEXTURE0);
+            this.gl.bindTexture(this.gl.TEXTURE_2D, this.tex);
+
+            this.textureSource = "hci-logo.png";
         }
-        const uvBuffer = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, uvBuffer);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.uv), this.gl.STATIC_DRAW);
-        this.texCoords = uvBuffer;
     }
 }
