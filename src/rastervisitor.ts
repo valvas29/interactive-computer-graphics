@@ -118,6 +118,8 @@ export class RasterVisitor implements Visitor {
                 // then check if the actual object (triangles) were hit: if no, keep going down the list
                 let object = this.objectIntersections[i][0];
                 let localMouseRay = this.objectIntersections[i][2];
+                // node
+
 
                 object.updateColor(new Vector(Math.random(), Math.random(), Math.random(), 1), new Vector(Math.random(), Math.random(), Math.random(), 1)); // TODO delete
                 break; // TODO delete

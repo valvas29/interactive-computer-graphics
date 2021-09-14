@@ -11,5 +11,11 @@ export interface RasterObject{
     render(shader: Shader): void;
     intersectBoundingSphere(ray: Ray): Intersection;
     //intersectTriangles(ray: Ray);
+    /*
     updateColor(newColor: Vector, newSecondaryColor?: Vector): void;
+    updateColor(): void;
+    updateColor(newTexture: string): void;
+     */
+    updateColor(a?: any, b?: any): void;
+
 }

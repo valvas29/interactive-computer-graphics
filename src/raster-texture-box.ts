@@ -65,51 +65,107 @@ export default class RasterTextureBox implements RasterObject{
     ) {
         const mi = minPoint;
         const ma = maxPoint;
+        // vertices are defined differently here than in raster-boxInside and raster-boxInside, since the
+        // algorithm from calculateTangentsAndBitangents(vertices, uv) assumes for example the front to be
+        // defined as 012 230 (here) instead of 012 023 (raster-boxInside, raster-boxOutside)
         let vertices = [
-            // front
-            mi.x, mi.y, ma.z, ma.x, mi.y, ma.z, ma.x, ma.y, ma.z,
-            ma.x, ma.y, ma.z, mi.x, ma.y, ma.z, mi.x, mi.y, ma.z,
+            // front 012 230
+            mi.x, mi.y, ma.z,
+            ma.x, mi.y, ma.z,
+            ma.x, ma.y, ma.z,
+            ma.x, ma.y, ma.z,
+            mi.x, ma.y, ma.z,
+            mi.x, mi.y, ma.z,
+
             // back
-            ma.x, mi.y, mi.z, mi.x, mi.y, mi.z, mi.x, ma.y, mi.z,
-            mi.x, ma.y, mi.z, ma.x, ma.y, mi.z, ma.x, mi.y, mi.z,
+            ma.x, mi.y, mi.z,
+            mi.x, mi.y, mi.z,
+            mi.x, ma.y, mi.z,
+            mi.x, ma.y, mi.z,
+            ma.x, ma.y, mi.z,
+            ma.x, mi.y, mi.z,
+
             // right
-            ma.x, mi.y, ma.z, ma.x, mi.y, mi.z, ma.x, ma.y, mi.z,
-            ma.x, ma.y, mi.z, ma.x, ma.y, ma.z, ma.x, mi.y, ma.z,
+            ma.x, mi.y, ma.z,
+            ma.x, mi.y, mi.z,
+            ma.x, ma.y, mi.z,
+            ma.x, ma.y, mi.z,
+            ma.x, ma.y, ma.z,
+            ma.x, mi.y, ma.z,
+
             // top
-            mi.x, ma.y, ma.z, ma.x, ma.y, ma.z, ma.x, ma.y, mi.z,
-            ma.x, ma.y, mi.z, mi.x, ma.y, mi.z, mi.x, ma.y, ma.z,
+            mi.x, ma.y, ma.z,
+            ma.x, ma.y, ma.z,
+            ma.x, ma.y, mi.z,
+            ma.x, ma.y, mi.z,
+            mi.x, ma.y, mi.z,
+            mi.x, ma.y, ma.z,
+
             // left
-            mi.x, mi.y, mi.z, mi.x, mi.y, ma.z, mi.x, ma.y, ma.z,
-            mi.x, ma.y, ma.z, mi.x, ma.y, mi.z, mi.x, mi.y, mi.z,
+            mi.x, mi.y, mi.z,
+            mi.x, mi.y, ma.z,
+            mi.x, ma.y, ma.z,
+            mi.x, ma.y, ma.z,
+            mi.x, ma.y, mi.z,
+            mi.x, mi.y, mi.z,
+
             // bottom
-            mi.x, mi.y, mi.z, ma.x, mi.y, mi.z, ma.x, mi.y, ma.z,
-            ma.x, mi.y, ma.z, mi.x, mi.y, ma.z, mi.x, mi.y, mi.z
+            mi.x, mi.y, mi.z,
+            ma.x, mi.y, mi.z,
+            ma.x, mi.y, ma.z,
+            ma.x, mi.y, ma.z,
+            mi.x, mi.y, ma.z,
+            mi.x, mi.y, mi.z
         ];
         this.boundingSphere = RitterAlgorithm.createRitterBoundingSphere(vertices);
         let normals = [
             // front
-            0, 0, 1, 0, 0, 1, 0, 0, 1,
-            0, 0, 1, 0, 0, 1, 0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
 
             // back
-            0, 0, -1, 0, 0, -1, 0, 0, -1,
-            0, 0, -1, 0, 0, -1, 0, 0, -1,
+            0, 0, -1,
+            0, 0, -1,
+            0, 0, -1,
+            0, 0, -1,
+            0, 0, -1,
+            0, 0, -1,
 
             // right
-            1, 0, 0, 1, 0, 0, 1, 0, 0,
-            1, 0, 0, 1, 0, 0, 1, 0, 0,
+            1, 0, 0,
+            1, 0, 0,
+            1, 0, 0,
+            1, 0, 0,
+            1, 0, 0,
+            1, 0, 0,
 
             // top
-            0, 1, 0, 0, 1, 0, 0, 1, 0,
-            0, 1, 0, 0, 1, 0, 0, 1, 0,
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0,
 
             // left
-            -1, 0, 0, -1, 0, 0, -1, 0, 0,
-            -1, 0, 0, -1, 0, 0, -1, 0, 0,
+            -1, 0, 0,
+            -1, 0, 0,
+            -1, 0, 0,
+            -1, 0, 0,
+            -1, 0, 0,
+            -1, 0, 0,
 
             // bottom
-            0, -1, 0, 0, -1, 0, 0, -1, 0,
-            0, -1, 0, 0, -1, 0, 0, -1, 0
+            0, -1, 0,
+            0, -1, 0,
+            0, -1, 0,
+            0, -1, 0,
+            0, -1, 0,
+            0, -1, 0
         ];
 
         const vertexBuffer = gl.createBuffer();
@@ -152,61 +208,6 @@ export default class RasterTextureBox implements RasterObject{
         ];
         this.uv = uv;
 
-        /*
-        this.tangents = [
-            // front
-            1, 0, 0, 1, 0, 0, 1, 0, 0,
-            1, 0, 0, 1, 0, 0, 1, 0, 0,
-
-            // back
-            -1, 0, 0, -1, 0, 0, -1, 0, 0,
-            -1, 0, 0, -1, 0, 0, -1, 0, 0,
-
-            // right
-            0, 0, -1, 0, 0, -1, 0, 0, -1,
-            0, 0, -1, 0, 0, -1, 0, 0, -1,
-
-            // top
-            1, 0, 0, 1, 0, 0, 1, 0, 0,
-            1, 0, 0, 1, 0, 0, 1, 0, 0,
-
-            // left
-            0, 0, 1, 0, 0, 1, 0, 0, 1,
-            0, 0, 1, 0, 0, 1, 0, 0, 1,
-
-            // bottom
-            1, 0, 0, 1, 0, 0, 1, 0, 0,
-            1, 0, 0, 1, 0, 0, 1, 0, 0,
-        ];
-
-        this.bitangents = [
-            // front
-            0, 1, 0, 0, 1, 0, 0, 1, 0,
-            0, 1, 0, 0, 1, 0, 0, 1, 0,
-
-            // back
-            0, 1, 0, 0, 1, 0, 0, 1, 0,
-            0, 1, 0, 0, 1, 0, 0, 1, 0,
-
-            // right
-            0, 1, 0, 0, 1, 0, 0, 1, 0,
-            0, 1, 0, 0, 1, 0, 0, 1, 0,
-
-            // top
-            0, 0, -1, 0, 0, -1, 0, 0, -1,
-            0, 0, -1, 0, 0, -1, 0, 0, -1,
-
-            // left
-            0, 1, 0, 0, 1, 0, 0, 1, 0,
-            0, 1, 0, 0, 1, 0, 0, 1, 0,
-
-            // bottom
-            0, 0, 1, 0, 0, 1, 0, 0, 1,
-            0, 0, 1, 0, 0, 1, 0, 0, 1,
-        ];
-
-         */
-
         this.tangents = [];
         this.bitangents = [];
         this.calculateTangentsAndBitangents(vertices, uv);
@@ -244,9 +245,6 @@ export default class RasterTextureBox implements RasterObject{
         this.gl.enableVertexAttribArray(positionLocation);
         this.gl.vertexAttribPointer(positionLocation, 3, this.gl.FLOAT, false, 0, 0);
 
-        // Bind the texture coordinates in this.texCoords
-        // to their attribute in the shader
-        // TODO
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.texCoords);
         const texCoordLocation = shader.getAttributeLocation("a_texCoord");
         this.gl.enableVertexAttribArray(texCoordLocation);
@@ -312,15 +310,13 @@ export default class RasterTextureBox implements RasterObject{
             let uv4 = new Vector(uv[8 + i * 12], uv[9 + i * 12], 0, 1);
 
             let edge1 = pos2.sub(pos1);
-            let edge2 = pos3.sub(pos1); // same as pos3.sub(pos2)?
+            let edge2 = pos3.sub(pos1);
             let edge3 = pos3.sub(pos1);
-            let edge4 = pos4.sub(pos3); // same as pos1.sub(pos4)?
-            // let edge3 = pos4.sub(pos3);
-            // let edge4 = pos1.sub(pos4); // same as pos1.sub(pos4)?
+            let edge4 = pos4.sub(pos3);
             let deltaUV1 = uv2.sub(uv1);
-            let deltaUV2 = uv3.sub(uv1); // same as uv3.sub(uv2)?
+            let deltaUV2 = uv3.sub(uv1);
             let deltaUV3 = uv3.sub(uv1);
-            let deltaUV4 = uv4.sub(uv3); // same as uv1.sub(uv4)?
+            let deltaUV4 = uv4.sub(uv3);
 
             let f = 1.0 / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 
@@ -366,7 +362,7 @@ export default class RasterTextureBox implements RasterObject{
         return intersection;
     }
 
-    updateColor(newColor: Vector){
+    updateColor(){
         // flip the texture instead of using a new color
         for (let i = 0; i < this.uv.length; i++) {
             if(this.uv[i] === 0){

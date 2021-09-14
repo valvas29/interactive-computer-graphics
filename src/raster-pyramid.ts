@@ -15,6 +15,8 @@ export default class RasterPyramid implements RasterObject{
      */
     vertexBuffer: WebGLBuffer;
 
+    indexBuffer: WebGLBuffer;
+
     normalBuffer: WebGLBuffer;
 
     colorBuffer: WebGLBuffer;
@@ -48,6 +50,7 @@ export default class RasterPyramid implements RasterObject{
 
         // some vertices are duplicate to give a different normal to the same vertex
         // and since duplicate vertices are actually needed, indexing would lose a lot of its value
+        // we will still use indices here to show that we know how to work with them and they still save a few vertices (2 here)
         let vertices = [
             // front
             mi.x, mi.y, ma.z, //0
@@ -69,10 +72,16 @@ export default class RasterPyramid implements RasterObject{
             mi.x, mi.y, ma.z,
             ma.x, mi.y, ma.z,
             ma.x, mi.y, mi.z,
-            ma.x, mi.y, mi.z,
             mi.x, mi.y, mi.z,
-            mi.x, mi.y, ma.z,
         ];
+        let indices = [
+            0, 1, 2,
+            3, 4, 5,
+            6, 7, 8,
+            9, 10, 11,
+            12, 13, 14,
+            14, 15, 12
+        ]
         this.boundingSphere = RitterAlgorithm.createRitterBoundingSphere(vertices);
 
         if(color1 === undefined){
@@ -108,6 +117,7 @@ export default class RasterPyramid implements RasterObject{
             color1.r, color1.g, color1.b, color1.a,
         ];
 
+        // calculate the normals
         let point0 = new Vector(mi.x, mi.y, ma.z, 1);
         let point1 = new Vector(ma.x, mi.y, ma.z, 1);
         let point2 = new Vector(ma.x, mi.y, mi.z, 1);
@@ -161,13 +171,17 @@ export default class RasterPyramid implements RasterObject{
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
         this.vertexBuffer = vertexBuffer;
-        this.elements = vertices.length / 3;
+
+        const indexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+        this.indexBuffer = indexBuffer;
+        this.elements = indices.length;
 
         const normalBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, normalBuffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(normals), this.gl.STATIC_DRAW);
         this.normalBuffer = normalBuffer;
-
 
         const colorBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
@@ -183,8 +197,7 @@ export default class RasterPyramid implements RasterObject{
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
         const positionLocation = shader.getAttributeLocation("a_position");
         this.gl.enableVertexAttribArray(positionLocation);
-        this.gl.vertexAttribPointer(positionLocation,
-            3, this.gl.FLOAT, false, 0, 0);
+        this.gl.vertexAttribPointer(positionLocation, 3, this.gl.FLOAT, false, 0, 0);
 
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
         const colorLocation = shader.getAttributeLocation("a_color");
@@ -196,7 +209,8 @@ export default class RasterPyramid implements RasterObject{
         this.gl.enableVertexAttribArray(normalLocation);
         this.gl.vertexAttribPointer(normalLocation, 3, this.gl.FLOAT, false, 0, 0);
 
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, this.elements);
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+        this.gl.drawElements(this.gl.TRIANGLES, this.elements, this.gl.UNSIGNED_SHORT, 0);
 
         this.gl.disableVertexAttribArray(positionLocation);
         this.gl.disableVertexAttribArray(colorLocation);
