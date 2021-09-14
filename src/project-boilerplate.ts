@@ -162,7 +162,7 @@ window.addEventListener('load', () => {
 	otherAnimationNodes.push(
 		new RotationNode(gn6, new Vector(0, 1, 0, 0), 20));
 
-	const gn7 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
+	const gn7 = new GroupNode(new Translation(new Vector(2, 0, 7, 0)));
 	const textureCube = new AABoxNode(new Vector(0.6, 0.4, 0.05, 1.0), new Vector(0.3, 1.0, 0.58, 1.0), true);
 	rootNode.add(gn7);
 	gn7.add(textureCube);
