@@ -185,7 +185,7 @@ window.addEventListener('load', () => {
     rootNode.add(gn9);
 
     const gn10 = new GroupNode(new Translation(new Vector(-2, 0, 0, 0)));
-    rootNode.add(gn9);
+    gn3.add(gn10);
 
     const lightNode1 = new GroupNode(new Translation(new Vector(-1, -2, 9, 0)));
     const light1 = new LightNode();
@@ -204,7 +204,6 @@ window.addEventListener('load', () => {
 
     const lightNode3 = new GroupNode(new Translation(new Vector(6, -1, 1, 0)));
     const light3 = new LightNode();
-    gn3.add(gn10);
     gn10.add(lightNode3)
     lightNode3.add(light3);
 
@@ -436,6 +435,7 @@ window.addEventListener('load', () => {
             animationNodes: animationNodes,
             phongValues: phongValues
         }
+        console.log(rootNode);
 
         //https://stackoverflow.com/questions/34156282/how-do-i-save-json-to-local-text-file
         var a = document.createElement("a");
