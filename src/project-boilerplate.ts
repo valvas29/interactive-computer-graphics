@@ -556,7 +556,7 @@ window.addEventListener('load', () => {
 				} else if (childNodes[i].hasOwnProperty("AABoxNode")) {
 					let color1 = new Vector(childNodes[i].AABoxNode.color1.data[0], childNodes[i].AABoxNode.color1.data[1], childNodes[i].AABoxNode.color1.data[2], childNodes[i].AABoxNode.color1.data[3]);
 					let color2 = new Vector(childNodes[i].AABoxNode.color2.data[0], childNodes[i].AABoxNode.color2.data[1], childNodes[i].AABoxNode.color2.data[2], childNodes[i].AABoxNode.color2.data[3]);
-					result.push(new AABoxNode(color1, color2, childNodes[i].outside));
+					result.push(new AABoxNode(color1, color2, childNodes[i].AABoxNode.outside));
 
 				} else if (childNodes[i].hasOwnProperty("TextureBoxNode")) {
 					result.push(new TextureBoxNode(childNodes[i].TextureBoxNode.texture, childNodes[i].TextureBoxNode.normalMap));
