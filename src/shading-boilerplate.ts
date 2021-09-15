@@ -1,22 +1,22 @@
 import 'bootstrap';
 import 'bootstrap/scss/bootstrap.scss';
-import Vector from './vector';
+import Vector from './math/vector';
 import {
     GroupNode,
     SphereNode,
     TextureBoxNode
-} from './nodes';
+} from './scene/nodes';
 import {
     RasterVisitor,
     RasterSetupVisitor
-} from './rastervisitor';
-import Shader from './shader';
-import phongVertexShader from './phong-vertex-shader.glsl';
-import phongFragmentShader from './phong-fragment-shader.glsl';
-import textureVertexShader from './texture-vertex-shader.glsl';
-import textureFragmentShader from './texture-fragment-shader.glsl';
-import { Rotation, Scaling, Translation } from './transformation';
-import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
+} from './rasterization/rastervisitor';
+import Shader from './rasterization/shaders/shader';
+import phongVertexShader from './uebung/phong-vertex-shader.glsl';
+import phongFragmentShader from './rasterization/shaders/phong-fragment-shader.glsl';
+import textureVertexShader from './uebung/texture-vertex-shader.glsl';
+import textureFragmentShader from './rasterization/shaders/texture-fragment-shader.glsl';
+import { Rotation, Scaling, Translation } from './math/transformation';
+import {FirstTraversalVisitorRaster} from "./rasterization/firstTraversalVisitorRaster";
 
 window.addEventListener('load', () => {
     const canvas = document.getElementById("rasteriser") as HTMLCanvasElement;

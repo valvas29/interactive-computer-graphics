@@ -1,28 +1,28 @@
 import 'bootstrap';
 import 'bootstrap/scss/bootstrap.scss';
-import Vector from './vector';
+import Vector from './math/vector';
 import {
 	AABoxNode,
 	GroupNode, PyramidNode, CameraNode, SphereNode,
 	TextureBoxNode, LightNode, CustomShapeNode
-} from './nodes';
+} from './scene/nodes';
 import {
 	RasterVisitor,
 	RasterSetupVisitor
-} from './rastervisitor';
-import Shader from './shader';
+} from './rasterization/rastervisitor';
+import Shader from './rasterization/shaders/shader';
 import {
 	RotationNode, TranslationNode, JumperNode, ScalingNode
-} from './animation-nodes';
-import phongVertexShader from './phong-vertex-perspective-shader.glsl';
-import phongFragmentShader from './phong-fragment-shader.glsl';
-import textureVertexShader from './texture-vertex-perspective-shader.glsl';
-import textureFragmentShader from './texture-fragment-shader.glsl';
-import {Rotation, Scaling, Transformation, Translation} from './transformation';
-import RayVisitor from "./rayvisitor";
-import Matrix from "./matrix";
-import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
-import {FirstTraversalVisitorRay} from "./firstTraversalVisitorRay";
+} from './scene/animation-nodes';
+import phongVertexShader from './rasterization/shaders/phong-vertex-perspective-shader.glsl';
+import phongFragmentShader from './rasterization/shaders/phong-fragment-shader.glsl';
+import textureVertexShader from './rasterization/shaders/texture-vertex-perspective-shader.glsl';
+import textureFragmentShader from './rasterization/shaders/texture-fragment-shader.glsl';
+import {Rotation, Scaling, Transformation, Translation} from './math/transformation';
+import RayVisitor from "./raytracing/rayvisitor";
+import Matrix from "./math/matrix";
+import {FirstTraversalVisitorRaster} from "./rasterization/firstTraversalVisitorRaster";
+import {FirstTraversalVisitorRay} from "./raytracing/firstTraversalVisitorRay";
 
 export interface CameraRasteriser {
 	eye: Vector,

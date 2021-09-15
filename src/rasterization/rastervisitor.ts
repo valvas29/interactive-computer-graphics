@@ -1,10 +1,10 @@
-import RasterSphere from './raster-sphere';
-import RasterBoxOutside from './raster-boxOutside';
-import RasterPyramid from './raster-pyramid';
-import RasterTextureBox from './raster-texture-box';
-import Vector from './vector';
-import Matrix from './matrix';
-import Visitor from './visitor';
+import RasterSphere from './objects/raster-sphere';
+import RasterBoxOutside from './objects/raster-boxOutside';
+import RasterPyramid from './objects/raster-pyramid';
+import RasterTextureBox from './objects/raster-texture-box';
+import Vector from '../math/vector';
+import Matrix from '../math/matrix';
+import Visitor from '../interfaces/visitor';
 import {
     AABoxNode,
     GroupNode,
@@ -15,15 +15,15 @@ import {
     CameraNode,
     LightNode,
     CustomShapeNode
-} from './nodes';
-import Shader from './shader';
-import {CameraRasteriser, PhongValues} from "./project-boilerplate";
+} from '../scene/nodes';
+import Shader from './shaders/shader';
+import {CameraRasteriser, PhongValues} from "../project-boilerplate";
 import {FirstTraversalVisitorRaster} from "./firstTraversalVisitorRaster";
-import RasterBoxInside from "./raster-boxInside";
-import Ray from "./ray";
-import Intersection from "./intersection";
-import {RasterObject} from "./rasterObject";
-import {RasterCustomShape} from "./raster-custom-shape";
+import RasterBoxInside from "./objects/raster-boxInside";
+import Ray from "../math/ray";
+import Intersection from "../math/intersection";
+import {RasterObject} from "../interfaces/rasterObject";
+import {RasterCustomShape} from "./objects/raster-custom-shape";
 
 interface Renderable {
     render(shader: Shader): void;

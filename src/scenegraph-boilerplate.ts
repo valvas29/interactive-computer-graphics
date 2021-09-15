@@ -1,15 +1,15 @@
 import 'bootstrap';
 import 'bootstrap/scss/bootstrap.scss';
-import Vector from './vector';
+import Vector from './math/vector';
 import {
     GroupNode,
     SphereNode
-} from './nodes';
-import RayVisitor from './rayvisitor';
-import { Rotation, Scaling, Translation } from './transformation';
-import {FirstTraversalVisitorRay} from "./firstTraversalVisitorRay";
-import phong from "./phong";
-import Matrix from "./matrix";
+} from './scene/nodes';
+import RayVisitor from './raytracing/rayvisitor';
+import { Rotation, Scaling, Translation } from './math/transformation';
+import {FirstTraversalVisitorRay} from "./raytracing/firstTraversalVisitorRay";
+import phong from "./raytracing/shaders/phong";
+import Matrix from "./math/matrix";
 
 window.addEventListener('load', () => {
     const canvas = document.getElementById("raytracer") as HTMLCanvasElement;

@@ -1,11 +1,11 @@
-import Vector from './vector';
-import Shader from './shader';
-import {RasterObject} from "./rasterObject";
-import Sphere from "./sphere";
-import Ray from "./ray";
-import RitterAlgorithm from "./ritterAlgorithm";
-import Intersection from "./intersection";
-import RayTriangleIntersection from "./RayTriangleIntersection";
+import Vector from '../../math/vector';
+import Shader from '../shaders/shader';
+import {RasterObject} from "../../interfaces/rasterObject";
+import Sphere from "../../raytracing/objects/sphere";
+import Ray from "../../math/ray";
+import RitterAlgorithm from "../../math/ritterAlgorithm";
+import Intersection from "../../math/intersection";
+import RayTriangleIntersection from "../../math/rayTriangleIntersection";
 
 /**
  * A class creating buffers for an axis aligned box to render it with WebGL

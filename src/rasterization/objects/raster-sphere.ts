@@ -1,8 +1,8 @@
-import Vector from './vector';
-import Shader from './shader';
-import Sphere from "./sphere";
-import Ray from "./ray";
-import {RasterObject} from "./rasterObject";
+import Vector from '../../math/vector';
+import Shader from '../shaders/shader';
+import Sphere from "../../raytracing/objects/sphere";
+import Ray from "../../math/ray";
+import {RasterObject} from "../../interfaces/rasterObject";
 
 /**
  * A class creating buffers for a sphere to render it with WebGL

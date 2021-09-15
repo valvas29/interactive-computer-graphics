@@ -1,9 +1,9 @@
-import {AABoxNode, CameraNode, GroupNode, Node, PyramidNode, SphereNode, TextureBoxNode, LightNode, CustomShapeNode} from "./nodes";
-import Vector from "./vector";
-import Matrix from "./matrix";
-import Visitor from "./visitor";
-import {CameraRaytracer} from "./project-boilerplate";
-import Ray from "./ray";
+import {AABoxNode, CameraNode, GroupNode, Node, PyramidNode, SphereNode, TextureBoxNode, LightNode, CustomShapeNode} from "../scene/nodes";
+import Vector from "../math/vector";
+import Matrix from "../math/matrix";
+import Visitor from "../interfaces/visitor";
+import {CameraRaytracer} from "../project-boilerplate";
+import Ray from "../math/ray";
 
 /**
  * Class traversing the Scene Graph before the actual traversal

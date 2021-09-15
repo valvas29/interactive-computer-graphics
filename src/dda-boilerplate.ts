@@ -1,6 +1,6 @@
 import 'bootstrap';
 import 'bootstrap/scss/bootstrap.scss';
-import { dda } from './dda';
+import { dda } from './uebung/dda';
 
 let canvasDDA: HTMLCanvasElement;
 let ctxDDA: CanvasRenderingContext2D;

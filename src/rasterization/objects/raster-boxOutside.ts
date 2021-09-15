@@ -1,18 +1,16 @@
-import Vector from './vector';
-import Shader from './shader';
-import {RasterObject} from "./rasterObject";
-import Sphere from "./sphere";
-import Ray from "./ray";
-import RitterAlgorithm from "./ritterAlgorithm";
-import Intersection from "./intersection";
-import RayTriangleIntersection from "./RayTriangleIntersection";
-
+import Vector from '../../math/vector';
+import Shader from '../shaders/shader';
+import {RasterObject} from "../../interfaces/rasterObject";
+import Sphere from "../../raytracing/objects/sphere";
+import Ray from "../../math/ray";
+import RitterAlgorithm from "../../math/ritterAlgorithm";
+import Intersection from "../../math/intersection";
+import RayTriangleIntersection from "../../math/rayTriangleIntersection";
 
 /**
  * A class creating buffers for an axis aligned box to render it with WebGL
  */
-// has inverted normals compared to RasterBoxOutside
-export default class RasterBoxInside implements RasterObject {
+export default class RasterBoxOutside implements RasterObject {
     /**
      * The buffer containing the box's vertices
      */
@@ -86,7 +84,7 @@ export default class RasterBoxInside implements RasterObject {
             ma.x, mi.y, ma.z,
             mi.x, mi.y, ma.z,
 
-            // top 327 376
+            // top 327 375
             mi.x, ma.y, ma.z,
             ma.x, ma.y, ma.z,
             ma.x, ma.y, mi.z,
@@ -106,55 +104,54 @@ export default class RasterBoxInside implements RasterObject {
         this.boundingSphere = RitterAlgorithm.createRitterBoundingSphere(vertices);
 
         let colors = this.createColorArrayTopBottom(color1, color2);
-        // has inverted normals compared to RasterBoxOutside
         let normals = [
             // facing front
-            0, 0, -1,
-            0, 0, -1,
-            0, 0, -1,
-            0, 0, -1,
-            0, 0, -1,
-            0, 0, -1,
+            0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
+            0, 0, 1,
 
             // facing back
-            0, 0, 1,
-            0, 0, 1,
-            0, 0, 1,
-            0, 0, 1,
-            0, 0, 1,
-            0, 0, 1,
+            0, 0, -1,
+            0, 0, -1,
+            0, 0, -1,
+            0, 0, -1,
+            0, 0, -1,
+            0, 0, -1,
 
             // facing right
-            -1, 0, 0,
-            -1, 0, 0,
-            -1, 0, 0,
-            -1, 0, 0,
-            -1, 0, 0,
-            -1, 0, 0,
+            1, 0, 0,
+            1, 0, 0,
+            1, 0, 0,
+            1, 0, 0,
+            1, 0, 0,
+            1, 0, 0,
 
             // facing bottom
-            0, 1, 0,
-            0, 1, 0,
-            0, 1, 0,
-            0, 1, 0,
-            0, 1, 0,
-            0, 1, 0,
+            0, -1, 0,
+            0, -1, 0,
+            0, -1, 0,
+            0, -1, 0,
+            0, -1, 0,
+            0, -1, 0,
 
             // facing top
-            0, -1, 0,
-            0, -1, 0,
-            0, -1, 0,
-            0, -1, 0,
-            0, -1, 0,
-            0, -1, 0,
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0,
 
             // facing left
-            1, 0, 0,
-            1, 0, 0,
-            1, 0, 0,
-            1, 0, 0,
-            1, 0, 0,
-            1, 0, 0,
+            -1, 0, 0,
+            -1, 0, 0,
+            -1, 0, 0,
+            -1, 0, 0,
+            -1, 0, 0,
+            -1, 0, 0,
         ];
 
         const vertexBuffer = gl.createBuffer();
@@ -167,7 +164,6 @@ export default class RasterBoxInside implements RasterObject {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, normalBuffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(normals), this.gl.STATIC_DRAW);
         this.normalBuffer = normalBuffer;
-
 
         const colorBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);

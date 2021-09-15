@@ -1,5 +1,5 @@
-import Matrix from './matrix';
-import Vector from './vector';
+import Matrix from '../../math/matrix';
+import Vector from '../../math/vector';
 
 // Refer to https://developer.mozilla.org/de/docs/Web/API/WebGL_API/Tutorial/Hinzuf%C3%BCgen_von_2D_Inhalten_in_einen_WebGL-Kontext
 /**

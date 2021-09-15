@@ -8,13 +8,13 @@ import {
 	PyramidNode,
 	SphereNode,
 	TextureBoxNode
-} from "./nodes";
-import RasterSphere from "./raster-sphere";
-import Vector from "./vector";
-import Matrix from "./matrix";
-import Visitor from "./visitor";
-import {CameraRasteriser} from "./project-boilerplate";
-import Ray from "./ray";
+} from "../scene/nodes";
+import RasterSphere from "./objects/raster-sphere";
+import Vector from "../math/vector";
+import Matrix from "../math/matrix";
+import Visitor from "../interfaces/visitor";
+import {CameraRasteriser} from "../project-boilerplate";
+import Ray from "../math/ray";
 
 /**
  * Class traversing the Scene Graph before the actual traversal

@@ -1,7 +1,7 @@
-import Shader from "./shader";
-import Ray from "./ray";
-import Intersection from "./intersection";
-import Sphere from "./sphere";
+import Shader from "../rasterization/shaders/shader";
+import Ray from "../math/ray";
+import Intersection from "../math/intersection";
+import Sphere from "../raytracing/objects/sphere";
 
 export interface RasterObject{
     boundingSphere: Sphere;

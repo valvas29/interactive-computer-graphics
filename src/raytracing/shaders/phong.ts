@@ -1,6 +1,6 @@
-import Vector from './vector';
-import Intersection from './intersection';
-import {PhongValues} from "./project-boilerplate";
+import Vector from '../../math/vector';
+import Intersection from '../../math/intersection';
+import {PhongValues} from "../../project-boilerplate";
 
 /**
  * Calculate the colour of an object at the intersection point according to the Phong Lighting model.

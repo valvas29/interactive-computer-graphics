@@ -1,6 +1,6 @@
 // https://www.researchgate.net/publication/242453691_An_Efficient_Bounding_Sphere
 import Vector from "./vector";
-import Sphere from "./sphere";
+import Sphere from "../raytracing/objects/sphere";
 
 export default class RitterAlgorithm {
     static createRitterBoundingSphere(vertices: Array<number>): Sphere {

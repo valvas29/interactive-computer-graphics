@@ -1,15 +1,15 @@
-import Matrix from './matrix';
-import Vector from './vector';
-import Sphere from './sphere';
-import Intersection from './intersection';
-import Ray from './ray';
-import Visitor from './visitor';
-import phong from './phong';
+import Matrix from '../math/matrix';
+import Vector from '../math/vector';
+import Sphere from './objects/sphere';
+import Intersection from '../math/intersection';
+import Ray from '../math/ray';
+import Visitor from '../interfaces/visitor';
+import phong from './shaders/phong';
 import {
     Node, GroupNode, SphereNode,
     AABoxNode, TextureBoxNode, CameraNode, PyramidNode, LightNode, CustomShapeNode
-} from './nodes';
-import {CameraRaytracer, PhongValues} from "./project-boilerplate";
+} from '../scene/nodes';
+import {CameraRaytracer, PhongValues} from "../project-boilerplate";
 import {FirstTraversalVisitorRay} from "./firstTraversalVisitorRay";
 
 const UNIT_SPHERE = new Sphere(new Vector(0, 0, 0, 1), 1, new Vector(0, 0, 0, 1));

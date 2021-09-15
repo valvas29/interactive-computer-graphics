@@ -1,6 +1,6 @@
-import Vector from './vector';
-import Intersection from './intersection';
-import Ray from './ray';
+import Vector from '../../math/vector';
+import Intersection from '../../math/intersection';
+import Ray from '../../math/ray';
 
 /**
  * A class representing a sphere

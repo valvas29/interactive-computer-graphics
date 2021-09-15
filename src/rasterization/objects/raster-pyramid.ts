@@ -1,11 +1,11 @@
-import Vector from './vector';
-import Shader from './shader';
-import Sphere from "./sphere";
-import RitterAlgorithm from "./ritterAlgorithm";
-import Ray from "./ray";
-import {RasterObject} from "./rasterObject";
-import Intersection from "./intersection";
-import RayTriangleIntersection from "./RayTriangleIntersection";
+import Vector from '../../math/vector';
+import Shader from '../shaders/shader';
+import Sphere from "../../raytracing/objects/sphere";
+import RitterAlgorithm from "../../math/ritterAlgorithm";
+import Ray from "../../math/ray";
+import {RasterObject} from "../../interfaces/rasterObject";
+import Intersection from "../../math/intersection";
+import RayTriangleIntersection from "../../math/rayTriangleIntersection";
 
 
 /**

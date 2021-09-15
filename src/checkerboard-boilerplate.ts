@@ -1,6 +1,6 @@
 import 'bootstrap';
 import 'bootstrap/scss/bootstrap.scss';
-import { checkerboard } from './checkerboard';
+import { checkerboard } from './uebung/checkerboard';
 
 function drawCheckerboard() {
     const canvas = document.getElementById("checkerboard") as HTMLCanvasElement;
