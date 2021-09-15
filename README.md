@@ -145,7 +145,7 @@ Wenn schon ein OBJ geladen wurde, wird keine neue GroupNode erstellt, sondern nu
 |M6 |7 |mathematische Bibliothek |<ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf, Mona Röhm |
 |M7 |7 |Phong Shader | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf, Mona Röhm |
 |O1 |6 |mehrere Texturen | <ul><li>- [bearbeitet] </li></ul> | Mona Röhm |
-|O2 |10 |Auswahl und Manipulation von Objekten | <ul><li>- [ ] </li></ul> | Mona Röhm |
+|O2 |10 |Auswahl und Manipulation von Objekten | <ul><li>- [bearbeitet] </li></ul> | Mona Röhm |
 |O3 |6 |Laden und Speichern | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
 |O4 |6 |Model Loader | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
 |O5 |8 |Kamera Knoten | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
