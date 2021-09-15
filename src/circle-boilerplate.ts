@@ -1,6 +1,6 @@
 import 'bootstrap';
 import 'bootstrap/scss/bootstrap.scss';
-import { circle } from './circle';
+import { circle } from './uebung/circle';
 
 function drawCircle() {
     const canvas = document.getElementById("circle") as HTMLCanvasElement;

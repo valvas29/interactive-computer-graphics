@@ -1,24 +1,25 @@
 import 'bootstrap';
 import 'bootstrap/scss/bootstrap.scss';
-import Vector from './vector';
+import Vector from './math/vector';
 import {
     GroupNode,
     SphereNode,
     TextureBoxNode
-} from './nodes';
+} from './scene/nodes';
 import {
     RasterVisitor,
     RasterSetupVisitor
-} from './rastervisitor';
-import Shader from './shader';
+} from './rasterization/rastervisitor';
+import Shader from './rasterization/shaders/shader';
 import {
     RotationNode
-} from './animation-nodes';
-import phongVertexShader from './phong-vertex-perspective-shader.glsl';
-import phongFragmentShader from './phong-fragment-shader.glsl';
-import textureVertexShader from './texture-vertex-perspective-shader.glsl';
-import textureFragmentShader from './texture-fragment-shader.glsl';
-import { Rotation, Translation } from './transformation';
+} from './scene/animation-nodes';
+import phongVertexShader from './rasterization/shaders/phong-vertex-perspective-shader.glsl';
+import phongFragmentShader from './rasterization/shaders/phong-fragment-shader.glsl';
+import textureVertexShader from './rasterization/shaders/texture-vertex-perspective-shader.glsl';
+import textureFragmentShader from './rasterization/shaders/texture-fragment-shader.glsl';
+import { Rotation, Translation } from './math/transformation';
+import {FirstTraversalVisitorRaster} from "./rasterization/firstTraversalVisitorRaster";
 
 window.addEventListener('load', () => {
     const canvas = document.getElementById("rasteriser") as HTMLCanvasElement;
@@ -42,7 +43,7 @@ window.addEventListener('load', () => {
     sg.add(gn2);
     const gn3 = new GroupNode(new Translation(new Vector(0, 0, 0, 0)));
     gn2.add(gn3);
-    const cube = new TextureBoxNode('hci-logo.png');
+    const cube = new TextureBoxNode('hci-logo.png', 'brickwall_normal.jpg');
     gn3.add(cube);
 
     // setup for rendering
@@ -92,7 +93,7 @@ window.addEventListener('load', () => {
 
     function animate(timestamp: number) {
         simulate(timestamp - lastTimestamp);
-        visitor.render(sg, camera, [], phongValues);
+        visitor.render(sg, camera, [], phongValues, null);
         lastTimestamp = timestamp;
         window.requestAnimationFrame(animate);
     }

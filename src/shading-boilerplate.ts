@@ -1,21 +1,22 @@
 import 'bootstrap';
 import 'bootstrap/scss/bootstrap.scss';
-import Vector from './vector';
+import Vector from './math/vector';
 import {
     GroupNode,
     SphereNode,
     TextureBoxNode
-} from './nodes';
+} from './scene/nodes';
 import {
     RasterVisitor,
     RasterSetupVisitor
-} from './rastervisitor';
-import Shader from './shader';
-import phongVertexShader from './phong-vertex-shader.glsl';
-import phongFragmentShader from './phong-fragment-shader.glsl';
-import textureVertexShader from './texture-vertex-shader.glsl';
-import textureFragmentShader from './texture-fragment-shader.glsl';
-import { Rotation, Scaling, Translation } from './transformation';
+} from './rasterization/rastervisitor';
+import Shader from './rasterization/shaders/shader';
+import phongVertexShader from './uebung/phong-vertex-shader.glsl';
+import phongFragmentShader from './rasterization/shaders/phong-fragment-shader.glsl';
+import textureVertexShader from './uebung/texture-vertex-shader.glsl';
+import textureFragmentShader from './rasterization/shaders/texture-fragment-shader.glsl';
+import { Rotation, Scaling, Translation } from './math/transformation';
+import {FirstTraversalVisitorRaster} from "./rasterization/firstTraversalVisitorRaster";
 
 window.addEventListener('load', () => {
     const canvas = document.getElementById("rasteriser") as HTMLCanvasElement;
@@ -35,7 +36,7 @@ window.addEventListener('load', () => {
     let gn3 = new GroupNode(new Translation(new Vector(.5, 0, 0, 0)));
     gn0.add(gn3);
     sg2.add(gn0);
-    const cube = new TextureBoxNode('hci-logo.png');
+    const cube = new TextureBoxNode('hci-logo.png', 'brickwall_normal.jpg');
     gn3.add(cube);
 
     // setup for rendering
@@ -73,7 +74,7 @@ window.addEventListener('load', () => {
     function animate(timestamp: number) {
         gn0.transform = new Rotation(new Vector(0, 0, 1, 0), timestamp / 1000);
         gn3.transform = new Rotation(new Vector(0, 1, 0, 0), timestamp / 1000);
-        visitor.render(sg, camera, [], phongValues);
+        visitor.render(sg, camera, [], phongValues, null);
         window.requestAnimationFrame(animate);
     }
 

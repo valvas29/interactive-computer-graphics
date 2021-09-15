@@ -1,10 +1,11 @@
 import 'bootstrap';
 import 'bootstrap/scss/bootstrap.scss';
-import Vector from './vector';
-import Sphere from './sphere';
-import Ray from './ray';
-import Intersection from './intersection';
-import phong from './phong';
+import Vector from './math/vector';
+import Sphere from './raytracing/objects/sphere';
+import Ray from './math/ray';
+import Intersection from './math/intersection';
+import phong from './raytracing/shaders/phong';
+import Matrix from "./math/matrix";
 
 window.addEventListener('load', () => {
     const canvas = document.getElementById("raytracer") as HTMLCanvasElement;
@@ -18,12 +19,18 @@ window.addEventListener('load', () => {
     const lightPositions = [
         new Vector(1, 1, -1, 1),
     ];
-    let shininess = 10;
+    const phongValues = {
+        shininess: 32.0,
+        kA: 0.5,
+        kD: 0.9,
+        kS: 1.0
+    }
     const camera = {
         origin: new Vector(0, 0, 0, 1),
         width: canvas.width,
         height: canvas.height,
-        alpha: Math.PI / 3
+        alpha: Math.PI / 3,
+        toWorld: Matrix.identity()
     }
 
     function setPixel(x: number, y: number, color: Vector) {
@@ -53,7 +60,7 @@ window.addEventListener('load', () => {
                     } else {
                         let color = phong(
                             Object.assign(Object.create(Vector.prototype), minObj.color),
-                            minIntersection, lightPositions, shininess, camera.origin);
+                            minIntersection, lightPositions, camera.origin, phongValues);
                         setPixel(x, y, color);
                     }
 
@@ -66,10 +73,10 @@ window.addEventListener('load', () => {
 
     const shininessElement = document.getElementById("shininess") as HTMLInputElement;
     shininessElement.onchange = function () {
-        shininess = Number(shininessElement.value);
+        phongValues.shininess = Number(shininessElement.value);
         window.requestAnimationFrame(animate);
     }
-    shininess = Number(shininessElement.value);
+    phongValues.shininess = Number(shininessElement.value);
 
     window.requestAnimationFrame(animate);
 });

@@ -1,25 +1,26 @@
 import 'bootstrap';
 import 'bootstrap/scss/bootstrap.scss';
-import Vector from './vector';
+import Vector from './math/vector';
 import {
     GroupNode,
     SphereNode,
     TextureBoxNode
-} from './nodes';
+} from './scene/nodes';
 import {
     RasterVisitor,
     RasterSetupVisitor
-} from './rastervisitor';
-import Shader from './shader';
+} from './rasterization/rastervisitor';
+import Shader from './rasterization/shaders/shader';
 import {
     SlerpNode
-} from './animation-nodes';
-import phongVertexShader from './phong-vertex-perspective-shader.glsl';
-import phongFragmentShader from './phong-fragment-shader.glsl';
-import textureVertexShader from './texture-vertex-perspective-shader.glsl';
-import textureFragmentShader from './texture-fragment-shader.glsl';
-import { SQT } from './transformation';
-import Quaternion from './quaternion';
+} from './scene/animation-nodes';
+import phongVertexShader from './rasterization/shaders/phong-vertex-perspective-shader.glsl';
+import phongFragmentShader from './rasterization/shaders/phong-fragment-shader.glsl';
+import textureVertexShader from './rasterization/shaders/texture-vertex-perspective-shader.glsl';
+import textureFragmentShader from './rasterization/shaders/texture-fragment-shader.glsl';
+import { SQT } from './math/transformation';
+import Quaternion from './math/quaternion';
+import {FirstTraversalVisitorRaster} from "./rasterization/firstTraversalVisitorRaster";
 
 window.addEventListener('load', () => {
     const canvas = document.getElementById("rasteriser") as HTMLCanvasElement;
@@ -27,7 +28,7 @@ window.addEventListener('load', () => {
 
     // construct scene graph
     const sg = new GroupNode(new SQT(new Vector(1, 1, 1, 0), { angle: 0.6, axis: new Vector(0, 1, 0, 0) }, new Vector(0, 0, 0, 0)));
-    const cube = new TextureBoxNode('hci-logo.png');
+    const cube = new TextureBoxNode('hci-logo.png', 'brickwall_normal.jpg');
     sg.add(cube);
 
     // setup for rendering
@@ -59,6 +60,7 @@ window.addEventListener('load', () => {
         kD: 0.6,
         kS: 0.7
     }
+    const firstTraversalVisitorRaster = new FirstTraversalVisitorRaster();
 
     const visitor = new RasterVisitor(gl, phongShader, textureShader, setupVisitor.objects);
 
@@ -79,7 +81,7 @@ window.addEventListener('load', () => {
 
     function animate(timestamp: number) {
         simulate(timestamp - lastTimestamp);
-        visitor.render(sg, camera, [], phongValues);
+        visitor.render(sg, camera, [], phongValues, firstTraversalVisitorRaster);
         lastTimestamp = timestamp;
         window.requestAnimationFrame(animate);
     }
