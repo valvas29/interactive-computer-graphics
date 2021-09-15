@@ -346,6 +346,7 @@ export class RotationNode extends AnimationNode {
     // change the matrix of the attached
     // group node to reflect a rotation
     if (this.active) {
+      //max-value for deltaT ensures, that the rotation of the free-flight-camera in the raytracer is still easy to use
       if (deltaT > 200) deltaT = 200;
 
       let matrix = this.groupNode.transform.getMatrix();

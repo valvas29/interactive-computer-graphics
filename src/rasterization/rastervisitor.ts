@@ -141,10 +141,10 @@ export class RasterVisitor implements Visitor {
                         node.color2 = newSecondaryColor;
                         object.updateColor(node.color1, node.color2);
                     } else if (node instanceof TextureBoxNode) {
-                        if (node.texture === "hci-logo.png") {
-                            node.texture = "checkerboard-finished.png";
+                        if (node.texture === "./textures/hci-logo.png") {
+                            node.texture = "./textures/checkerboard-finished.png";
                         } else {
-                            node.texture = "hci-logo.png";
+                            node.texture = "./textures/hci-logo.png";
                         }
                         object.updateColor(node.texture);
                     }

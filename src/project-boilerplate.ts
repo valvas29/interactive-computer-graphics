@@ -163,7 +163,7 @@ window.addEventListener('load', () => {
 		new RotationNode(gn6, new Vector(0, 1, 0, 0), 20));
 
 	const gn7 = new GroupNode(new Translation(new Vector(0, 0, 7, 0)));
-	const textureCube = new TextureBoxNode('hci-logo.png', 'flowers_normal.jpg');
+	const textureCube = new TextureBoxNode('./textures/hci-logo.png', './textures/flowers_normal.jpg');
 	rootNode.add(gn7);
 	gn7.add(textureCube);
 	otherAnimationNodes.push(
@@ -348,21 +348,21 @@ window.addEventListener('load', () => {
 	//IMPORT-OBJ-Files
 	let bunnyObjButton = document.getElementById('bunnyObjButton');
 	bunnyObjButton.onclick = () => {
-		fetch("./stanford_bunny.obj"
+		fetch("./obj/stanford_bunny.obj"
 		).then(resp => resp.text()
 		).then(resp => parseObjData(resp));
 	}
 
 	let armadilloObjButton = document.getElementById('armadilloObjButton');
 	armadilloObjButton.onclick = () => {
-		fetch("./armadillo.obj"
+		fetch("./obj/armadillo.obj"
 		).then(resp => resp.text()
 		).then(resp => parseObjData(resp));
 	}
 
 	let tyraObjButton = document.getElementById('tyraObjButton');
 	tyraObjButton.onclick = () => {
-		fetch("./tyra.obj"
+		fetch("./obj/tyra.obj"
 		).then(resp => resp.text()
 		).then(resp => parseObjData(resp));
 	}
@@ -451,7 +451,7 @@ window.addEventListener('load', () => {
 	//SampleScene
 	let sampleSceneButton = document.getElementById('sampleSceneButton');
 	sampleSceneButton.onclick = () => {
-		fetch("./sample_scene.json"
+		fetch("./sample_scene/sample_scene.json"
 		).then(resp => resp.json()
 		).then(resp => parseSceneData(resp));
 	}
