@@ -11,52 +11,52 @@ Dieses Repository beinhaltet das Projekt des Kurses  "Interaktive Computergraphi
 ├── README.md
 ├── dist
 │   ├── obj <-- enthält die obj.-Dateien, die man über die Buttons der UI laden kann
-│	│	└── ...
+│   │	└── ...
 │   ├── sample_scene
-│	│	└── sample_scene.json <-- die Beispielszene die mit dem "Beispiel-Szene importieren"-Button geladen wird
+│   │	└── sample_scene.json <-- die Beispielszene die mit dem "Beispiel-Szene importieren"-Button geladen wird
 │   ├── textures <-- enthält Bild- und Normalen-Texturen
-│	│	└── ...
+│   │	└── ...
 │   ├── ...
 │   ├── index.html
 │   ├── ...
 │   ├── project.html <-- html der finalen Abgabe
 │   └── ...
 ├── img <-- Dokumentation
-│	└── screenshot.jpg
+│   └── screenshot.jpg
 ├── src
-│	├── interfaces
-│	│	├── rasterObject.ts
-│	│	└── visitor.ts
-│	├── math <-- Mathe Bibliothek
-│	│	├── intersection.ts
-│	│	├── matrix.ts
-│	│	├── quaternion.ts <-- wird in finalen Abgabe, zwar importiert, aber entsprechende animantion nodes nicht benutzt
-│	│	├── ray.ts
-│	│	├── rayTriangleIntersection.ts <-- utils für Strahl-Triangle Schnittpunktberechnung
-│	│	├── ritterAlgorithm.ts <-- utils für BoundingSphere-Berechnung
-│	│	├── transformation.ts
-│	│	└── vector.ts
-│	├── rasterization
-│	│	├── objects
-│	│	│	├── ...
-│	│	│	├── raster-custom-shape.ts <-- für OBJs
-│	│	│	└── ...
-│	│	├── shaders
-│	│	│	└── ...
-│	│	├── firstTraversalVisitorRaster.ts <-- rendert nichts bei Traversierung, sodern speichert nur Kamera- und Lichtpositionen
-│	│	└── rastervisitor.ts <-- rendert die raster objekte
-│	├── raytracing
-│	│	├── objects
-│	│	│	└── sphere.ts
-│	│	├── shaders
-│	│	│	└── phong.ts
-│	│	├── firstTraversalVisitorRay.ts <-- rendert nichts bei Traversierung, sodern speichert nur Kamera- und Lichtpositionen
-│	│	└── rayvisitor.ts <-- rendert die raster objekte
-│	├── scene <-- definiert die verschiedenen Arten von nodes, die im Szenengraph verwendet werden können
-│	│	├── animation-nodes.ts
-│	│	└── nodes.ts
-│	├── uebung <-- enthält Files aus der Übung. Sie werden in der finalen Abgabe nicht benutzt und sind somit irrelevant.
-│	│	└── ...
+│   ├── interfaces
+│   │	├── rasterObject.ts
+│   │	└── visitor.ts
+│   ├── math <-- Mathe Bibliothek
+│   │	├── intersection.ts
+│   │	├── matrix.ts
+│   │	├── quaternion.ts <-- wird in finalen Abgabe, zwar importiert, aber entsprechende animantion nodes nicht benutzt
+│   │	├── ray.ts
+│   │	├── rayTriangleIntersection.ts <-- utils für Strahl-Triangle Schnittpunktberechnung
+│   │	├── ritterAlgorithm.ts <-- utils für BoundingSphere-Berechnung
+│   │	├── transformation.ts
+│   │	└── vector.ts
+│   ├── rasterization
+│   │	├── objects
+│   │	│   ├── ...
+│   │	│   ├── raster-custom-shape.ts <-- für OBJs
+│   │	│   └── ...
+│   │	├── shaders
+│   │	│   └── ...
+│   │	├── firstTraversalVisitorRaster.ts <-- rendert nichts bei Traversierung, sodern speichert nur Kamera- und Lichtpositionen
+│   │	└── rastervisitor.ts <-- rendert die raster objekte
+│   ├── raytracing
+│   │	├── objects
+│   │	│   └── sphere.ts
+│   │	├── shaders
+│   │	│   └── phong.ts
+│   │	├── firstTraversalVisitorRay.ts <-- rendert nichts bei Traversierung, sodern speichert nur Kamera- und Lichtpositionen
+│   │	└── rayvisitor.ts <-- rendert die raster objekte
+│   ├── scene <-- definiert die verschiedenen Arten von nodes, die im Szenengraph verwendet werden können
+│   │	├── animation-nodes.ts
+│   │	└── nodes.ts
+│   ├── uebung <-- enthält Files aus der Übung. Sie werden in der finalen Abgabe nicht benutzt und sind somit irrelevant.
+│   │	└── ...
 │   ├── project-boilerplate.ts <-- Boilerplate: enthält den Default-Szenengraph, den Animations/Render-Loop, das Speichern/Laden der Szene, das Parsen der OBJs und definiert die eventListener der UI. 
 │   ├── ...
 └── ...
@@ -133,25 +133,35 @@ Alternativ kann man die vorgefertigte sample_scene.json mit "Beispiel-Szene impo
 Es können drei verschiedene Beispiel-OBJ-Dateien über die Buttons in der UI geladen werden. Sobald ein OBJ geladen wird, wird eine GroupNode erstellt und an die rootNode gehängt. An die eben erstellte GroupNode wird dann das neue Objekt angehängt. 
 Wenn schon ein OBJ geladen wurde, wird keine neue GroupNode erstellt, sondern nur das Objekt ersetzt.
 
-### Funktionen 
+### Funktionen
 
-|Nummer|Punkte|Beschreibung |bearbeitet| Verantwortliche/r |
-|------|------|---------------------------------------|---------------|-|
 |M1 |6 |Szenengraph | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf, Mona Röhm |
-|M2 |14 |Rasteriser & Ray Tracer | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf, Mona Röhm |
-|M3 |5 |min. drei eingebundene Objekte | <ul><li>- [bearbeitet] </li></ul> | Mona Röhm |
-|M4 |7 |min. drei verschiedene Animationsknoten| <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
-|M5 |4 |mehrfarbige Objekte | <ul><li>- [bearbeitet] </li></ul> | Mona Röhm |
-|M6 |7 |mathematische Bibliothek |<ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf, Mona Röhm |
-|M7 |7 |Phong Shader | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf, Mona Röhm |
-|O1 |6 |mehrere Texturen | <ul><li>- [bearbeitet] </li></ul> | Mona Röhm |
-|O2 |10 |Auswahl und Manipulation von Objekten | <ul><li>- [bearbeitet] </li></ul> | Mona Röhm |
-|O3 |6 |Laden und Speichern | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
-|O4 |6 |Model Loader | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
-|O5 |8 |Kamera Knoten | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
-|O6 |8 |mehrere Lichtquellen |<ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf, Mona Röhm |
-|O7 |6 |Free Flight Modus | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
 
+|M2 |14 |Rasteriser & Ray Tracer | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf, Mona Röhm |
+
+|M3 |5 |min. drei eingebundene Objekte | <ul><li>- [bearbeitet] </li></ul> | Mona Röhm |
+
+|M4 |7 |min. drei verschiedene Animationsknoten| <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
+
+|M5 |4 |mehrfarbige Objekte | <ul><li>- [bearbeitet] </li></ul> | Mona Röhm |
+
+|M6 |7 |mathematische Bibliothek |<ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf, Mona Röhm |
+
+|M7 |7 |Phong Shader | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf, Mona Röhm |
+
+|O1 |6 |mehrere Texturen | <ul><li>- [bearbeitet] </li></ul> | Mona Röhm |
+
+|O2 |10 |Auswahl und Manipulation von Objekten | <ul><li>- [bearbeitet] </li></ul> | Mona Röhm |
+
+|O3 |6 |Laden und Speichern | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
+
+|O4 |6 |Model Loader | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
+
+|O5 |8 |Kamera Knoten | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
+
+|O6 |8 |mehrere Lichtquellen |<ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf, Mona Röhm |
+
+|O7 |6 |Free Flight Modus | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
 
 
 
