@@ -435,7 +435,6 @@ window.addEventListener('load', () => {
 			animationNodes: animationNodes,
 			phongValues: phongValues
 		}
-		console.log(rootNode);
 
 		//https://stackoverflow.com/questions/34156282/how-do-i-save-json-to-local-text-file
 		var a = document.createElement("a");
