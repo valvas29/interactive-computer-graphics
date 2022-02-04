@@ -1,17 +1,17 @@
 {
   "name": "icg",
   "version": "1.0.0",
-  "description": "ICG exercise",
+  "description": "ICG",
   "scripts": {
-    "start": "webpack-dev-server --open",
-    "start-no-browser": "webpack-dev-server"
+    "start": "parcel serve src/index.html",
+    "build": "cross-env NODE_ENV=production parcel build src/index.html --public-url .",
+    "deploy": "gh-pages -d dist"
   },
-  "license": "UNLICENSED",
-  "private": true,
-  "author": "JP Stauffert",
   "devDependencies": {
     "css-loader": "^3.6.0",
+    "gh-pages": "^1.2.0",
     "node-sass": "^4.14.1",
+    "parcel-bundler": "^1.9.7",
     "raw-loader": "^4.0.2",
     "sass": "^1.32.8",
     "sass-loader": "^8.0.2",
