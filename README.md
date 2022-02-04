@@ -1,5 +1,7 @@
 # ICG Projekt
 
+[test](dist/project.html)
+
 <img src="img/screenshot.jpg" width="100%">
 
 Dieses Repository beinhaltet mein Projekt des Kurses "Interaktive Computergraphik", erstellt in einem Team mit einer weiteren Person.
