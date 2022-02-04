@@ -1,8 +1,20 @@
-# ICG Projekt von Gruppe < Gruppe 11 >
+# ICG Projekt
 
 <img src="img/screenshot.jpg" width="75%">
 
-Dieses Repository beinhaltet das Projekt des Kurses  "Interaktive Computergraphik" von < Julian Dockendorf, Mona Röhm >. 
+Dieses Repository beinhaltet mein Projekt des Kurses "Interaktive Computergraphik", erstellt in einem Team mit einer weiteren Person.
+
+# Mein Beitrag zum Projekt
+
+- Implementation des Szenengraphs
+- Implementation des Rasteriser & Ray Tracer 
+- drei verschiedene Objekte, die gerendert werden koennen
+- Benutzung mehrfarbiger Objekte ermoeglicht
+- mathematische Bibliothek zur Berechnung der Bounding Boxes und Raycasting der Mausinteraktion
+- Auswahl und Manipulation von Objekten
+- Implementation des Phong Shaders
+- Benutzung mehrerer Texturen ermoeglicht
+- Benutzung mehrerer Lichtquellen
 
 # Projekt Struktur
 
@@ -73,7 +85,7 @@ Hierbei haben wir die Pakete entsprechend ihren Funktionen strukturiert:
 - `rasterization` enthält die Rasterobjekte, Phongshader und Rastervisitor.
 - `raytracing` enthält die Raytracingobjekte, Phongshader und Rayvisitor.
 - `scene`  umfasst die Datenstrukturen (animation-nodes und nodes) für die Szene.
-- `uebung` enthält Files aus der Übung. Sie werden in der finalen Abgabe nicht benutzt und sind somit irrelevant.
+- `uebung` enthält Files aus der Übung.
 - `project-boilerplate.ts` enthält den Default-Szenengraph, den Animations/Render-Loop, das Speichern/Laden der Szene, das Parsen der OBJs und definiert die eventListener der UI.
 
 # Installation
@@ -113,14 +125,14 @@ Die Slider rechts vom Canvas beinflussen die Koeffizienten und Shininess des Pho
 
 ## Animationsknoten
 
-Anforderung M4 beinhaltet drei verschiedene Animationsknoten: Rotation, Jumper und Scaling.
+Drei verschiedene Animationsknoten: Rotation, Jumper und Scaling.
 Jumper und Scaling sind mit der Tastatur steuerbar:
 Jumper: I drücken, um die rote Sphäre einmal bis zu einem Maximalwert springen zu lassen.
 Scaling: U drücken und halten, um die Pyramide bis zu einem Maximalwert hochzuskalieren, beziehungsweise bis zu einem Minimalwert herunterzuskalieren.
 
 ## Mausinteraktion
 
-Objekte im Raytracer und Rasterizer wechseln per Klick ihre Farbe oder Textur. Dies gilt nicht für den Desktop-Würfel, den man von innen sieht, da sonst alle Objekte innerhalb des Würfels nicht mehr klickbar wären.
+Objekte im Raytracer und Rasterizer wechseln per Klick ihre Farbe oder Textur. Dies gilt nicht für den Desktop-Würfel, den man von innen sieht.
 Der Farbwechsel funktioniert auch im Raytracer, kann aber ein paar Sekunden dauern bis die neue Farbe angezeigt wird, aufgrund der langsamen Performance.
 
 ## Laden und Speichern der Szene
@@ -133,44 +145,8 @@ Alternativ kann man die vorgefertigte sample_scene.json mit "Beispiel-Szene impo
 Es können drei verschiedene Beispiel-OBJ-Dateien über die Buttons in der UI geladen werden. Sobald ein OBJ geladen wird, wird eine GroupNode erstellt und an die rootNode gehängt. An die eben erstellte GroupNode wird dann das neue Objekt angehängt. 
 Wenn schon ein OBJ geladen wurde, wird keine neue GroupNode erstellt, sondern nur das Objekt ersetzt.
 
-### Funktionen
-
-|M1 |6 |Szenengraph | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf, Mona Röhm |
-
-|M2 |14 |Rasteriser & Ray Tracer | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf, Mona Röhm |
-
-|M3 |5 |min. drei eingebundene Objekte | <ul><li>- [bearbeitet] </li></ul> | Mona Röhm |
-
-|M4 |7 |min. drei verschiedene Animationsknoten| <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
-
-|M5 |4 |mehrfarbige Objekte | <ul><li>- [bearbeitet] </li></ul> | Mona Röhm |
-
-|M6 |7 |mathematische Bibliothek |<ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf, Mona Röhm |
-
-|M7 |7 |Phong Shader | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf, Mona Röhm |
-
-|O1 |6 |mehrere Texturen | <ul><li>- [bearbeitet] </li></ul> | Mona Röhm |
-
-|O2 |10 |Auswahl und Manipulation von Objekten | <ul><li>- [bearbeitet] </li></ul> | Mona Röhm |
-
-|O3 |6 |Laden und Speichern | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
-
-|O4 |6 |Model Loader | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
-
-|O5 |8 |Kamera Knoten | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
-
-|O6 |8 |mehrere Lichtquellen |<ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf, Mona Röhm |
-
-|O7 |6 |Free Flight Modus | <ul><li>- [bearbeitet] </li></ul> | Julian Dockendorf |
-
-
-
 ### Kompatibilität
 Das Projekt wurde mit folgenden Konfigurationen getestet:
 - Windows 10 Build Version <19042.1165> mit
-  - Firefox Version - nein
   - Chrome Version <93.0.4577.63 (Offizieller Build) (64-Bit)> und Version <93.0.4577.82 (Offizieller Build) (64-Bit)>
-  - Edge Version - nein
-  - Internet Explorer - nein 
   - node js Version <v14.16.1>
-
