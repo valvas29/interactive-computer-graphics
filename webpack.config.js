@@ -35,7 +35,7 @@ module.exports = {
     entry: entries,
     output: {
         filename: '[name].bundle.js',
-        path: path.resolve(__dirname, 'dist'),
+        publicPath: "/interactive-computer-graphics/",
     },
     devServer: {
         contentBase: path.join(__dirname, 'dist')
