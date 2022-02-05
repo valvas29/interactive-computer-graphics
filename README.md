@@ -1,6 +1,6 @@
 # ICG Projekt
 
-Zum Projekt: [https://monaroehm.github.io/interactive-computer-graphics/](https://monaroehm.github.io/interactive-computer-graphics/)
+Zur Projekt-Demo: [https://monaroehm.github.io/interactive-computer-graphics/](https://monaroehm.github.io/interactive-computer-graphics/)
 
 <img src="img/screenshot.jpg" width="100%">
 
