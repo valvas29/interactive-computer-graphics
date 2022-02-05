@@ -1,5 +1,7 @@
 # ICG Projekt
 
+Zum Projekt: [https://monaroehm.github.io/interactive-computer-graphics/](https://monaroehm.github.io/interactive-computer-graphics/)
+
 <img src="img/screenshot.jpg" width="100%">
 
 Dieses Repository beinhaltet mein Projekt des Kurses "Interaktive Computergraphik", erstellt in einem Team mit einer weiteren Person.
@@ -88,7 +90,7 @@ Hierbei haben wir die Pakete entsprechend ihren Funktionen strukturiert:
 - `uebung` enthält Files aus der Übung.
 - `project-boilerplate.ts` enthält den Default-Szenengraph, den Animations/Render-Loop, das Speichern/Laden der Szene, das Parsen der OBJs und definiert die eventListener der UI.
 
-# Installation
+# Lokales Ausführen der Applikation
 
 Wechseln Sie mit einer Konsole in das Verzeichnis dieser Datei und füren Sie 
 
@@ -96,7 +98,7 @@ Wechseln Sie mit einer Konsole in das Verzeichnis dieser Datei und füren Sie
 npm install
 ```
 aus.
-### Ausführung
+
 Geben Sie anschließend 
 ```bash
 npm start
