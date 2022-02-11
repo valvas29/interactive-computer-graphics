@@ -10,15 +10,15 @@ This repository includes my project for the module "interactive computer graphic
 
 # My contributions
 
-- Implementation of the scene graph
-- Implementation of the rasterizer and ray tracer
-- Three different renderable object shape classes
-- Functionality of multicolored objects
-- Mathematical library including algorithms for the calculation of bounding boxes and mouse interaction ray casting
-- Selection of objects in 3D space using the mouse
-- Implementation of the phong shaders
-- Functionality of textures (color and normal maps)
-- Shading calculation with multiple moving light sources
+- Implementation of the [scene graph](src/project-boilerplate.ts#L133)
+- Implementation of the [rasterizer](src/rasterization) and [ray tracer](src/raytracing)
+- Three different renderable (raster) object shape classes: [Sphere](src/rasterization/objects/raster-sphere.ts), [Cube](src/rasterization/objects/raster-boxOutside.ts) and [Pyramid](src/rasterization/objects/raster-pyramid.ts)
+- Functionality of multicolored objects (see [RasterPyramid](src/rasterization/objects/raster-pyramid.ts) for example)
+- [Mathematical library](src/math) including algorithms for the [calculation of bounding boxes](src/math/ritterAlgorithm.ts) and [mouse interaction ray casting](src/math/rayTriangleIntersection.ts)
+- Selection of objects in 3D space using the [mouse](src/project-boilerplate.ts#L752)
+- Implementation of the phong shaders for [rasterizer](src/rasterization/shaders) and [ray tracer](src/raytracing/shaders/phong.ts)
+- Functionality of textures (color and normal maps): [RasterTextureBox](src/rasterization/objects/raster-texture-box.ts), [suitable fragment shader](src/rasterization/shaders/texture-fragment-shader.glsl), [suitable vertex perspective shader](src/rasterization/shaders/texture-vertex-perspective-shader.glsl)
+- Shading calculation with multiple moving light sources (see shaders)
 
 # Project structure
 
