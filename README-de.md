@@ -33,9 +33,7 @@ Dieses Repository beinhaltet mein Projekt des Kurses "Interaktive Computergraphi
 │   ├── textures <-- enthält Bild- und Normalen-Texturen
 │   │	└── ...
 │   ├── ...
-│   ├── index.html
-│   ├── ...
-│   ├── project.html <-- html der finalen Abgabe
+│   ├── index. <-- HTML der finalen Abgabe
 │   └── ...
 ├── img <-- Dokumentation
 │   └── screenshot.jpg
@@ -80,7 +78,7 @@ Dieses Repository beinhaltet mein Projekt des Kurses "Interaktive Computergraphi
 ```
 
 Das Projekt ist in mehreren Ordner thematisch aufgeteilt. 
-`dist` beinhaltet die htmls, die `sample_scene`, `textures` und `obj`. In `obj` liegen Beispieldateien, welche durch unseren OBJ Loader in die Szene geladen werden können. 
+`dist` beinhaltet die HTMLs, die `sample_scene`, `textures` und `obj`. In `obj` liegen Beispieldateien, welche durch unseren OBJ Loader in die Szene geladen werden können. 
 `img` enthält einen Screenshot der Anwendung zu Dokumentationszwecken.
 Unter `src` sind alle Quelldateien zusammengefasst, welche durch `webgl` transpiliert werden.
 Hierbei haben wir die Pakete entsprechend ihren Funktionen strukturiert:
@@ -111,7 +109,7 @@ ein und rufen sie die Website des Servers über `0.0.0.0:<port>` bzw. `localhost
 
 # How-To
 
-Im folgenden wird erklärt wie die Anwendung zu bedienen ist:
+Im Folgenden wird erklärt, wie die Anwendung zu bedienen ist:
 
 ## Renderer
 
@@ -120,7 +118,7 @@ Das deltaT der RotationNode (die auch zum Rotieren der Kamera benutzt wird) habe
 
 ## Free Flight Modus
 
-Die Kamera ist automatisch im Free Flight Modus. Mit WASD bewegen sie die Kamera auf ihrer x und z Achse, mit QE auf der y Achse. Mit den Pfeiltasten können sie die Kamera nicken und gieren.
+Die Kamera ist automatisch im Free Flight Modus. Mit WASD bewegen sie die Kamera auf ihrer x- und z-Achse, mit QE auf der y-Achse. Mit den Pfeiltasten können sie die Kamera nicken und gieren.
 Mit C wird zu einer festen Kamera gewechselt, die an einem animierten (Rotation) Knoten hängt, beziehungsweise kann man mit C von der festen Kamera wieder zurück in den Free Flight Modus wechseln.
 
 ## Beleuchtungsparameter
@@ -141,16 +139,10 @@ Der Farbwechsel funktioniert auch im Raytracer, kann aber ein paar Sekunden daue
 
 ## Laden und Speichern der Szene
 
-Der "Szene herunterladen"-Button auf der rechten Seite speichert alle Informationen der aktuellen Szene in einer .txt im json-Format. Diese kann man dann über den darunterliegenden FilePicker laden. 
+Der "Szene herunterladen"-Button auf der rechten Seite speichert alle Informationen der aktuellen Szene in einer .txt im JSON-Format. Diese kann man dann über den darunterliegenden FilePicker laden. 
 Alternativ kann man die vorgefertigte sample_scene.json mit "Beispiel-Szene importieren" laden.
 
 ## OBJ Loader
 
 Es können drei verschiedene Beispiel-OBJ-Dateien über die Buttons in der UI geladen werden. Sobald ein OBJ geladen wird, wird eine GroupNode erstellt und an die rootNode gehängt. An die eben erstellte GroupNode wird dann das neue Objekt angehängt. 
 Wenn schon ein OBJ geladen wurde, wird keine neue GroupNode erstellt, sondern nur das Objekt ersetzt.
-
-### Kompatibilität
-Das Projekt wurde mit folgenden Konfigurationen getestet:
-- Windows 10 Build Version <19042.1165> mit
-  - Chrome Version <93.0.4577.63 (Offizieller Build) (64-Bit)> und Version <93.0.4577.82 (Offizieller Build) (64-Bit)>
-  - node js Version <v14.16.1>
