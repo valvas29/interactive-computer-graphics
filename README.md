@@ -6,7 +6,7 @@ View the project demo: [https://monaroehm.github.io/interactive-computer-graphic
 
 <img src="img/screenshot.jpg" width="100%">
 
-This repository includes my project for the lecture "interactive computer graphics". It was created in collaboration with another student.
+This repository includes my project for the lecture "interactive computer graphics" in 2021, my fourth semester at the Julius-Maximilians-Universität of Würzburg. It was created in collaboration with another student.
 
 # My contributions
 
